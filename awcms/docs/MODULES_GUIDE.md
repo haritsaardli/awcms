@@ -40,10 +40,10 @@ AWCMS provides a diverse set of modules for managing content, products, users, a
 
 ## 6. User Management & Security
 
-- **Users**: Manage accounts, roles, and status (Active/Suspended). New "Invite User" workflow.
+- **Users**: Manage accounts, roles, and status (Active/Suspended). Soft-delete support prevents data loss.
 - **Roles & Permissions**: Granular "Permission Matrix" to control access (View, Create, Edit, Delete) for every module.
-- **Profile**: Self-service profile management, Password Change, and **Two-Factor Authentication (2FA)** setup.
-- **Turnstile CAPTCHA**: Secure login and password recovery pages.
+- **Profile**: Self-service profile management, Password Change, and **Two-Factor Authentication (2FA)** setup with backup codes.
+- **Turnstile CAPTCHA**: Secure login with Cloudflare Turnstile integration (Server-side verification).
 
 ## 7. Navigation & Menus
 

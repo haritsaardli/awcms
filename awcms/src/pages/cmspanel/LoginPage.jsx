@@ -100,35 +100,38 @@ const LoginPage = () => {
     setVerificationError('');
 
     try {
-      // 0. Verify Turnstile token first (skip for localhost or if widget has error)
+      // 1. Verify Turnstile token (Security Check)
       const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
-      // Skip Turnstile verification if:
-      // 1. Running on localhost (development)
-      // 2. Turnstile widget has error (temporary bypass while debugging)
-      const shouldSkipTurnstile = isLocalhost || turnstileError;
+      // We skip ONLY if on localhost. If widget errors in prod, we FAIL OPEN or CLOSED?
+      // Security decision: Fail CLOSED in production. User must pass CAPTCHA.
 
-      if (!shouldSkipTurnstile) {
+      if (!isLocalhost) {
         if (!turnstileToken) {
+          // If widget errored, we might want to tell them.
+          if (turnstileError) {
+            throw new Error('Security check failed to load. Please refresh the page.');
+          }
           throw new Error('Please complete the security check (CAPTCHA).');
         }
 
-        // Production with valid token: verify with server
+        // Verify with server
         const { data: verifyData, error: verifyError } = await supabase.functions.invoke('verify-turnstile', {
           body: { token: turnstileToken }
         });
 
         if (verifyError || !verifyData?.success) {
-          // Reset Turnstile widget on failure
+          console.error('[Login] Turnstile server error:', verifyData?.error || verifyError);
+
+          // Reset the token so they can try again
           setTurnstileToken('');
-          if (window.turnstileReset) {
-            window.turnstileReset();
-          }
+          if (window.turnstileReset) window.turnstileReset();
+
           throw new Error(verifyData?.error || 'Security verification failed. Please try again.');
         }
-        console.log('[Turnstile] Server verification successful');
+        console.log('[Login] Security verification passed.');
       } else {
-        console.log('[Turnstile] Skipping verification:', isLocalhost ? 'localhost' : 'widget error');
+        console.log('[Login] Dev mode: Skipping security verification.');
       }
 
       // 1. Authenticate with Supabase Auth

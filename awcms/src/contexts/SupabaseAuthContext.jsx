@@ -46,15 +46,22 @@ export const AuthProvider = ({ children }) => {
   // Helper to clear local storage aggressively
   const clearLocalAuth = useCallback(() => {
     try {
+      console.log("[Auth] Clearing local session data...");
       const keyPattern = /^sb-.*-auth-token$/;
+
+      // 1. Clear Supabase Tokens
       Object.keys(localStorage).forEach(key => {
         if (keyPattern.test(key)) {
           localStorage.removeItem(key);
         }
       });
-      // Also clear 2FA tokens
+
+      // 2. Clear 2FA State
       sessionStorage.removeItem('awcms_2fa_verified');
       sessionStorage.removeItem('awcms_2fa_timestamp');
+
+      // 3. Clear any potential tenant context if stored locally (though usually in-memory)
+      // This ensures a fresh start for the next user.
     } catch (e) {
       console.warn("Could not clear local storage", e);
     }

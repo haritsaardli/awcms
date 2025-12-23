@@ -66,7 +66,7 @@ import { sanitizeHTML } from '@/lib/utils';
 ### Session Management
 
 | Feature | Implementation |
-|---------|----------------|
+| :--- | :--- |
 | Token Storage | Secure localStorage |
 | Token Refresh | Automatic via Supabase |
 | Session Timeout | Configurable in Supabase |
@@ -74,16 +74,17 @@ import { sanitizeHTML } from '@/lib/utils';
 
 ### Two-Factor Authentication (2FA)
 
-AWCMS supports TOTP-based 2FA:
+AWCMS supports robust database-backed TOTP 2FA:
 
-- QR code generation
-- Backup codes
-- Recovery options
+- **Provider Agnostic**: Works with Google Authenticator, Authy, etc.
+- **Backup Codes**: Generated upon setup for emergency access.
+- **Secure Storage**: Secrets stored in `two_factor_auth` table (RLS protected).
+- **Enforcement**: Optional for standard users, recommended for Admins.
 
-```javascript
-// 2FA implementation in src/hooks/useTwoFactor.js
-import { OTPAuth } from 'otpauth';
-```
+ ```javascript
+ // Core logic in src/pages/cmspanel/LoginPage.jsx
+ // Uses: otpauth library + server-side validation
+ ```
 
 ---
 
