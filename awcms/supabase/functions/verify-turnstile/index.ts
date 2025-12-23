@@ -24,7 +24,7 @@ Deno.serve(async (req: Request) => {
         return new Response('ok', { headers: corsHeaders })
     }
 
-    console.log('=== verify-turnstile function called ===')
+    console.log('=== verify-turnstile function called (CORS Updated) ===')
 
     try {
         // Get secret key from environment
