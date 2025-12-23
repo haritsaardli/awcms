@@ -1,0 +1,273 @@
+
+import React, { Suspense, lazy } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/SupabaseAuthContext';
+import TenantGuard from '@/components/auth/TenantGuard';
+import LoginPage from '@/pages/cmspanel/LoginPage';
+import ForgotPasswordPage from '@/pages/cmspanel/ForgotPasswordPage';
+import UpdatePasswordPage from '@/pages/cmspanel/UpdatePasswordPage';
+// Public Pages (Keep Static for SEO/Speed on Landing)
+import Home from '@/pages/public/Home';
+import PublicLayout from '@/components/public/PublicLayout';
+import PublicArticles from '@/pages/public/PublicArticles';
+import PublicArticleDetail from '@/pages/public/PublicArticleDetail';
+import PublicPages from '@/pages/public/PublicPages';
+import PublicPageDetail from '@/pages/public/PublicPageDetail';
+import PublicProducts from '@/pages/public/PublicProducts';
+import PublicProductDetail from '@/pages/public/PublicProductDetail';
+import PublicPromotions from '@/pages/public/PublicPromotions';
+import PublicPromotionDetail from '@/pages/public/PublicPromotionDetail';
+import PublicPortfolio from '@/pages/public/PublicPortfolio';
+import PublicPortfolioDetail from '@/pages/public/PublicPortfolioDetail';
+import PublicTestimonies from '@/pages/public/PublicTestimonies';
+import PublicPhotoGallery from '@/pages/public/PublicPhotoGallery';
+import PublicPhotoGalleryDetail from '@/pages/public/PublicPhotoGalleryDetail';
+import PublicVideoGallery from '@/pages/public/PublicVideoGallery';
+import PublicVideoGalleryDetail from '@/pages/public/PublicVideoGalleryDetail';
+import PublicAnnouncements from '@/pages/public/PublicAnnouncements';
+import PublicAnnouncementDetail from '@/pages/public/PublicAnnouncementDetail';
+import PublicContact from '@/pages/public/PublicContact';
+import PublicPageResolver from '@/components/public/PublicPageResolver';
+import SitemapRedirect from '@/pages/public/SitemapRedirect';
+
+// Admin Layout
+const AdminLayout = lazy(() => import('@/components/dashboard/AdminLayout'));
+
+// Admin Pages (Lazy Loaded)
+const DashboardHome = lazy(() => import('@/components/dashboard/DashboardHome'));
+const ArticlesManager = lazy(() => import('@/components/dashboard/ArticlesManager'));
+const ArticleEditor = lazy(() => import('@/components/dashboard/ArticleEditor'));
+const PagesManager = lazy(() => import('@/components/dashboard/PagesManager'));
+const VisualPagesManager = lazy(() => import('@/components/dashboard/VisualPagesManager'));
+const VisualPageBuilder = lazy(() => import('@/components/visual-builder/VisualPageBuilder'));
+const PageEditor = lazy(() => import('@/components/dashboard/PageEditor'));
+const CategoriesManager = lazy(() => import('@/components/dashboard/CategoriesManager'));
+const TagsManager = lazy(() => import('@/components/dashboard/TagsManager'));
+const FilesManager = lazy(() => import('@/components/dashboard/FilesManager'));
+const UsersManager = lazy(() => import('@/components/dashboard/UsersManager'));
+const UserProfile = lazy(() => import('@/components/dashboard/UserProfile'));
+const RolesManager = lazy(() => import('@/components/dashboard/RolesManager'));
+const RoleEditor = lazy(() => import('@/components/dashboard/RoleEditor'));
+const PermissionsManager = lazy(() => import('@/components/dashboard/PermissionsManager'));
+const MenusManager = lazy(() => import('@/components/dashboard/MenusManager'));
+const ProductsManager = lazy(() => import('@/components/dashboard/ProductsManager'));
+const OrdersManager = lazy(() => import('@/components/dashboard/OrdersManager'));
+const ProductTypesManager = lazy(() => import('@/components/dashboard/ProductTypesManager'));
+const PromotionsManager = lazy(() => import('@/components/dashboard/PromotionsManager'));
+const PortfolioManager = lazy(() => import('@/components/dashboard/PortfolioManager'));
+const TestimonyManager = lazy(() => import('@/components/dashboard/TestimonyManager'));
+const PhotoGalleryManager = lazy(() => import('@/components/dashboard/PhotoGalleryManager'));
+const VideoGalleryManager = lazy(() => import('@/components/dashboard/VideoGalleryManager'));
+const AnnouncementsManager = lazy(() => import('@/components/dashboard/AnnouncementsManager'));
+const ContactMessagesManager = lazy(() => import('@/components/dashboard/ContactMessagesManager'));
+const ContactsManager = lazy(() => import('@/components/dashboard/ContactsManager'));
+const ThemesManager = lazy(() => import('@/components/dashboard/ThemesManager'));
+const TemplatesManager = lazy(() => import('@/components/dashboard/TemplatesManager'));
+const ThemeEditor = lazy(() => import('@/components/dashboard/ThemeEditor'));
+const SeoManager = lazy(() => import('@/components/dashboard/SeoManager'));
+const ExtensionsManager = lazy(() => import('@/components/dashboard/ExtensionsManager'));
+const ExtensionMarketplace = lazy(() => import('@/components/dashboard/ExtensionMarketplace'));
+const ExtensionSettings = lazy(() => import('@/components/dashboard/ExtensionSettings'));
+const LanguageSettings = lazy(() => import('@/components/dashboard/LanguageSettings'));
+const NotificationsManager = lazy(() => import('@/components/dashboard/notifications/NotificationsManager'));
+const NotificationDetail = lazy(() => import('@/components/dashboard/notifications/NotificationDetail'));
+const SSOManager = lazy(() => import('@/components/dashboard/SSOManager'));
+const ExtensionLogs = lazy(() => import('@/components/dashboard/ExtensionLogs'));
+const SidebarMenuManager = lazy(() => import('@/components/dashboard/SidebarMenuManager'));
+
+const SettingsManager = lazy(() => import('@/components/dashboard/SettingsManager'));
+const AuditLogsManager = lazy(() => import('@/components/dashboard/AuditLogsManager'));
+const TenantsManager = lazy(() => import('@/components/dashboard/TenantsManager'));
+const TenantSettings = lazy(() => import('@/components/dashboard/TenantSettings'));
+
+// Extensions (Lazy Loaded)
+const BackupSettings = lazy(() => import('@/extensions/backup/BackupSettings'));
+
+
+// Loading Screen
+const PageLoader = () => (
+  <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
+    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+  </div>
+);
+
+const ProtectedRoute = ({ children }) => {
+  const { session, loading, twoFactorEnabled } = useAuth();
+  // We need to check sessionStorage strictly here inside the component body
+  // because hooks/utils might cache values, but reading directly is safe in render for this.
+  const is2FAVerified = sessionStorage.getItem('awcms_2fa_verified') === 'true';
+
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  }
+
+  if (!session) {
+    // Redirect to the unified login route
+    return <Navigate to="/login" replace />;
+  }
+
+  // Security Check: If 2FA is enabled but not verified, force back to login
+  if (twoFactorEnabled && !is2FAVerified) {
+    // We can redirect to login. The LoginPage will see the session, check 2FA again, and show the prompt.
+    // This effectively "loops" them back to the 2FA prompt if they try to bypass it.
+    return <Navigate to="/login" replace />;
+  }
+
+  return children;
+};
+
+import PublicRegisterPage from '@/pages/public/PublicRegisterPage';
+
+const MainRouter = () => {
+  return (
+    <BrowserRouter>
+      <Routes>
+        {/* Auth Routes */}
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<PublicRegisterPage />} />
+        {/* Alias for cmspanel login to avoid confusion if user manually types it */}
+        <Route path="/cmspanel/login" element={<Navigate to="/login" replace />} />
+
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/cmspanel/update-password" element={<UpdatePasswordPage />} />
+
+        {/* Public Routes */}
+        <Route element={<PublicLayout />}>
+          <Route path="/" element={<Home />} />
+
+          <Route path="/articles" element={<PublicArticles />} />
+          <Route path="/articles/category/:categorySlug" element={<PublicArticles />} />
+          <Route path="/articles/tag/:tagSlug" element={<PublicArticles />} />
+          <Route path="/articles/:slug" element={<PublicArticleDetail />} />
+
+          <Route path="/pages" element={<PublicPages />} />
+          <Route path="/pages/:slug" element={<PublicPageDetail />} />
+
+          <Route path="/products" element={<PublicProducts />} />
+          <Route path="/product/:slug" element={<PublicProductDetail />} />
+
+          <Route path="/promotions" element={<PublicPromotions />} />
+          <Route path="/promotion/:slug" element={<PublicPromotionDetail />} />
+
+          <Route path="/portfolio" element={<PublicPortfolio />} />
+          <Route path="/portfolio/:slug" element={<PublicPortfolioDetail />} />
+
+          <Route path="/testimonies" element={<PublicTestimonies />} />
+
+          <Route path="/gallery/photos" element={<PublicPhotoGallery />} />
+          <Route path="/gallery/photos/:slug" element={<PublicPhotoGalleryDetail />} />
+
+          <Route path="/gallery/videos" element={<PublicVideoGallery />} />
+          <Route path="/gallery/videos/:slug" element={<PublicVideoGalleryDetail />} />
+
+          <Route path="/announcements" element={<PublicAnnouncements />} />
+          <Route path="/announcement/:id" element={<PublicAnnouncementDetail />} />
+
+          <Route path="/contact" element={<PublicContact />} />
+
+          {/* Sitemap Routes */}
+          <Route path="/sitemap.xml" element={<SitemapRedirect />} />
+          <Route path="/sitemap" element={<SitemapRedirect />} />
+
+          {/* Dynamic Catch-all Resolver for Public Pages (Must be last) */}
+          <Route path="/:slug" element={<PublicPageResolver />} />
+        </Route>
+
+        {/* CMS Panel Routes */}
+        <Route
+          path="/cmspanel"
+          element={
+            <ProtectedRoute>
+              <TenantGuard>
+                <Suspense fallback={<PageLoader />}>
+                  <AdminLayout />
+                </Suspense>
+              </TenantGuard>
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<DashboardHome />} />
+          <Route path="articles" element={<ArticlesManager />} />
+          <Route path="articles/new" element={<ArticleEditor />} />
+          <Route path="articles/edit/:id" element={<ArticleEditor />} />
+
+          <Route path="pages" element={<PagesManager />} />
+          <Route path="pages/new" element={<PageEditor />} />
+          <Route path="pages/edit/:id" element={<PageEditor />} />
+          <Route path="visual-pages" element={<VisualPagesManager />} />
+
+          <Route path="categories" element={<CategoriesManager />} />
+          <Route path="tags" element={<TagsManager />} />
+          <Route path="media" element={<FilesManager />} />
+          <Route path="files" element={<FilesManager />} />
+
+          <Route path="users" element={<UsersManager />} />
+          <Route path="profile" element={<UserProfile />} />
+
+          <Route path="roles" element={<RolesManager />} />
+          <Route path="roles/new" element={<RoleEditor />} />
+          <Route path="roles/edit/:id" element={<RoleEditor />} />
+          <Route path="permissions" element={<PermissionsManager />} />
+
+          <Route path="menus" element={<MenusManager />} />
+          <Route path="products" element={<ProductsManager />} />
+          <Route path="product-types" element={<ProductTypesManager />} />
+          <Route path="orders" element={<OrdersManager />} />
+
+          <Route path="promotions" element={<PromotionsManager />} />
+          <Route path="portfolio" element={<PortfolioManager />} />
+          <Route path="testimonies" element={<TestimonyManager />} />
+
+          <Route path="gallery/photos" element={<PhotoGalleryManager />} />
+          <Route path="gallery/videos" element={<VideoGalleryManager />} />
+          <Route path="photo-gallery" element={<PhotoGalleryManager />} />
+          <Route path="video-gallery" element={<VideoGalleryManager />} />
+
+          <Route path="announcements" element={<AnnouncementsManager />} />
+
+          <Route path="contacts" element={<ContactsManager />} />
+          <Route path="messages" element={<ContactMessagesManager />} />
+          <Route path="inbox" element={<ContactMessagesManager />} />
+          <Route path="contact-messages" element={<ContactMessagesManager />} />
+
+          <Route path="themes" element={<ThemesManager />} />
+          <Route path="templates" element={<TemplatesManager />} />
+          <Route path="themes/edit/:id" element={<ThemeEditor />} />
+
+          <Route path="seo" element={<SeoManager />} />
+          <Route path="seo-manager" element={<SeoManager />} />
+
+          <Route path="extensions" element={<ExtensionsManager />} />
+          <Route path="extensions/marketplace" element={<ExtensionMarketplace />} />
+          <Route path="extensions/settings/:id" element={<ExtensionSettings />} />
+          <Route path="extensions/logs" element={<ExtensionLogs />} />
+
+          <Route path="settings/general" element={<SettingsManager />} />
+          <Route path="settings/branding" element={<TenantSettings />} />
+          <Route path="logs" element={<AuditLogsManager />} />
+          <Route path="audit-logs" element={<AuditLogsManager />} />
+          <Route path="settings/language" element={<LanguageSettings />} />
+          <Route path="settings/sso" element={<SSOManager />} />
+          <Route path="languages" element={<LanguageSettings />} />
+          <Route path="language-settings" element={<LanguageSettings />} />
+          <Route path="sso" element={<SSOManager />} />
+
+
+          <Route path="admin-navigation" element={<SidebarMenuManager />} />
+          <Route path="tenants" element={<TenantsManager />} />
+
+          <Route path="notifications" element={<NotificationsManager />} />
+          <Route path="notifications/:id" element={<NotificationDetail />} />
+
+
+          <Route path="visual-editor" element={<VisualPageBuilder />} />
+          <Route path="backup" element={<BackupSettings />} />
+        </Route>
+
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
+  );
+};
+
+export default MainRouter;

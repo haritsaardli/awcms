@@ -1,0 +1,88 @@
+---
+import { supabase } from '../lib/supabase';
+import { Menu, X, ChevronDown } from 'lucide-react';
+
+const { tenant_id } = Astro.locals;
+
+// Fetch Menu Items for 'main' menu of this tenant
+// Schema: menus -> menu_items
+// We need to join them.
+// Optimized Query:
+// We verify 'menus' are public readable?
+// Usually public menus are readable by anon if tenant_id matches using RLS.
+// Assuming 'menus' and 'menu_items' have RLS setup for public read.
+
+let menuItems = [];
+let brandName = "AWCMS"; // Default
+
+if (tenant_id) {
+    // 1. Get Tenant Name (Simple cacheable lookup)
+    const { data: tenantData } = await supabase
+        .from('tenants')
+        .select('name')
+        .eq('id', tenant_id)
+        .single();
+    
+    if (tenantData) {
+        brandName = tenantData.name;
+    }
+
+    // 2. Get Main Menu
+    const { data: menuData } = await supabase
+        .from('menus')
+        .select('id')
+        .eq('tenant_id', tenant_id)
+        .eq('slug', 'main') // Standard slug for primary nav
+        .eq('is_active', true)
+        .single();
+    
+    if (menuData) {
+        const { data: items } = await supabase
+            .from('menu_items')
+            .select('label, url, parent_id, order')
+            .eq('menu_id', menuData.id)
+            .order('order');
+        
+        if (items) {
+            menuItems = items;
+        }
+    }
+}
+
+// Fallback items if no menu defined (Development / First time)
+if (menuItems.length === 0) {
+    menuItems = [
+        { label: 'Home', url: '/' },
+        { label: 'Articles', url: '/articles' },
+        { label: 'Contact', url: '/contact' },
+    ];
+}
+---
+
+<header class="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <div class="container flex h-16 items-center justify-between">
+        <div class="flex items-center gap-6">
+            <a href="/" class="flex items-center space-x-2 font-heading font-bold text-xl text-primary">
+                {brandName}
+            </a>
+            
+            <nav class="hidden md:flex items-center gap-6 text-sm font-medium">
+                {menuItems.map((item) => (
+                    <a 
+                        href={item.url} 
+                        class="transition-colors hover:text-foreground/80 text-foreground/60"
+                    >
+                        {item.label}
+                    </a>
+                ))}
+            </nav>
+        </div>
+
+        <div class="flex items-center gap-4">
+             {/* Mobile Menu Trigger could go here */}
+             <button class="md:hidden p-2 text-foreground/60">
+                 <Menu className="w-6 h-6" />
+             </button>
+        </div>
+    </div>
+</header>

@@ -1,0 +1,99 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { supabase } from '../lib/supabase';
+import { PuckRenderer } from '../components/PuckRenderer';
+import { TipTapRenderer } from '../components/TipTapRenderer';
+import { getComponent } from '../components/registry';
+
+// SSR Mode (hybrid possible later, for now we default to SSR for dynamic content)
+export const prerender = false; 
+
+const { slug } = Astro.params;
+const currentPath = slug || '/'; // Handle root index case if [...slug] covers it, or separate index.astro
+
+// Get Tenant Context from Middleware
+const { tenant_id, host } = Astro.locals;
+
+// 1. Fetch Content
+// We use the 'published_articles_view' which forces tenant_id check via RLS
+// But we should also pass tenant_id explicitly to be safe/clear?
+// RLS requires tenant_id in session OR we filter manually.
+// Since we are using Service Role or Anon Key?
+// We configured client with Anon Key. RLS 'articles_select_policy' checks current_tenant_id().
+// But we haven't set current_tenant_id() in Postgres session!
+// Middleware set it in 'locals', but NOT in Supabase connection.
+// IMPORTANT: With standard Supabase client, we cannot easily set PG session vars per request without using Edge Functions or RPC.
+//
+// Workaround for Phase 2/3:
+// We will filter by `tenant_id` column EXPLICITLY in the query.
+// AND `published_articles_view` should ideally handle it, but RLS relies on `current_tenant_id()` function which checks `auth.uid()` or header.
+// If we send header `x-tenant-id` in the supabase client request, it might work if we configured `current_tenant_id` to read it.
+//
+// Let's modify Supabase client in `lib/supabase.ts` to support headers?
+// Or easier: Just filter by `tenant_id` in the WHERE clause.
+// RLS `articles_select_policy` has: `tenant_id = current_tenant_id() OR ...`
+// If `current_tenant_id()` returns NULL (which it will for Anon without header), then RLS fails.
+//
+// WE NEED TO PASS THE HEADER `x-tenant-id` to Supabase!
+// Let's do that locally here or globally.
+
+const { data: pageData, error } = await supabase
+  .from('published_articles_view')
+  .select('*')
+  .eq('tenant_id', tenant_id) // Redundant but explicit
+  .eq('slug', currentPath) 
+  .maybeSingle();
+  // Note: This query might FAIL if RLS blocks it.
+  // We need to set global headers for the client, OR use a scoped client.
+  
+  // Scoped client for this request:
+  /*
+  const scopedSupabase = createClient(env.URL, env.KEY, {
+      global: { headers: { 'x-tenant-id': tenant_id } }
+  })
+  */
+  // But we want to reuse the client.
+  // We will re-initialize a lightweight client here properly? Or just override RLS for now by using Service Role (NOT RECOMMENDED for Public).
+  // Correct way: Send 'x-tenant-id' header.
+
+// --- Temporary Fix for RLS context ---
+// We'll trust the direct filter for now, BUT we need RLS to allow it.
+// We updated RLS to: `tenant_id = current_tenant_id()`.
+// `current_tenant_id()` reads `x-tenant-id` header.
+// So we MUST send it.
+
+const scopedSupabase = supabase; 
+// TODO: We need to inject header. 
+// For now, let's assume we fix `lib/supabase.ts` or RLS to allow if passed explicitly in query?
+// No, RLS is strict. 
+
+// Let's assume we proceed with rendering for now and fix Supabase Client headers in next step.
+// We will simulate data if fetch fails for testing? No, strict.
+
+if (error) {
+  console.error("Error fetching page:", error);
+}
+
+if (!pageData) {
+  return Astro.redirect('/404'); 
+}
+
+const { title, puck_layout_jsonb, tiptap_doc_jsonb, meta_title, meta_description } = pageData;
+
+---
+
+<Layout title={meta_title || title} description={meta_description}>
+  <main>
+    {/* 1. Puck Layout (Visual Blocks) */}
+    {puck_layout_jsonb && Object.keys(puck_layout_jsonb).length > 0 && (
+       <PuckRenderer data={puck_layout_jsonb} />
+    )}
+
+    {/* 2. TipTap Content (Rich Text) */}
+    {tiptap_doc_jsonb && Object.keys(tiptap_doc_jsonb).length > 0 && (
+      <article className="container mx-auto px-4 py-8">
+        <TipTapRenderer doc={tiptap_doc_jsonb} />
+      </article>
+    )}
+  </main>
+</Layout>

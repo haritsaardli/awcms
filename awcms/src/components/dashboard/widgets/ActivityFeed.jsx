@@ -1,0 +1,43 @@
+
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { FileEdit, Plus, Trash, User } from 'lucide-react';
+import { formatDistanceToNow } from 'date-fns';
+
+export function ActivityFeed({ activities }) {
+  return (
+    <Card className="h-full border-slate-200 shadow-sm">
+      <CardHeader>
+        <CardTitle>Recent Activity</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          {activities && activities.length > 0 ? (
+            activities.map((activity, index) => (
+              <div key={index} className="flex items-start gap-4 pb-4 border-b border-slate-100 last:border-0 last:pb-0">
+                <div className="bg-blue-100 p-2 rounded-full">
+                  <FileEdit className="w-4 h-4 text-blue-600" />
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-slate-900">
+                    <span className="font-bold">{activity.user}</span> {activity.action} a {activity.type}
+                  </p>
+                  <p className="text-sm text-slate-600">
+                    "{activity.title}"
+                  </p>
+                  <p className="text-xs text-slate-400">
+                    {formatDistanceToNow(new Date(activity.time), { addSuffix: true })}
+                  </p>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="text-center text-slate-500 py-8">
+                No recent activity found.
+            </div>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
