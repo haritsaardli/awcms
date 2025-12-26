@@ -1,86 +1,51 @@
 /// AWCMS Mobile - Articles Provider
 ///
-/// Riverpod provider untuk mengambil data artikel dari Supabase.
+/// Riverpod providers untuk data artikel dengan offline-first support.
+/// Membaca dari local database (Drift), auto-sync dari Supabase.
 library;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../core/database/app_database.dart';
+import '../../../core/services/sync_service.dart';
 import '../../../core/utils/tenant_utils.dart';
 
-/// Provider untuk daftar artikel
-final articlesProvider = FutureProvider<List<Map<String, dynamic>>>((
-  ref,
-) async {
+/// Provider untuk daftar artikel (dari local DB)
+final articlesProvider = StreamProvider<List<LocalArticle>>((ref) {
+  final db = ref.watch(appDatabaseProvider);
   final tenantId = ref.watch(tenantIdProvider);
 
-  var query = Supabase.instance.client
-      .from('articles')
-      .select('id, title, excerpt, cover_image, status, created_at')
-      .eq('status', 'published')
-      .isFilter('deleted_at', null);
+  // Trigger sync in background
+  Future.microtask(() {
+    ref.read(syncServiceProvider.notifier).fullSync();
+  });
 
-  // Apply tenant filter if available
-  if (tenantId != null) {
-    query = query.eq('tenant_id', tenantId);
-  }
-
-  final response = await query.order('created_at', ascending: false);
-  return List<Map<String, dynamic>>.from(response);
+  return db.articlesDao.watchPublishedArticles(tenantId: tenantId);
 });
 
-/// Provider untuk detail artikel by ID
-final articleDetailProvider =
-    FutureProvider.family<Map<String, dynamic>?, String>((
-      ref,
-      articleId,
-    ) async {
-      final response = await Supabase.instance.client
-          .from('articles')
-          .select('''
-          id, 
-          title, 
-          content, 
-          excerpt, 
-          cover_image, 
-          status, 
-          created_at,
-          author:profiles!articles_owner_id_fkey (
-            id,
-            name
-          )
-        ''')
-          .eq('id', articleId)
-          .isFilter('deleted_at', null)
-          .maybeSingle();
+/// Provider untuk detail artikel by ID (dari local DB)
+final articleDetailProvider = StreamProvider.family<LocalArticle?, String>((
+  ref,
+  articleId,
+) {
+  final db = ref.watch(appDatabaseProvider);
+  return db.articlesDao.watchArticleById(articleId);
+});
 
-      return response;
-    });
+/// Provider untuk search artikel (dari local DB)
+final articleSearchProvider = FutureProvider.family<List<LocalArticle>, String>(
+  (ref, query) async {
+    if (query.length < 3) return [];
 
-/// Provider untuk search artikel
-final articleSearchProvider =
-    FutureProvider.family<List<Map<String, dynamic>>, String>((
-      ref,
-      query,
-    ) async {
-      if (query.length < 3) return [];
+    final db = ref.watch(appDatabaseProvider);
+    final tenantId = ref.watch(tenantIdProvider);
 
-      final tenantId = ref.watch(tenantIdProvider);
+    return db.articlesDao.searchArticles(query, tenantId: tenantId);
+  },
+);
 
-      var dbQuery = Supabase.instance.client
-          .from('articles')
-          .select('id, title, excerpt, cover_image, created_at')
-          .eq('status', 'published')
-          .isFilter('deleted_at', null)
-          .ilike('title', '%$query%');
-
-      if (tenantId != null) {
-        dbQuery = dbQuery.eq('tenant_id', tenantId);
-      }
-
-      final response = await dbQuery
-          .order('created_at', ascending: false)
-          .limit(20);
-
-      return List<Map<String, dynamic>>.from(response);
-    });
+/// Provider untuk jumlah artikel cached
+final articlesCountProvider = FutureProvider<int>((ref) {
+  final db = ref.watch(appDatabaseProvider);
+  return db.articlesDao.getArticleCount();
+});

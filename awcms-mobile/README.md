@@ -3,6 +3,7 @@
 [![Flutter](https://img.shields.io/badge/Flutter-3.x-02569B.svg)](https://flutter.dev)
 [![Supabase](https://img.shields.io/badge/Supabase-2.8.0-3ECF8E.svg)](https://supabase.com)
 [![Riverpod](https://img.shields.io/badge/Riverpod-2.6.1-00D09E.svg)](https://riverpod.dev)
+[![Drift](https://img.shields.io/badge/Drift-2.30-blue.svg)](https://drift.simonbinder.eu/)
 
 Aplikasi mobile Flutter untuk **AWCMS** (Ahliweb Content Management System). Menggunakan backend Supabase yang sama dengan web admin.
 
@@ -19,17 +20,10 @@ Aplikasi mobile Flutter untuk **AWCMS** (Ahliweb Content Management System). Men
 ### Installation
 
 ```bash
-# Masuk ke folder
 cd awcms-mobile
-
-# Install dependencies
 flutter pub get
-
-# Copy environment file
-cp .env.example .env
-# Edit .env dengan kredensial Supabase Anda
-
-# Jalankan aplikasi
+dart run build_runner build  # Generate Drift code
+cp .env.example .env         # Configure credentials
 flutter run
 ```
 
@@ -37,80 +31,85 @@ flutter run
 
 ## 📁 Project Structure
 
-```
+```text
 lib/
-├── main.dart                    # Entry point & Supabase init
+├── main.dart                    # Entry point
 ├── core/
-│   ├── config/                  # App & Supabase configuration
-│   ├── services/                # Supabase & Auth services
-│   ├── utils/                   # Tenant utilities
+│   ├── config/                  # App & Supabase config
+│   ├── database/                # Drift local database
+│   │   ├── tables/              # LocalArticles, SyncQueue
+│   │   └── daos/                # ArticlesDao, SyncDao
+│   ├── services/                # Auth, Sync, Connectivity
 │   └── constants/               # App constants
 ├── features/
-│   ├── auth/                    # Login, Register screens
+│   ├── auth/                    # Login screen
 │   ├── articles/                # Articles list & detail
 │   └── home/                    # Home screen
 ├── shared/
-│   ├── widgets/                 # Reusable widgets
-│   └── themes/                  # App themes
-└── routes/                      # GoRouter configuration
+│   ├── widgets/                 # OfflineIndicator, etc.
+│   └── themes/                  # Material 3 themes
+└── routes/                      # GoRouter config
 ```
-
----
-
-## 🔧 Configuration
-
-Edit file `.env` dengan kredensial dari project Supabase Anda:
-
-```env
-SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_ANON_KEY=your-anon-key
-APP_NAME=AWCMS Mobile
-APP_ENV=development
-```
-
-> ⚠️ **Penting**: Jangan commit `.env` ke repository!
 
 ---
 
 ## 🛠️ Tech Stack
 
 | Category | Technology |
-|----------|------------|
+| -------- | ---------- |
 | Framework | Flutter 3.x |
 | State Management | Riverpod 2.x |
 | Routing | GoRouter 14.x |
 | Backend | Supabase Flutter 2.x |
+| Local Database | Drift 2.30 (SQLite) |
+| Connectivity | connectivity_plus |
 | UI | Material 3, Shimmer, CachedNetworkImage |
 
 ---
 
 ## 📱 Features
 
-- ✅ **Authentication**: Email/Password login dengan Supabase Auth
-- ✅ **Articles**: Daftar dan detail artikel dari CMS
-- ✅ **Multi-Tenant**: Dukungan tenant context seperti web admin
-- ✅ **Dark Mode**: Tema otomatis mengikuti sistem
-- ✅ **Offline-Ready**: Cached images dan data
+### ✅ Implemented
+
+- **Authentication**: Email/Password login via Supabase Auth
+- **Articles**: List & detail dari CMS
+- **Multi-Tenant**: Tenant context support
+- **Dark Mode**: Tema otomatis mengikuti sistem
+- **Offline-First**: Data cached di local SQLite
+
+### 📴 Offline Mode
+
+Aplikasi mendukung **offline-first** dengan ketentuan:
+
+| Feature | Offline | Notes |
+| :------ | :------ | :---- |
+| Baca artikel | ✅ | Dari cache lokal |
+| Lihat gambar cached | ✅ | CachedNetworkImage |
+| Upload gambar | ❌ | Perlu koneksi |
+| Download file | ❌ | Perlu koneksi |
+| Lihat PDF | ❌ | Perlu koneksi |
+| Akses Storage | ❌ | Perlu koneksi |
+
+> ⚠️ **Warning**: Saat offline, fitur file/asset (upload, download, PDF viewer) tidak tersedia dan akan menampilkan warning.
 
 ---
 
 ## 🔗 Integration with AWCMS
 
-Aplikasi ini menggunakan **backend yang sama** dengan web admin AWCMS:
+Menggunakan **backend yang sama** dengan web admin:
 
 - **Database**: PostgreSQL via Supabase
 - **Auth**: Supabase Auth (akun sama dengan web)
 - **RLS**: Row Level Security untuk tenant isolation
 - **Realtime**: Subscribe ke perubahan data
-
-Lihat dokumentasi lengkap di [`awcms/docs/MOBILE_DEVELOPMENT.md`](../awcms/docs/MOBILE_DEVELOPMENT.md)
+- **Storage**: Supabase Storage (online only)
 
 ---
 
 ## 📚 Documentation
 
 | Document | Description |
-|----------|-------------|
+| -------- | ----------- |
 | [Mobile Development](../awcms/docs/MOBILE_DEVELOPMENT.md) | Strategi pengembangan mobile |
 | [API Documentation](../awcms/docs/API_DOCUMENTATION.md) | Supabase API usage |
 | [ABAC System](../awcms/docs/ABAC_SYSTEM.md) | Permissions & Policies |
@@ -138,4 +137,4 @@ MIT License - see [LICENSE](../LICENSE)
 
 ---
 
-**Built with ❤️ by AhliWeb.com Team**
+Built with ❤️ by AhliWeb.com Team

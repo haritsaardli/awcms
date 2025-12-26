@@ -182,3 +182,44 @@ Jika memilih opsi Custom Sync manual, ikuti pola ini:
 * **Gambar Offline**: Gunakan `cached_network_image` di Flutter. Library ini otomatis menyimpan cache gambar di disk.
 * **Indikator Status**: Selalu berikan indikator visual di UI ("Sedang Offline", "Menyinkronkan...", "Sudah Sinkron").
 * **Konflik**: Strategi "Last Write Wins" biasanya cukup untuk kasus CMS sederhana. Timestamp server adalah *source of truth*.
+
+### ⚠️ Fitur Online-Only (Asset/File)
+
+Beberapa fitur **tidak tersedia saat offline** karena membutuhkan akses ke Supabase Storage:
+
+| Fitur | Status Offline | Keterangan |
+| :---- | :------------- | :--------- |
+| Upload Gambar | ❌ Tidak tersedia | Perlu koneksi untuk upload ke bucket |
+| Download File | ❌ Tidak tersedia | File di-serve dari storage online |
+| Lihat PDF | ❌ Tidak tersedia | PDF diakses via URL storage |
+| Galeri Media | ❌ Tidak tersedia | Membutuhkan list bucket files |
+| Akses Storage | ❌ Tidak tersedia | Semua operasi bucket perlu koneksi |
+
+#### Implementasi Warning di Flutter
+
+Gunakan `OnlineRequiredWrapper` widget atau utility functions:
+
+```dart
+// Wrapper widget (auto-disable saat offline)
+OnlineRequiredWrapper(
+  feature: OnlineFeature.imageUpload,
+  child: UploadButton(),
+);
+
+// Manual check dengan snackbar
+if (ref.checkOnlineForFeature(context, OnlineFeature.fileDownload)) {
+  // Proceed with download
+}
+
+// Dialog warning
+showOfflineAssetWarning(context, feature: OnlineFeature.pdfView);
+```
+
+## 8. Referensi AWCMS Mobile
+
+Lihat implementasi referensi di folder `awcms-mobile/`:
+
+* `lib/core/database/` - Drift local database
+* `lib/core/services/sync_service.dart` - Sync logic
+* `lib/shared/widgets/offline_indicator.dart` - Status indicators
+* `lib/shared/widgets/offline_asset_warning.dart` - Asset warnings

@@ -2,40 +2,55 @@
 ///
 /// Service untuk autentikasi dengan Supabase Auth.
 /// Mendukung email/password, magic link, dan session management.
+/// Menggunakan secure storage untuk token.
 library;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'secure_storage_service.dart';
+import 'security_service.dart';
+
 /// Authentication state
-enum AuthStatus { initial, authenticated, unauthenticated, loading }
+enum AuthStatus { initial, authenticated, unauthenticated, loading, blocked }
 
 /// Auth state data class
 class AuthState {
   final AuthStatus status;
   final User? user;
   final String? errorMessage;
+  final bool isDeviceSecure;
 
   const AuthState({
     this.status = AuthStatus.initial,
     this.user,
     this.errorMessage,
+    this.isDeviceSecure = true,
   });
 
-  AuthState copyWith({AuthStatus? status, User? user, String? errorMessage}) {
+  AuthState copyWith({
+    AuthStatus? status,
+    User? user,
+    String? errorMessage,
+    bool? isDeviceSecure,
+  }) {
     return AuthState(
       status: status ?? this.status,
       user: user ?? this.user,
       errorMessage: errorMessage,
+      isDeviceSecure: isDeviceSecure ?? this.isDeviceSecure,
     );
   }
 
   bool get isAuthenticated => status == AuthStatus.authenticated;
   bool get isLoading => status == AuthStatus.loading;
+  bool get isBlocked => status == AuthStatus.blocked;
 }
 
 /// Auth Service using Riverpod Notifier
 class AuthService extends Notifier<AuthState> {
+  final _secureStorage = SecureStorageService.instance;
+
   @override
   AuthState build() {
     // Listen to auth state changes
@@ -44,6 +59,8 @@ class AuthService extends Notifier<AuthState> {
     // Check initial session
     final session = Supabase.instance.client.auth.currentSession;
     if (session != null) {
+      // Store tokens securely
+      _storeTokensSecurely(session);
       return AuthState(status: AuthStatus.authenticated, user: session.user);
     }
     return const AuthState(status: AuthStatus.unauthenticated);
@@ -56,15 +73,22 @@ class AuthService extends Notifier<AuthState> {
 
       switch (event) {
         case AuthChangeEvent.signedIn:
+          if (session != null) {
+            _storeTokensSecurely(session);
+          }
           state = AuthState(
             status: AuthStatus.authenticated,
             user: session?.user,
           );
           break;
         case AuthChangeEvent.signedOut:
+          _clearTokens();
           state = const AuthState(status: AuthStatus.unauthenticated);
           break;
         case AuthChangeEvent.tokenRefreshed:
+          if (session != null) {
+            _storeTokensSecurely(session);
+          }
           state = state.copyWith(user: session?.user);
           break;
         default:
@@ -73,8 +97,40 @@ class AuthService extends Notifier<AuthState> {
     });
   }
 
+  /// Store tokens in secure storage
+  Future<void> _storeTokensSecurely(Session session) async {
+    await _secureStorage.storeAuthTokens(
+      accessToken: session.accessToken,
+      refreshToken: session.refreshToken,
+    );
+  }
+
+  /// Clear tokens from secure storage
+  Future<void> _clearTokens() async {
+    await _secureStorage.clearAuthTokens();
+  }
+
+  /// Check device security before auth
+  Future<bool> _checkDeviceSecurity() async {
+    final securityService = SecurityService();
+    final isCompromised = await securityService.isDeviceCompromised();
+
+    if (isCompromised) {
+      state = const AuthState(
+        status: AuthStatus.blocked,
+        errorMessage: 'Perangkat tidak aman (root/jailbreak)',
+        isDeviceSecure: false,
+      );
+      return false;
+    }
+    return true;
+  }
+
   /// Sign in with email and password
   Future<void> signInWithEmail(String email, String password) async {
+    // Check device security first
+    if (!await _checkDeviceSecurity()) return;
+
     state = state.copyWith(status: AuthStatus.loading, errorMessage: null);
 
     try {
@@ -100,7 +156,7 @@ class AuthService extends Notifier<AuthState> {
         errorMessage: e.message,
       );
     } catch (e) {
-      state = AuthState(
+      state = const AuthState(
         status: AuthStatus.unauthenticated,
         errorMessage: 'An unexpected error occurred',
       );
@@ -109,16 +165,13 @@ class AuthService extends Notifier<AuthState> {
 
   /// Sign in with magic link (OTP)
   Future<void> signInWithMagicLink(String email) async {
+    if (!await _checkDeviceSecurity()) return;
+
     state = state.copyWith(status: AuthStatus.loading, errorMessage: null);
 
     try {
       await Supabase.instance.client.auth.signInWithOtp(email: email);
-
-      // Stay in loading state - user needs to check email
-      state = const AuthState(
-        status: AuthStatus.unauthenticated,
-        errorMessage: null,
-      );
+      state = const AuthState(status: AuthStatus.unauthenticated);
     } on AuthException catch (e) {
       state = AuthState(
         status: AuthStatus.unauthenticated,
@@ -129,6 +182,8 @@ class AuthService extends Notifier<AuthState> {
 
   /// Sign up with email and password
   Future<void> signUp(String email, String password, {String? name}) async {
+    if (!await _checkDeviceSecurity()) return;
+
     state = state.copyWith(status: AuthStatus.loading, errorMessage: null);
 
     try {
@@ -158,8 +213,10 @@ class AuthService extends Notifier<AuthState> {
 
     try {
       await Supabase.instance.client.auth.signOut();
+      await _clearTokens();
       state = const AuthState(status: AuthStatus.unauthenticated);
     } catch (e) {
+      await _clearTokens();
       state = const AuthState(status: AuthStatus.unauthenticated);
     }
   }
@@ -203,7 +260,14 @@ class AuthService extends Notifier<AuthState> {
           .eq('id', user.id)
           .maybeSingle();
 
-      return profile?['tenant_id'] as String?;
+      final tenantId = profile?['tenant_id'] as String?;
+
+      // Store tenant ID securely
+      if (tenantId != null) {
+        await _secureStorage.storeTenantId(tenantId);
+      }
+
+      return tenantId;
     } catch (e) {
       return null;
     }
@@ -223,4 +287,9 @@ final isAuthenticatedProvider = Provider<bool>((ref) {
 /// Helper provider for current user
 final currentUserProvider = Provider<User?>((ref) {
   return ref.watch(authProvider).user;
+});
+
+/// Helper provider for device security status
+final isDeviceSecureProvider = Provider<bool>((ref) {
+  return ref.watch(authProvider).isDeviceSecure;
 });

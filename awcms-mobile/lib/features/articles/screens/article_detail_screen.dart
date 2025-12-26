@@ -1,6 +1,6 @@
 /// AWCMS Mobile - Article Detail Screen
 ///
-/// Halaman detail artikel.
+/// Halaman detail artikel dari local database.
 library;
 
 import 'package:flutter/material.dart';
@@ -26,11 +26,10 @@ class ArticleDetailScreen extends ConsumerWidget {
             return const Center(child: Text('Artikel tidak ditemukan'));
           }
 
-          final coverImage = article['cover_image'] as String?;
-          final title = article['title'] as String? ?? 'Untitled';
-          final content = article['content'] as String? ?? '';
-          final createdAt = article['created_at'] as String?;
-          final author = article['author'] as Map<String, dynamic>?;
+          final coverImage = article.coverImage;
+          final title = article.title;
+          final content = article.content ?? '';
+          final createdAt = article.createdAt;
 
           return CustomScrollView(
             slivers: [
@@ -75,25 +74,6 @@ class ArticleDetailScreen extends ConsumerWidget {
                     // Meta Info
                     Row(
                       children: [
-                        if (author != null) ...[
-                          CircleAvatar(
-                            radius: 16,
-                            backgroundColor: colorScheme.primaryContainer,
-                            child: Text(
-                              (author['name'] as String? ?? 'A')[0]
-                                  .toUpperCase(),
-                              style: TextStyle(
-                                color: colorScheme.primary,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            author['name'] as String? ?? 'Anonymous',
-                            style: Theme.of(context).textTheme.bodyMedium,
-                          ),
-                        ],
                         const Spacer(),
                         if (createdAt != null)
                           Text(
@@ -145,27 +125,22 @@ class ArticleDetailScreen extends ConsumerWidget {
     );
   }
 
-  String _formatDate(String dateString) {
-    try {
-      final date = DateTime.parse(dateString);
-      final months = [
-        'Jan',
-        'Feb',
-        'Mar',
-        'Apr',
-        'May',
-        'Jun',
-        'Jul',
-        'Aug',
-        'Sep',
-        'Oct',
-        'Nov',
-        'Dec',
-      ];
-      return '${date.day} ${months[date.month - 1]} ${date.year}';
-    } catch (_) {
-      return dateString;
-    }
+  String _formatDate(DateTime date) {
+    final months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    return '${date.day} ${months[date.month - 1]} ${date.year}';
   }
 
   String _stripHtml(String html) {

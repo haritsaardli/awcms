@@ -1,6 +1,6 @@
 /// AWCMS Mobile - Login Screen
 ///
-/// Halaman login dengan email/password.
+/// Halaman login dengan email/password dan security check.
 library;
 
 import 'package:flutter/material.dart';
@@ -41,16 +41,57 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         );
 
     final authState = ref.read(authProvider);
-    if (authState.isAuthenticated && mounted) {
+
+    if (!mounted) return;
+
+    if (authState.isAuthenticated) {
       context.go(AppRoutes.home);
-    } else if (authState.errorMessage != null && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(authState.errorMessage!),
-          backgroundColor: Theme.of(context).colorScheme.error,
-        ),
-      );
+    } else if (authState.isBlocked) {
+      _showBlockedDialog();
+    } else if (authState.errorMessage != null) {
+      _showErrorSnackbar(authState.errorMessage!);
     }
+  }
+
+  void _showBlockedDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        icon: Icon(
+          Icons.security,
+          size: 48,
+          color: Theme.of(context).colorScheme.error,
+        ),
+        title: const Text('Perangkat Tidak Aman'),
+        content: const Text(
+          'Login tidak dapat dilakukan pada perangkat yang telah di-root atau jailbreak '
+          'demi keamanan data Anda.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Mengerti'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showErrorSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.error_outline, color: Colors.white),
+            const SizedBox(width: 12),
+            Expanded(child: Text(message)),
+          ],
+        ),
+        backgroundColor: Theme.of(context).colorScheme.error,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
   }
 
   @override
@@ -59,7 +100,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Login')),
+      appBar: AppBar(
+        title: const Text('Login'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () =>
+              context.canPop() ? context.pop() : context.go(AppRoutes.home),
+        ),
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -70,17 +118,39 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               children: [
                 const SizedBox(height: 40),
 
-                // Logo
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: colorScheme.primaryContainer,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.lock_outline,
-                    size: 48,
-                    color: colorScheme.primary,
+                // Logo with animation
+                TweenAnimationBuilder<double>(
+                  tween: Tween(begin: 0.8, end: 1.0),
+                  duration: const Duration(milliseconds: 500),
+                  curve: Curves.elasticOut,
+                  builder: (context, value, child) {
+                    return Transform.scale(scale: value, child: child);
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          colorScheme.primaryContainer,
+                          colorScheme.primary.withValues(alpha: 0.3),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: colorScheme.primary.withValues(alpha: 0.3),
+                          blurRadius: 20,
+                          offset: const Offset(0, 8),
+                        ),
+                      ],
+                    ),
+                    child: Icon(
+                      Icons.lock_outline,
+                      size: 48,
+                      color: colorScheme.primary,
+                    ),
                   ),
                 ),
 
@@ -110,9 +180,29 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                   textInputAction: TextInputAction.next,
-                  decoration: const InputDecoration(
+                  autofillHints: const [AutofillHints.email],
+                  decoration: InputDecoration(
                     labelText: 'Email',
-                    prefixIcon: Icon(Icons.email_outlined),
+                    prefixIcon: const Icon(Icons.email_outlined),
+                    filled: true,
+                    fillColor: colorScheme.surfaceContainerHighest.withValues(
+                      alpha: 0.5,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                        color: colorScheme.primary,
+                        width: 2,
+                      ),
+                    ),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -132,10 +222,30 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   controller: _passwordController,
                   obscureText: _obscurePassword,
                   textInputAction: TextInputAction.done,
+                  autofillHints: const [AutofillHints.password],
                   onFieldSubmitted: (_) => _handleLogin(),
                   decoration: InputDecoration(
                     labelText: 'Password',
                     prefixIcon: const Icon(Icons.lock_outlined),
+                    filled: true,
+                    fillColor: colorScheme.surfaceContainerHighest.withValues(
+                      alpha: 0.5,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                        color: colorScheme.primary,
+                        width: 2,
+                      ),
+                    ),
                     suffixIcon: IconButton(
                       icon: Icon(
                         _obscurePassword
@@ -165,6 +275,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 // Login Button
                 FilledButton(
                   onPressed: authState.isLoading ? null : _handleLogin,
+                  style: FilledButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
                   child: authState.isLoading
                       ? const SizedBox(
                           height: 20,
@@ -174,14 +290,22 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             color: Colors.white,
                           ),
                         )
-                      : const Text('Masuk'),
+                      : const Text(
+                          'Masuk',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                 ),
 
                 const SizedBox(height: 16),
 
                 // Back Button
                 TextButton(
-                  onPressed: () => context.pop(),
+                  onPressed: () => context.canPop()
+                      ? context.pop()
+                      : context.go(AppRoutes.home),
                   child: const Text('Kembali ke Beranda'),
                 ),
               ],

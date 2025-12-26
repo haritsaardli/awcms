@@ -1,6 +1,6 @@
 /// AWCMS Mobile - Main Entry Point
 ///
-/// Inisialisasi aplikasi dengan Supabase dan Riverpod.
+/// Inisialisasi aplikasi dengan Supabase, Riverpod, Offline Services, dan Security.
 library;
 
 import 'package:flutter/material.dart';
@@ -9,8 +9,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'core/config/supabase_config.dart';
+import 'core/services/connectivity_service.dart';
 import 'routes/app_router.dart';
 import 'shared/themes/app_theme.dart';
+import 'shared/widgets/security_gate.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,7 +33,18 @@ void main() async {
     anonKey: SupabaseConfig.anonKey,
   );
 
-  runApp(const ProviderScope(child: AWCMSMobileApp()));
+  // Initialize connectivity service
+  final connectivityService = ConnectivityService();
+  await connectivityService.initialize();
+
+  runApp(
+    ProviderScope(
+      overrides: [
+        connectivityServiceProvider.overrideWithValue(connectivityService),
+      ],
+      child: const AWCMSMobileApp(),
+    ),
+  );
 }
 
 class AWCMSMobileApp extends ConsumerWidget {
@@ -50,8 +63,11 @@ class AWCMSMobileApp extends ConsumerWidget {
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.system,
 
-      // Routing
+      // Routing with security gate
       routerConfig: router,
+      builder: (context, child) {
+        return SecurityGate(child: child ?? const SizedBox.shrink());
+      },
     );
   }
 }
