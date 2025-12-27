@@ -12,6 +12,7 @@
 #include "config.h"
 #include "esp_camera.h"
 #include <Arduino.h>
+#include <ArduinoJson.h>
 
 // ============================================
 // ESP32-CAM AI-Thinker Pin Configuration

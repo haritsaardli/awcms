@@ -11,7 +11,8 @@
 .vscode/launch.json
 .vscode/ipch
 
-# Config with credentials (IMPORTANT!)
+# SECURITY - Secrets and credentials
+.env
 include/config.h
 
 # OS

@@ -8,6 +8,7 @@
 #ifndef WEBSERVER_H
 #define WEBSERVER_H
 
+#include "auth.h"
 #include "config.h"
 #include <Arduino.h>
 #include <ArduinoJson.h>
