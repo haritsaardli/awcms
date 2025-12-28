@@ -89,8 +89,11 @@ const MobileUsersManager = lazy(() => import('@/pages/cmspanel/MobileUsersManage
 const PushNotificationsManager = lazy(() => import('@/pages/cmspanel/PushNotificationsManager'));
 const MobileAppConfig = lazy(() => import('@/pages/cmspanel/MobileAppConfig'));
 
-// Extensions (Lazy Loaded)
-const BackupSettings = lazy(() => import('@/extensions/backup/BackupSettings'));
+// Plugins (Lazy Loaded)
+const BackupSettings = lazy(() => import('@/plugins/backup/BackupSettings'));
+
+// Plugin Dynamic Routes
+import PluginRoutes from '@/components/routing/PluginRoutes';
 
 
 // Loading Screen
@@ -280,6 +283,9 @@ const MainRouter = () => {
           <Route path="mobile/users" element={<MobileUsersManager />} />
           <Route path="mobile/push" element={<PushNotificationsManager />} />
           <Route path="mobile/config" element={<MobileAppConfig />} />
+
+          {/* Plugin Dynamic Routes */}
+          <PluginRoutes />
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />

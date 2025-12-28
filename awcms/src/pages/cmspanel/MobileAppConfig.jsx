@@ -12,12 +12,13 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { Save, Smartphone, AlertTriangle } from 'lucide-react';
 import { supabase } from '@/lib/customSupabaseClient';
-import { useTenant, useAuth } from '@/contexts/PermissionContext';
+import { usePermissions } from '@/contexts/PermissionContext';
+import { useAuth } from '@/contexts/SupabaseAuthContext';
 import { useToast } from '@/components/ui/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
 
 function MobileAppConfig() {
-    const { tenantId } = useTenant();
+    const { tenantId } = usePermissions();
     const { user } = useAuth();
     const { toast } = useToast();
     const [loading, setLoading] = useState(true);

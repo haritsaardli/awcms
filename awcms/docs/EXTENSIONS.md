@@ -1,93 +1,166 @@
-# Extension System Documentation
+# AWCMS Extension System
 
 ## Overview
 
-AWCMS uses a **WordPress-style Hook System** (Actions and Filters) to allow extensions to modify system behavior and inject content without altering core files. This system is managed via `src/lib/hooks.js` and provided globally through `PluginContext`.
+AWCMS uses a dual extension system combining WordPress-style hooks with modern ES module architecture.
 
-## Core Concepts
+| Type | Location | Loading | Use Case |
+| ---- | -------- | ------- | -------- |
+| **Core Plugin** | `src/plugins/` | Bundled | Essential features |
+| **External Extension** | `awcms-ext-{vendor}-{slug}/` | Dynamic | Third-party modules |
 
-### 1. Actions (`addAction`, `doAction`)
+---
 
-Actions allow you to execute custom code at specific points in the application lifecycle.
+## Hook System
+
+### Actions
+
+Execute custom code at specific points:
 
 ```javascript
-// Register an action
-addAction('dashboard_top', 'my_custom_widget', () => {
-  console.log('Dashboard loaded!');
-});
-
-// Trigger an action (Core)
+addAction('dashboard_top', 'my_widget', () => console.log('Dashboard loaded!'));
 doAction('dashboard_top');
 ```
 
-### 2. Filters (`addFilter`, `applyFilters`)
+### Filters
 
-Filters allow you to modify data passing through the system, such as menu items, content, or configurations.
+Modify data passing through:
 
 ```javascript
-// Register a filter
-addFilter('admin_sidebar_menu', 'add_my_menu', (items) => {
-  return [...items, { label: 'My Plugin', path: '/my-plugin' }];
-});
-
-// Apply filters (Core)
+addFilter('admin_sidebar_menu', 'add_menu', (items) => [
+  ...items, 
+  { label: 'My Plugin', path: '/my-plugin' }
+]);
 const menuItems = applyFilters('admin_sidebar_menu', defaultItems);
 ```
 
-## Plugin Architecture
+---
 
-### Registration
+## Core Plugins
 
-Extensions are React components or logic modules registered in `src/lib/extensionRegistry.js`. Each extension must export a `register` function.
+Located in `src/plugins/`. Each plugin requires:
 
-**Example `src/extensions/helloworld/HelloWorld.js`:**
+### Structure
+
+```text
+src/plugins/{slug}/
+├── plugin.json       # Manifest
+├── index.js          # Entry with lifecycle
+└── Components.jsx
+```
+
+### Manifest (`plugin.json`)
+
+```json
+{
+  "name": "Backup Manager",
+  "slug": "backup",
+  "version": "1.0.0",
+  "type": "core",
+  "routes": [{ "path": "/cmspanel/backup", "component": "BackupSettings" }],
+  "menu": { "label": "Backup", "icon": "Database", "path": "backup" },
+  "permissions": ["tenant.backup.create"]
+}
+```
+
+### Entry (`index.js`)
 
 ```javascript
-export const register = ({ addAction, addFilter }) => {
-    // Add a widget to the dashboard
-    addFilter('dashboard_widgets', 'hello_world_widget', (widgets) => {
-        return [...widgets, MyWidgetComponent];
-    });
+import manifest from './plugin.json';
 
-    // Add a menu item
-    addFilter('admin_sidebar_menu', 'hello_world_menu', (items) => {
-        return [...items, { key: 'hello', label: 'Hello World', path: '/hello' }];
-    });
+export { manifest };
+
+export const register = ({ addAction, addFilter, supabase, pluginConfig }) => {
+  addFilter('dashboard_widgets', 'backup', (widgets) => [...widgets, MyWidget]);
 };
+
+export const activate = async (supabase, tenantId) => { /* setup */ };
+export const deactivate = async (supabase, tenantId) => { /* cleanup */ };
 ```
 
-### UI Injection (`PluginAction`)
+---
 
-The `<PluginAction />` component creates a "slot" in the UI where multiple extensions can render content.
+## External Extensions
 
-**Usage in Core:**
+Located in `awcms-ext-{vendor}-{slug}/` at project root. Loaded dynamically.
 
-```javascript
-// AdminDashboard.jsx
-<PluginAction name="dashboard_top" args={[userRole]} />
+### Directory Structure
+
+```text
+awcms-ext-ahliweb-analytics/
+├── manifest.json
+├── package.json
+└── src/index.js
 ```
 
-**Usage in Extension:**
+### Manifest (`manifest.json`)
 
-```javascript
-// Register a component to render in that slot
-addFilter('dashboard_top', 'my_banner', (components) => {
-    return [...components, MyBannerComponent];
-});
+```json
+{
+  "name": "Analytics",
+  "slug": "analytics",
+  "vendor": "ahliweb",
+  "version": "1.0.0",
+  "entry": "src/index.js",
+  "type": "external",
+  "awcms_version": ">=2.0.0"
+}
 ```
+
+---
 
 ## Available Hooks
 
-| Hook Name | Type | Description | Args |
-|-----------|------|-------------|------|
-| `plugins_loaded` | Action | Fired when all plugins are initialized | None |
-| `admin_sidebar_menu` | Filter | Modify sidebar menu items | `items`, `context` |
-| `dashboard_top` | Filter | Inject components at top of dashboard | `components` |
-| `dashboard_widgets` | Filter | Inject widget components | `components` |
+| Hook Name | Type | Description |
+| --------- | ---- | ----------- |
+| `plugins_loaded` | Action | All plugins loaded |
+| `dashboard_widgets` | Filter | Dashboard widgets |
+| `admin_menu_items` | Filter | Sidebar menu items |
+| `admin_routes` | Filter | Admin panel routes |
 
-## Developing an Extension
+---
 
-1. **Create Directory**: `src/extensions/your-extension-name/`
-2. **Create Main File**: `index.js` exporting your components and `register` function.
-3. **Register**: Import in `src/lib/extensionRegistry.js` and add to map.
-4. **Activate**: Insert record into `extensions` table in Supabase.
+## Database Tables
+
+### `extensions`
+
+| Column | Type | Description |
+| ------ | ---- | ----------- |
+| slug | TEXT | Unique identifier |
+| extension_type | TEXT | 'core' or 'external' |
+| external_path | TEXT | Path for external |
+| manifest | JSONB | Plugin manifest |
+| config | JSONB | Runtime config |
+
+### `extension_logs`
+
+Audit trail with RLS for all extension actions.
+
+---
+
+## Security
+
+- **RLS**: Tenant isolation on all tables
+- **Audit**: Automatic logging via triggers
+- **Permissions**: `ext.manage`, `ext.configure`, `ext.view_logs`
+
+---
+
+## Quick Start
+
+1. Create `src/plugins/{slug}/plugin.json`
+2. Create `src/plugins/{slug}/index.js` with `register()`
+3. Add to `pluginRegistry.js`
+4. Insert row in `extensions` table
+
+---
+
+## API Reference
+
+```javascript
+import { usePlugins, PluginSlot } from '@/contexts/PluginContext';
+
+const { addAction, addFilter, applyFilters } = usePlugins();
+
+<PluginSlot name="dashboard_top" args={{ user }} />
+```

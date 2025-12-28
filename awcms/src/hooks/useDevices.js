@@ -5,14 +5,14 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/customSupabaseClient';
-import { useTenant } from '@/contexts/PermissionContext';
+import { usePermissions } from '@/contexts/PermissionContext';
 import { useToast } from '@/components/ui/use-toast';
 
 export function useDevices() {
     const [devices, setDevices] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const { tenantId } = useTenant();
+    const { tenantId } = usePermissions();
     const { toast } = useToast();
 
     // Fetch all devices

@@ -34,13 +34,13 @@ import {
 } from '@/components/ui/table';
 import { Bell, Plus, Send, Trash2, RefreshCw } from 'lucide-react';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
-import { usePermission } from '@/contexts/PermissionContext';
+import { usePermissions } from '@/contexts/PermissionContext';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
 
 function PushNotificationsManager() {
     const { notifications, loading, createNotification, sendNotification, deleteNotification, fetchNotifications } = usePushNotifications();
-    const { hasPermission } = usePermission();
+    const { hasPermission } = usePermissions();
 
     const [showCreateDialog, setShowCreateDialog] = useState(false);
     const [newNotification, setNewNotification] = useState({

@@ -33,6 +33,7 @@ export default defineConfig(({ mode }) => {
 			extensions: ['.jsx', '.js', '.tsx', '.ts', '.json'],
 			alias: {
 				'@': path.resolve(__dirname, './src'),
+				'@plugins': path.resolve(__dirname, './src/plugins'),
 			},
 		},
 

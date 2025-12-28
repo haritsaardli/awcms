@@ -28,14 +28,14 @@ import {
 import { Label } from '@/components/ui/label';
 import { Plus, Search, Wifi, WifiOff, Cpu, RefreshCw } from 'lucide-react';
 import { useDevices } from '@/hooks/useDevices';
-import { usePermission } from '@/contexts/PermissionContext';
+import { usePermissions } from '@/contexts/PermissionContext';
 import DeviceCard from '@/components/esp32/DeviceCard';
 import { Skeleton } from '@/components/ui/skeleton';
 
 function DevicesManager() {
     const navigate = useNavigate();
     const { devices, loading, onlineCount, totalCount, registerDevice, deleteDevice, fetchDevices } = useDevices();
-    const { hasPermission } = usePermission();
+    const { hasPermission } = usePermissions();
 
     const [search, setSearch] = useState('');
     const [showAddDialog, setShowAddDialog] = useState(false);

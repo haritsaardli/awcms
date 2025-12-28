@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/lib/customSupabaseClient';
-import { getExtensionComponent } from '@/lib/extensionRegistry';
+import { getPluginComponent } from '@/lib/pluginRegistry';
 import { Helmet } from 'react-helmet';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
@@ -50,7 +50,7 @@ function Dashboard() {
   // Determine current "page" from URL path
   // /cmspanel/notifications -> page = notifications
   // /cmspanel/notifications/123 -> page = notifications, sub = 123 (handled via match logic below)
-  
+
   const pathParts = location.pathname.split('/');
   // pathParts[0] = ""
   // pathParts[1] = "cmspanel"
@@ -69,11 +69,11 @@ function Dashboard() {
           .eq('is_active', true);
 
         if (data) {
-           const routes = {};
-           data.forEach(route => {
-              routes[route.path] = route.component_key;
-           });
-           setExtensionRoutes(routes);
+          const routes = {};
+          data.forEach(route => {
+            routes[route.path] = route.component_key;
+          });
+          setExtensionRoutes(routes);
         }
       } catch (e) {
         console.error("Error fetching extension routes", e);
@@ -112,15 +112,15 @@ function Dashboard() {
       case 'language-settings': return <LanguageSettings />;
       case 'profile': return <UserProfile />;
       case 'admin-navigation': return <SidebarMenuManager />;
-      case 'notifications': 
+      case 'notifications':
         if (subParam) return <NotificationDetail id={subParam} />;
         return <NotificationsManager />;
-      
-      // 2. Check Extension Routes
+
+      // 2. Check Plugin Routes
       default:
         if (extensionRoutes[currentPage]) {
-           const Component = getExtensionComponent(extensionRoutes[currentPage]);
-           return <Component />;
+          const Component = getPluginComponent(extensionRoutes[currentPage]);
+          return <Component />;
         }
         return <AdminDashboard />;
     }
@@ -139,13 +139,13 @@ function Dashboard() {
           isOpen={sidebarOpen}
           setIsOpen={setSidebarOpen}
         />
-        
+
         <div className="flex-1 flex flex-col overflow-hidden">
-          <Header 
-            toggleSidebar={() => setSidebarOpen(!sidebarOpen)} 
+          <Header
+            toggleSidebar={() => setSidebarOpen(!sidebarOpen)}
             onNavigate={(page) => navigate(`/cmspanel/${page}`)}
           />
-          
+
           <main className="flex-1 overflow-y-auto p-6 bg-slate-50">
             <motion.div
               key={location.pathname} // Changed key to full pathname to trigger animation on sub-route changes

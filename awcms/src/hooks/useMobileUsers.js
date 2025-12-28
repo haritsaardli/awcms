@@ -5,14 +5,14 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/customSupabaseClient';
-import { useTenant } from '@/contexts/PermissionContext';
+import { usePermissions } from '@/contexts/PermissionContext';
 import { useToast } from '@/components/ui/use-toast';
 
 export function useMobileUsers() {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [stats, setStats] = useState({ total: 0, ios: 0, android: 0, active: 0 });
-    const { tenantId } = useTenant();
+    const { tenantId } = usePermissions();
     const { toast } = useToast();
 
     // Fetch mobile users

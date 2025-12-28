@@ -5,13 +5,14 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/customSupabaseClient';
-import { useTenant, useAuth } from '@/contexts/PermissionContext';
+import { usePermissions } from '@/contexts/PermissionContext';
+import { useAuth } from '@/contexts/SupabaseAuthContext';
 import { useToast } from '@/components/ui/use-toast';
 
 export function usePushNotifications() {
     const [notifications, setNotifications] = useState([]);
     const [loading, setLoading] = useState(true);
-    const { tenantId } = useTenant();
+    const { tenantId } = usePermissions();
     const { user } = useAuth();
     const { toast } = useToast();
 

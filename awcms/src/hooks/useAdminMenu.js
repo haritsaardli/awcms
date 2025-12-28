@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/customSupabaseClient';
+import { hooks } from '@/lib/hooks';
 
 // Default menu configuration - used as fallback when admin_menus table is empty
 // Default menu configuration - used as fallback when admin_menus table is empty
@@ -112,6 +113,37 @@ export function useAdminMenu() {
       let combined = [...baseMenus, ...normalizedExtMenus];
 
       // Sort again by group_order then order to ensure merged list is correct
+      combined.sort((a, b) => {
+        if ((a.group_order || 0) !== (b.group_order || 0)) {
+          return (a.group_order || 0) - (b.group_order || 0);
+        }
+        return (a.order || 0) - (b.order || 0);
+      });
+
+      // 4. Merge Plugin-registered menu items (via filters)
+      try {
+        const pluginMenuItems = hooks.applyFilters('admin_menu_items', []);
+        const normalizedPluginMenus = (pluginMenuItems || [])
+          .map(item => ({
+            id: `plugin-${item.id}`,
+            original_id: item.id,
+            label: item.label,
+            key: `plugin-${item.id}`,
+            icon: item.icon || 'Puzzle',
+            path: item.path?.replace('/admin/', '') || item.path,
+            group_label: item.group || item.parent || 'PLUGINS',
+            group_order: item.groupOrder || 75,
+            order: item.order || 10,
+            is_visible: true,
+            permission: item.permission || null,
+            source: 'plugin'
+          }));
+        combined = [...combined, ...normalizedPluginMenus];
+      } catch (pluginErr) {
+        console.warn('Error loading plugin menu items:', pluginErr);
+      }
+
+      // Re-sort after adding plugin items
       combined.sort((a, b) => {
         if ((a.group_order || 0) !== (b.group_order || 0)) {
           return (a.group_order || 0) - (b.group_order || 0);

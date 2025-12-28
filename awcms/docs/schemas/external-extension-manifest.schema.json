@@ -1,0 +1,160 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "AWCMS External Extension Manifest",
+    "description": "Schema for manifest.json in awcms-ext-* folders",
+    "type": "object",
+    "required": [
+        "name",
+        "slug",
+        "vendor",
+        "version",
+        "entry"
+    ],
+    "properties": {
+        "name": {
+            "type": "string",
+            "description": "Human-readable extension name",
+            "examples": [
+                "Advanced Analytics"
+            ]
+        },
+        "slug": {
+            "type": "string",
+            "description": "URL-safe identifier (lowercase, no spaces)",
+            "pattern": "^[a-z0-9-]+$",
+            "examples": [
+                "analytics"
+            ]
+        },
+        "vendor": {
+            "type": "string",
+            "description": "Vendor/publisher identifier",
+            "pattern": "^[a-z0-9-]+$",
+            "examples": [
+                "ahliweb"
+            ]
+        },
+        "version": {
+            "type": "string",
+            "description": "Semantic version (x.y.z)",
+            "pattern": "^\\d+\\.\\d+\\.\\d+",
+            "examples": [
+                "1.0.0"
+            ]
+        },
+        "description": {
+            "type": "string",
+            "description": "Brief description of the extension"
+        },
+        "author": {
+            "type": "string",
+            "description": "Author name or organization"
+        },
+        "license": {
+            "type": "string",
+            "description": "SPDX license identifier",
+            "examples": [
+                "MIT",
+                "GPL-3.0",
+                "proprietary"
+            ]
+        },
+        "homepage": {
+            "type": "string",
+            "format": "uri",
+            "description": "Extension homepage or documentation URL"
+        },
+        "entry": {
+            "type": "string",
+            "description": "Relative path to main entry file",
+            "default": "dist/index.js",
+            "examples": [
+                "dist/index.js",
+                "src/index.js"
+            ]
+        },
+        "type": {
+            "type": "string",
+            "enum": [
+                "external"
+            ],
+            "default": "external",
+            "description": "Extension type (always 'external' for external extensions)"
+        },
+        "awcms_version": {
+            "type": "string",
+            "description": "Required AWCMS version (semver range)",
+            "examples": [
+                ">=2.0.0",
+                "2.1.0"
+            ]
+        },
+        "dependencies": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            },
+            "description": "Other extensions this depends on (by slug)"
+        },
+        "routes": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "path": {
+                        "type": "string",
+                        "description": "Admin route path"
+                    },
+                    "component": {
+                        "type": "string",
+                        "description": "Component name to render"
+                    }
+                },
+                "required": [
+                    "path",
+                    "component"
+                ]
+            },
+            "description": "Admin panel routes to register"
+        },
+        "menu": {
+            "type": "object",
+            "properties": {
+                "label": {
+                    "type": "string"
+                },
+                "icon": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string"
+                },
+                "parent": {
+                    "type": "string"
+                },
+                "order": {
+                    "type": "integer"
+                }
+            },
+            "description": "Admin sidebar menu item"
+        },
+        "permissions": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            },
+            "description": "Permission keys this extension requires/provides"
+        },
+        "hooks": {
+            "type": "object",
+            "additionalProperties": {
+                "type": "string"
+            },
+            "description": "Map of hook names to function names"
+        },
+        "settings": {
+            "type": "object",
+            "description": "Default settings for the extension"
+        }
+    }
+}

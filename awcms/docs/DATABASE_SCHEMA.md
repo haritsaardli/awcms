@@ -387,6 +387,72 @@ WHERE deleted_at IS NULL;
 
 ---
 
+## Extension System Tables
+
+### extensions
+
+Stores registered plugins and extensions.
+
+```sql
+CREATE TABLE extensions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID NOT NULL REFERENCES tenants(id),
+  name TEXT NOT NULL,
+  slug TEXT NOT NULL,
+  version TEXT DEFAULT '1.0.0',
+  is_active BOOLEAN DEFAULT FALSE,
+  extension_type TEXT DEFAULT 'core' CHECK (extension_type IN ('core', 'external')),
+  external_path TEXT,            -- Path for external extensions
+  manifest JSONB DEFAULT '{}',   -- Plugin manifest (plugin.json)
+  config JSONB DEFAULT '{}',     -- Runtime configuration
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  deleted_at TIMESTAMPTZ
+);
+
+CREATE INDEX idx_extensions_tenant ON extensions(tenant_id);
+CREATE INDEX idx_extensions_slug ON extensions(slug);
+```
+
+### extension_logs
+
+Audit trail for extension lifecycle events.
+
+```sql
+CREATE TABLE extension_logs (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID NOT NULL REFERENCES tenants(id),
+  extension_id UUID REFERENCES extensions(id) ON DELETE SET NULL,
+  extension_slug TEXT NOT NULL,
+  action TEXT NOT NULL CHECK (action IN ('install', 'uninstall', 'activate', 'deactivate', 'update', 'config_change', 'error')),
+  details JSONB DEFAULT '{}',
+  user_id UUID REFERENCES auth.users(id),
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_extension_logs_tenant ON extension_logs(tenant_id);
+CREATE INDEX idx_extension_logs_extension ON extension_logs(extension_id);
+CREATE INDEX idx_extension_logs_user ON extension_logs(user_id);
+```
+
+### extension_menu_items
+
+Admin sidebar menu items added by extensions.
+
+```sql
+CREATE TABLE extension_menu_items (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  extension_id UUID REFERENCES extensions(id) ON DELETE CASCADE,
+  label TEXT NOT NULL,
+  icon TEXT,
+  path TEXT NOT NULL,
+  order_num INTEGER DEFAULT 0,
+  is_active BOOLEAN DEFAULT TRUE
+);
+```
+
+---
+
 ## Indexes
 
 Recommended indexes for performance:

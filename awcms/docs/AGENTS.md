@@ -44,21 +44,21 @@ In the AWCMS ecosystem, AI Agents are treated as specialized team members. We de
 
 Agents must be aware of the exact versions in use:
 
-| Technology | Version | Notes |
-|------------|---------|-------|
-| React | 18.3.1 | Functional components only |
-| Vite | 7.2.7 | Build tool & dev server |
-| TailwindCSS | 4.0.0 | CSS-based config (no tailwind.config.js) |
-| Supabase | 2.87.1 | Auth, Database, Storage |
-| React Router DOM | 7.10.1 | Client-side routing |
-| Puck | Latest | Visual Editor (@measured/puck) |
-| TipTap | 3.13.0 | Rich text editor (XSS-safe) |
-| Framer Motion | 12.23.26 | Animations |
-| Radix UI | Latest | Accessible UI primitives |
-| Lucide React | 0.561.0 | Icon library |
-| i18next | 25.7.2 | Internationalization |
-| Recharts | 3.5.1 | Charts & Data Visualization |
-| Leaflet | 1.9.4 | Maps |
+| Technology       | Version  | Notes                                   |
+| ---------------- | -------- | --------------------------------------- |
+| React            | 18.3.1   | Functional components only              |
+| Vite             | 7.2.7    | Build tool & dev server                 |
+| TailwindCSS      | 4.0.0    | CSS-based config (no tailwind.config.js)|
+| Supabase         | 2.87.1   | Auth, Database, Storage                 |
+| React Router DOM | 7.10.1   | Client-side routing                     |
+| Puck             | Latest   | Visual Editor (@measured/puck)          |
+| TipTap           | 3.13.0   | Rich text editor (XSS-safe)             |
+| Framer Motion    | 12.23.26 | Animations                              |
+| Radix UI         | Latest   | Accessible UI primitives                |
+| Lucide React     | 0.561.0  | Icon library                            |
+| i18next          | 25.7.2   | Internationalization                    |
+| Recharts         | 3.5.1    | Charts & Data Visualization             |
+| Leaflet          | 1.9.4    | Maps                                    |
 
 > [!IMPORTANT]
 > **React 18 Required**: This project strictly uses React 18.3.1 because the Puck visual editor is not yet compatible with React 19. Do not upgrade to React 19 until Puck adds support.
@@ -91,13 +91,13 @@ To ensure successful code generation and integration, Agents must adhere to the 
 
 4. **Strict Technology Constraints**:
 
-| Rule | Requirement |
-   |------|-------------|
-   | Language | JavaScript ES2022+ (NO TypeScript) |
-   | **Admin Panel** | React 18.3.1 (Strict), Vite 7 |
-   | **Public Portal** | Astro 5, React 19, Cloudflare Pages |
-   | Styling | TailwindCSS 4 utilities (NO external CSS files) |
-   | Backend | Supabase only (NO Node.js servers) |
+| Rule             | Requirement                                |
+| ---------------- | ------------------------------------------ |
+| Language         | JavaScript ES2022+ (NO TypeScript)         |
+| **Admin Panel**  | React 18.3.1 (Strict), Vite 7              |
+| **Public Portal**| Astro 5, React 19, Cloudflare Pages        |
+| Styling          | TailwindCSS 4 utilities (NO external CSS)  |
+| Backend          | Supabase only (NO Node.js servers)         |
 
 ### Code Patterns
 
@@ -147,40 +147,41 @@ class MyComponent extends Component<Props> { } // NO class components!
 
 ### Contexts (Global State)
 
-| File | Purpose |
-|------|---------|
-| `src/contexts/SupabaseAuthContext.jsx` | Authentication state & methods |
-| `src/contexts/PermissionContext.jsx` | ABAC/RBAC permissions & role checks |
-| `src/contexts/PluginContext.jsx` | Extension system & hook provider |
-| `src/contexts/ThemeContext.jsx` | Dark/Light theme management |
+| File                                   | Purpose                               |
+| -------------------------------------- | ------------------------------------- |
+| `src/contexts/SupabaseAuthContext.jsx` | Authentication state & methods        |
+| `src/contexts/PermissionContext.jsx`   | ABAC/RBAC permissions & role checks   |
+| `src/contexts/PluginContext.jsx`       | Extension system & hook provider      |
+| `src/contexts/ThemeContext.jsx`        | Dark/Light theme management           |
 
 ### Core Libraries
 
-| File | Purpose |
-|------|---------|
-| `src/lib/hooks.js` | WordPress-style Action/Filter system |
+| File                              | Purpose                               |
+| --------------------------------- | ------------------------------------- |
+| `src/lib/hooks.js`                | WordPress-style Action/Filter system  |
 | `src/lib/customSupabaseClient.js` | Public Supabase client (respects RLS) |
 
-| Hook | File | Purpose |
-|------|------|---------|
-| `useAdminMenu` | `src/hooks/useAdminMenu.js` | Sidebar menu loading & state |
-| `useAuditLog` | `src/hooks/useAuditLog.js` | ERP Audit Logging & Compliance |
-| `useDashboardData` | `src/hooks/useDashboardData.js` | Dashboard statistics |
-| `useMedia` | `src/hooks/useMedia.js` | Media library operations |
-| `useNotifications` | `src/hooks/useNotifications.js` | Notification system |
-| `useSearch` | `src/hooks/useSearch.js` | Debounced search logic |
-| `useTwoFactor` | `src/hooks/useTwoFactor.js` | 2FA setup & verification |
+| Hook               | File                               | Purpose                         |
+| ------------------ | ---------------------------------- | ------------------------------- |
+| `useAdminMenu`     | `src/hooks/useAdminMenu.js`        | Sidebar menu loading & state    |
+| `useAuditLog`      | `src/hooks/useAuditLog.js`         | ERP Audit Logging & Compliance  |
+| `useDashboardData` | `src/hooks/useDashboardData.js`    | Dashboard statistics            |
+| `useExtensionAudit`| `src/hooks/useExtensionAudit.js`   | Extension audit logging         |
+| `useMedia`         | `src/hooks/useMedia.js`            | Media library operations        |
+| `useNotifications` | `src/hooks/useNotifications.js`    | Notification system             |
+| `useSearch`        | `src/hooks/useSearch.js`           | Debounced search logic          |
+| `useTwoFactor`     | `src/hooks/useTwoFactor.js`        | 2FA setup & verification        |
 
 ### Utility Libraries
 
-| File | Purpose |
-|------|---------|
+| File                              | Purpose                               |
+| --------------------------------- | ------------------------------------- |
 | `src/lib/customSupabaseClient.js` | Public Supabase client (respects RLS) |
-| `src/lib/supabaseAdmin.js` | Admin client (bypasses RLS) |
-| `src/lib/utils.js` | Helper functions (`cn()`, etc.) |
-| `src/lib/extensionRegistry.js` | Extension component mapping |
-| `src/lib/themeUtils.js` | Theme utilities |
-| `src/lib/i18n.js` | i18next configuration |
+| `src/lib/supabaseAdmin.js`        | Admin client (bypasses RLS)           |
+| `src/lib/utils.js`                | Helper functions (`cn()`, etc.)       |
+| `src/lib/extensionRegistry.js`    | Extension component mapping           |
+| `src/lib/themeUtils.js`           | Theme utilities                       |
+| `src/lib/i18n.js`                 | i18next configuration                 |
 
 ---
 

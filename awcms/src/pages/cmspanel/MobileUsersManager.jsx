@@ -28,13 +28,13 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Smartphone, Apple, Search, Trash2, RefreshCw, Users } from 'lucide-react';
 import { useMobileUsers } from '@/hooks/useMobileUsers';
-import { usePermission } from '@/contexts/PermissionContext';
+import { usePermissions } from '@/contexts/PermissionContext';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatDistanceToNow } from 'date-fns';
 
 function MobileUsersManager() {
     const { users, loading, stats, fetchUsers, deleteUser } = useMobileUsers();
-    const { hasPermission } = usePermission();
+    const { hasPermission } = usePermissions();
     const [search, setSearch] = useState('');
     const [deleteTarget, setDeleteTarget] = useState(null);
     const [platformFilter, setPlatformFilter] = useState('all');

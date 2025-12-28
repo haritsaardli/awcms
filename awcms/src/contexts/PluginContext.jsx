@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { hooks } from '@/lib/hooks';
 import { supabase } from '@/lib/customSupabaseClient';
-import { getExtensionComponent } from '@/lib/extensionRegistry';
+import { getAllPlugins, getPlugin, getPluginComponent } from '@/lib/pluginRegistry';
+import { loadExternalExtension } from '@/lib/externalExtensionLoader';
 
 const PluginContext = createContext(null);
 
@@ -14,24 +15,11 @@ export const usePlugins = () => {
 };
 
 /**
- * Component to render content injected via actions
- * Usage: <PluginAction name="dashboard_top" args={[user]} />
+ * Component to render content injected via filters
+ * Usage: <PluginSlot name="dashboard_top" args={{ user }} />
  */
-export const PluginAction = ({ name, args = [], fallback = null }) => {
-    // Actions are usually void, but for UI rendering we can use a "render_action" pattern
-    // where plugins register a component to be rendered.
-    // However, the standard 'doAction' is for logic. 
-    // For UI injection, we often use a filter that returns an array of components.
-
-    // Alternative: We can define a convention where 'applyFilters' is used for UI lists.
-    // Example: const widgets = applyFilters('dashboard_widgets', []);
-
-    // But specific 'slot' rendering is common.
-    // Let's implement a 'Slot' helper that uses filters to gather content.
-
+export const PluginSlot = ({ name, args = {}, fallback = null }) => {
     const { applyFilters } = usePlugins();
-
-    // Plugins can hook into 'name' and append their component to the array
     const components = applyFilters(name, []);
 
     if (!Array.isArray(components) || components.length === 0) {
@@ -42,26 +30,31 @@ export const PluginAction = ({ name, args = [], fallback = null }) => {
         <>
             {components.map((Comp, index) => (
                 <React.Fragment key={index}>
-                    {React.isValidElement(Comp) ? Comp : <Comp {...(args[0] || {})} />}
+                    {React.isValidElement(Comp) ? Comp : <Comp {...args} />}
                 </React.Fragment>
             ))}
         </>
     );
 };
 
+// Backward compatibility alias
+export const PluginAction = PluginSlot;
+
 export const PluginProvider = ({ children }) => {
     const [isLoading, setIsLoading] = useState(true);
-    const [activeExtensions, setActiveExtensions] = useState([]);
+    const [activePlugins, setActivePlugins] = useState([]);
+    const [registeredPlugins, setRegisteredPlugins] = useState([]);
+    const [externalPlugins, setExternalPlugins] = useState([]);
 
     // Expose hook methods
     const { addAction, doAction, addFilter, applyFilters, removeAction, removeFilter } = hooks;
 
     useEffect(() => {
-        const loadExtensions = async () => {
+        const loadPlugins = async () => {
             setIsLoading(true);
             try {
-                // 1. Fetch active extensions
-                const { data: extensions, error } = await supabase
+                // 1. Fetch active plugins from database
+                const { data: dbPlugins, error } = await supabase
                     .from('extensions')
                     .select('*')
                     .eq('is_active', true)
@@ -69,61 +62,108 @@ export const PluginProvider = ({ children }) => {
 
                 if (error) throw error;
 
-                setActiveExtensions(extensions || []);
+                setActivePlugins(dbPlugins || []);
 
-                // 2. Register Loops
-                // For each extension, we look up its entry point in the static registry
-                // and call its 'register' function if it exists.
-                // Note: Since code is bundled, we still rely on extensionRegistry.js to map 
-                // DB keys to actual code.
+                // 2. Separate core and external plugins
+                const corePlugins = (dbPlugins || []).filter(p => p.extension_type !== 'external');
+                const extPlugins = (dbPlugins || []).filter(p => p.extension_type === 'external');
 
-                if (extensions) {
-                    for (const ext of extensions) {
-                        try {
-                            const extensionModule = getExtensionComponent(ext.component_key);
+                const allBundledPlugins = getAllPlugins();
+                const registered = [];
+                const loadedExternal = [];
 
-                            // If the module exports a 'register' function, run it.
-                            // We need to handle how getExtensionComponent returns. 
-                            // Currently it returns a Component. 
-                            // We might need to adjust genericRegistry to export the module or an object.
+                // 3. Register core plugins
+                for (const dbPlugin of corePlugins) {
+                    try {
+                        const pluginModule = allBundledPlugins[dbPlugin.slug] || getPlugin(dbPlugin.slug);
 
-                            // Let's assume for strict "WordPress Style", we need a 'register' function.
-                            // But getExtensionComponent currently just returns the Main Component (for UI).
-                            // We might need a separate 'getExtensionEntry' or check if the Component has a static 'register' method.
-
-                            if (extensionModule && typeof extensionModule.register === 'function') {
-                                extensionModule.register({ addAction, addFilter, supabase });
-                            }
-
-                            // Also check if there's a standalone register function exported alongside if we change registry import
-                        } catch (err) {
-                            console.error(`Failed to register extension ${ext.name}:`, err);
+                        if (!pluginModule) {
+                            console.warn(`[Core Plugin] "${dbPlugin.slug}" not found in registry`);
+                            continue;
                         }
+
+                        if (typeof pluginModule.register === 'function') {
+                            pluginModule.register({
+                                addAction,
+                                addFilter,
+                                supabase,
+                                pluginConfig: dbPlugin.config || {}
+                            });
+                            registered.push(dbPlugin.slug);
+                            console.log(`[Core Plugin] Registered: ${dbPlugin.name}`);
+                        }
+                    } catch (err) {
+                        console.error(`[Core Plugin] Failed to register ${dbPlugin.name}:`, err);
                     }
                 }
 
-                // 3. Trigger 'plugins_loaded' action
-                doAction('plugins_loaded');
+                // 4. Load external plugins (async)
+                for (const extPlugin of extPlugins) {
+                    try {
+                        // Build manifest from DB data
+                        const manifest = extPlugin.manifest || {
+                            name: extPlugin.name,
+                            slug: extPlugin.slug,
+                            vendor: extPlugin.slug.split('-')[0] || 'unknown',
+                            version: extPlugin.version || '1.0.0',
+                            entry: extPlugin.external_path || 'src/index.js'
+                        };
+
+                        const loadedModule = await loadExternalExtension(manifest);
+
+                        if (loadedModule.loaded && typeof loadedModule.register === 'function') {
+                            loadedModule.register({
+                                addAction,
+                                addFilter,
+                                supabase,
+                                pluginConfig: extPlugin.config || {}
+                            });
+                            registered.push(extPlugin.slug);
+                            loadedExternal.push({ ...extPlugin, module: loadedModule });
+                            console.log(`[External Plugin] Registered: ${extPlugin.name}`);
+                        } else if (!loadedModule.loaded) {
+                            console.error(`[External Plugin] Failed to load: ${extPlugin.name}`, loadedModule.error);
+                        }
+                    } catch (err) {
+                        console.error(`[External Plugin] Failed to load ${extPlugin.name}:`, err);
+                    }
+                }
+
+                setRegisteredPlugins(registered);
+                setExternalPlugins(loadedExternal);
+
+                // 5. Trigger 'plugins_loaded' action
+                doAction('plugins_loaded', {
+                    core: corePlugins.length,
+                    external: loadedExternal.length,
+                    total: registered.length
+                });
 
             } catch (err) {
-                console.error("Error loading extensions:", err);
+                console.error("Error loading plugins:", err);
             } finally {
                 setIsLoading(false);
             }
         };
 
-        loadExtensions();
+        loadPlugins();
     }, []);
 
     const value = {
         isLoading,
-        activeExtensions,
+        activePlugins,
+        registeredPlugins,
+        externalPlugins,
         addAction,
         doAction,
         addFilter,
         applyFilters,
         removeAction,
-        removeFilter
+        removeFilter,
+        // APIs
+        getPluginComponent,
+        getAllPlugins,
+        loadExternalExtension
     };
 
     return (

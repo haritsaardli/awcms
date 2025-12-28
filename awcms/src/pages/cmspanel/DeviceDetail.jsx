@@ -22,7 +22,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '@/lib/customSupabaseClient';
 import { useSensorData } from '@/hooks/useSensorData';
-import { useTenant } from '@/contexts/PermissionContext';
+import { usePermissions } from '@/contexts/PermissionContext';
 import SensorChart from '@/components/esp32/SensorChart';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatDistanceToNow } from 'date-fns';
@@ -30,7 +30,7 @@ import { formatDistanceToNow } from 'date-fns';
 function DeviceDetail() {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { tenantId } = useTenant();
+    const { tenantId } = usePermissions();
     const [device, setDevice] = useState(null);
     const [loading, setLoading] = useState(true);
 

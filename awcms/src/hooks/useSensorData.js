@@ -5,14 +5,14 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/customSupabaseClient';
-import { useTenant } from '@/contexts/PermissionContext';
+import { usePermissions } from '@/contexts/PermissionContext';
 
 export function useSensorData(deviceId, options = {}) {
     const { limit = 50, realtime = true } = options;
     const [readings, setReadings] = useState([]);
     const [loading, setLoading] = useState(true);
     const [latestReading, setLatestReading] = useState(null);
-    const { tenantId } = useTenant();
+    const { tenantId } = usePermissions();
 
     // Fetch sensor readings
     const fetchReadings = useCallback(async () => {
