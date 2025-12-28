@@ -1,8 +1,10 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/customSupabaseClient';
+import { useAuth } from '@/contexts/SupabaseAuthContext';
 
 export function useDashboardData() {
+  const { session } = useAuth();
   const [data, setData] = useState({
     overview: {
       articles: 0,
@@ -24,6 +26,10 @@ export function useDashboardData() {
   const [lastUpdated, setLastUpdated] = useState(new Date());
 
   const fetchDashboardData = useCallback(async () => {
+    if (!session) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
@@ -127,7 +133,7 @@ export function useDashboardData() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [session]);
 
   useEffect(() => {
     fetchDashboardData();

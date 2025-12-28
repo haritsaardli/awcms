@@ -1,7 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/customSupabaseClient';
+import { useAuth } from '@/contexts/SupabaseAuthContext';
+import { usePermissions } from '@/contexts/PermissionContext';
 
 export function usePlatformStats() {
+    const { session } = useAuth();
+    const { isPlatformAdmin } = usePermissions();
     const [stats, setStats] = useState({
         totalTenants: 0,
         totalUsers: 0,
@@ -12,6 +16,10 @@ export function usePlatformStats() {
     const [loading, setLoading] = useState(true);
 
     const fetchStats = useCallback(async () => {
+        if (!session || !isPlatformAdmin) {
+            setLoading(false);
+            return;
+        }
         try {
             setLoading(true);
 
@@ -59,7 +67,7 @@ export function usePlatformStats() {
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [session, isPlatformAdmin]);
 
     useEffect(() => {
         fetchStats();

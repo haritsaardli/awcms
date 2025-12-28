@@ -10,6 +10,7 @@ import { supabase } from '@/lib/customSupabaseClient';
 import PermissionMatrix from '@/components/dashboard/PermissionMatrix';
 import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { usePermissions } from '@/contexts/PermissionContext';
 
 const PREDEFINED_TEMPLATES = {
   'Viewer': ['view_articles', 'view_pages', 'view_products', 'view_portfolio', 'view_announcements', 'view_photo_gallery'],
@@ -19,6 +20,10 @@ const PREDEFINED_TEMPLATES = {
 
 const RoleEditor = ({ role, onClose, onSave }) => {
   const { toast } = useToast();
+  const { hasPermission, isSuperAdmin } = usePermissions();
+
+  // Permission check - only super admin or role.update can edit roles
+  const canEditRoles = isSuperAdmin || hasPermission('tenant.user.update') || hasPermission('platform.user.update');
 
   // Form State
   const [formData, setFormData] = useState({
