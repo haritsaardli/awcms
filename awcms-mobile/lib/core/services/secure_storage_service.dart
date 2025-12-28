@@ -25,7 +25,8 @@ class SecureStorageService {
   SecureStorageService._() {
     _storage = const FlutterSecureStorage(
       aOptions: AndroidOptions(
-        encryptedSharedPreferences: true,
+        // encryptedSharedPreferences removed - deprecated in v10
+        // Data auto-migrates to custom ciphers on first access
         sharedPreferencesName: 'awcms_secure_prefs',
         preferencesKeyPrefix: 'awcms_',
       ),
