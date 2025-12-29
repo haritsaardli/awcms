@@ -6,7 +6,7 @@ import TemplatesList from './templates/TemplatesList';
 import TemplatePartsList from './templates/TemplatePartsList';
 import TemplateAssignments from './templates/TemplateAssignments';
 import TemplateLanguageManager from './templates/TemplateLanguageManager';
-import { usePermissions } from '@/hooks/usePermissions';
+import { usePermissions } from '@/contexts/PermissionContext';
 
 const TemplatesManager = () => {
     const { t } = useTranslation();
