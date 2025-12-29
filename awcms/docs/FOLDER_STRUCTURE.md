@@ -94,7 +94,10 @@ src/
 │   ├── useMedia.js
 │   ├── useNotifications.js
 │   ├── useSearch.js
-│   └── useTwoFactor.js
+│   ├── useTemplates.js          # Template CRUD operations
+│   ├── useTemplateStrings.js    # Localized strings with fallback
+│   ├── useTwoFactor.js
+│   └── useWidgets.js            # Widget CRUD operations
 │
 ├── 📁 lib/               # Utilities and configs
 │   ├── customSupabaseClient.js  # Public Supabase client
@@ -104,6 +107,8 @@ src/
 │   ├── pluginRegistry.js        # Core plugin registry
 │   ├── externalExtensionLoader.js # External extension loader
 │   ├── extensionRegistry.js     # Legacy (deprecated)
+│   ├── templateExtensions.js    # Template/Widget/PageType APIs
+│   ├── widgetRegistry.js        # Widget type definitions
 │   ├── i18n.js                  # i18n configuration
 │   └── themeUtils.js            # Theme utilities
 │
@@ -167,7 +172,7 @@ docs/
 ## Key Files Explained
 
 | File | Purpose |
-|------|---------|
+| ---- | ------- |
 | `main.jsx` | Application entry point, renders root component |
 | `App.jsx` | Root component with providers and router |
 | `index.css` | Global CSS with TailwindCSS 4 directives |
@@ -202,7 +207,7 @@ resolve: {
 ### Dashboard Components (49 files)
 
 | Category | Examples |
-|----------|----------|
+| -------- | -------- |
 | **Content Managers** | ArticlesManager, PagesManager, ProductsManager |
 | **Editors** | ArticleEditor, PageEditor, ThemeEditor, RoleEditor |
 | **System** | UsersManager, RolesManager, PermissionMatrix |
@@ -213,7 +218,7 @@ resolve: {
 ### UI Components (30 files)
 
 | Category | Components |
-|----------|------------|
+| -------- | ---------- |
 | **Forms** | button, input, textarea, select, checkbox, switch |
 | **Feedback** | toast, alert, dialog, alert-dialog |
 | **Layout** | card, tabs, scroll-area |

@@ -26,6 +26,8 @@ Welcome to the AWCMS documentation. This index provides a roadmap to help you na
 - [Internationalization (i18n)](INTERNATIONALIZATION.md): Multi-language support details.
 - [Theming](THEMING.md): Tenant-specific theming and branding.
 - [Extensions](EXTENSIONS.md): Plugin and extension architecture.
+- [Template System](TEMPLATE_SYSTEM.md): Template architecture and APIs.
+- [Template Migration](TEMPLATE_MIGRATION.md): Migration guide for templates.
 
 ## 💻 Development & API
 

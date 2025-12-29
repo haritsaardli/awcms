@@ -492,6 +492,114 @@ CREATE TABLE region_levels (
 
 ---
 
+## Template System Tables (New)
+
+### templates
+
+Full page layouts using Puck visual builder.
+
+```sql
+CREATE TABLE templates (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID REFERENCES tenants(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  slug TEXT NOT NULL,
+  description TEXT,
+  type TEXT DEFAULT 'page', -- 'page', 'archive', 'single', 'error'
+  data JSONB DEFAULT '{}', -- Puck layout JSON
+  parts JSONB DEFAULT '{}', -- { header: uuid, footer: uuid }
+  language TEXT DEFAULT 'en',
+  translation_group_id UUID,
+  is_active BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  deleted_at TIMESTAMPTZ
+);
+
+CREATE INDEX idx_templates_tenant ON templates(tenant_id);
+CREATE INDEX idx_templates_slug ON templates(tenant_id, slug);
+```
+
+### template_parts
+
+Reusable template components (headers, footers, sidebars).
+
+```sql
+CREATE TABLE template_parts (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID REFERENCES tenants(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  type TEXT NOT NULL, -- 'header', 'footer', 'sidebar', 'widget_area'
+  data JSONB DEFAULT '{}', -- Puck layout JSON
+  language TEXT DEFAULT 'en',
+  translation_group_id UUID,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  deleted_at TIMESTAMPTZ
+);
+
+CREATE INDEX idx_template_parts_tenant ON template_parts(tenant_id);
+CREATE INDEX idx_template_parts_type ON template_parts(tenant_id, type);
+```
+
+### template_assignments
+
+Maps system routes to templates per channel.
+
+```sql
+CREATE TABLE template_assignments (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID REFERENCES tenants(id) ON DELETE CASCADE,
+  route_type TEXT NOT NULL, -- 'home', '404', 'search', 'archive', 'single'
+  template_id UUID REFERENCES templates(id) ON DELETE SET NULL,
+  channel TEXT DEFAULT 'web', -- 'web', 'mobile', 'esp32'
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(tenant_id, channel, route_type)
+);
+```
+
+### widgets
+
+Widget instances for widget areas.
+
+```sql
+CREATE TABLE widgets (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID REFERENCES tenants(id) ON DELETE CASCADE,
+  area_id UUID REFERENCES template_parts(id) ON DELETE CASCADE,
+  type TEXT NOT NULL, -- 'core/text', 'core/image', 'core/menu', etc.
+  config JSONB DEFAULT '{}',
+  sort_order INTEGER DEFAULT 0,
+  is_active BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_widgets_area ON widgets(area_id);
+CREATE INDEX idx_widgets_tenant ON widgets(tenant_id);
+```
+
+### template_strings
+
+Localized strings for template translations.
+
+```sql
+CREATE TABLE template_strings (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID REFERENCES tenants(id) ON DELETE CASCADE,
+  key TEXT NOT NULL,
+  locale TEXT NOT NULL DEFAULT 'en',
+  value TEXT,
+  context TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_template_strings_tenant ON template_strings(tenant_id);
+CREATE INDEX idx_template_strings_key ON template_strings(key, locale);
+```
+
 ## Indexes
 
 Recommended indexes for performance:

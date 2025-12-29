@@ -235,3 +235,41 @@ const extension = await loadExternalExtension(manifest);
 // Validate manifest
 const { valid, errors } = validateManifest(manifest);
 ```
+
+---
+
+## Template Extension APIs
+
+Extensions can integrate with the Template System using these APIs:
+
+```javascript
+import { 
+  registerTemplateBlock, 
+  registerWidgetArea, 
+  registerPageType 
+} from '@/lib/templateExtensions';
+
+// Register a custom Puck block for Visual Builder
+registerTemplateBlock({
+  type: 'my_plugin/carousel',
+  label: 'Image Carousel',
+  render: CarouselComponent,
+  fields: { images: { type: 'array' } }
+});
+
+// Register a new widget type for Widget Areas
+registerWidgetArea({
+  type: 'my_plugin/social_links',
+  name: 'Social Links',
+  icon: ShareIcon,
+  defaultConfig: { networks: [] }
+});
+
+// Register a new page type for Route Assignments
+registerPageType({
+  type: 'product_archive',
+  label: 'Product Archive'
+});
+```
+
+These APIs use the WordPress-style hooks system internally. Registered blocks will be available in both the Admin Panel's Visual Builder and the Public Portal's component registry.

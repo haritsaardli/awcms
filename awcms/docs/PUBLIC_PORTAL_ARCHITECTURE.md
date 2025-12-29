@@ -50,7 +50,18 @@ The Public Portal is a high-performance, secure, multi-tenant frontend built wit
   - `VITE_SUPABASE_URL`: Public Supabase URL.
   - `VITE_SUPABASE_ANON_KEY`: Public Anon Key (scoped by RLS).
 
-## 5. Compliance
+## 5. Template System Integration
+
+- **Dynamic Routing** (`[...slug].astro`):
+  - Fetches page data from `pages` table.
+  - Fetches `template_assignments` for the current channel.
+  - Determines template from page override or channel assignment.
+  - Merges **Header Part** + **Page Content** + **Footer Part** into final layout.
+- **Component Registry** (`registry.tsx`):
+  - Whitelists allowed components including Core Widgets (`core/text`, `core/image`, `core/menu`, `core/button`).
+  - Validates props with Zod schemas.
+
+## 6. Compliance
 
 - **Audit**: All public interactions (forms, etc.) should log to `audit_logs` via Edge Functions.
 - **Privacy**: No PII stored in local storage without consent.
