@@ -59,5 +59,6 @@ Welcome to the AWCMS documentation. This index provides a roadmap to help you na
 
 - [Contributing](CONTRIBUTING.md): Guidelines for contributing to the project.
 - [Code of Conduct](CODE_OF_CONDUCT.md): Community standards.
+- [Versioning](VERSIONING.md): Semantic versioning and release process.
 - [Changelog](CHANGELOG.md): History of changes and updates.
 - [License](LICENSE.md): Project license information.
