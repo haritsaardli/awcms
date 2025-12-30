@@ -32,7 +32,7 @@ const UserApprovalManager = () => {
     const { userRole, isPlatformAdmin, hasPermission } = usePermissions();
     const { toast } = useToast();
 
-    const isSuperAdmin = isPlatformAdmin || ['super_admin', 'super_super_admin'].includes(userRole);
+    const isSuperAdmin = isPlatformAdmin || ['super_admin', 'owner'].includes(userRole);
 
     // Reset page when tab changes
     useEffect(() => {

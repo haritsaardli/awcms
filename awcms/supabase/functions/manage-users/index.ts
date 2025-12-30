@@ -42,7 +42,7 @@ Deno.serve(async (req: Request) => {
             throw new Error('Invalid JSON in request body')
         }
 
-        const {
+        let {
             action,
             email,
             password,
@@ -119,7 +119,7 @@ Deno.serve(async (req: Request) => {
 
         const roleName = userData.role.name
         const requesterTenantId = userData.tenant_id
-        const isSuperAdmin = ['super_admin', 'super_super_admin'].includes(roleName)
+        const isSuperAdmin = ['super_admin', 'owner'].includes(roleName)
         const isAdmin = ['admin', 'owner'].includes(roleName) || isSuperAdmin
 
         if (!isAdmin) {
