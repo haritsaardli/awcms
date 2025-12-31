@@ -8,10 +8,13 @@ import { supabase } from '@/lib/customSupabaseClient';
 import { Textarea } from '@/components/ui/textarea';
 import { useTenant } from '@/contexts/TenantContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { usePermissions } from '@/contexts/PermissionContext';
+import { ShieldAlert } from 'lucide-react';
 
 function SeoManager() {
     const { toast } = useToast();
     const { currentTenant } = useTenant();
+    const { hasPermission } = usePermissions();
     const tenantId = currentTenant?.id;
     const [loading, setLoading] = useState(false);
     const [saving, setSaving] = useState(false);
@@ -108,6 +111,18 @@ function SeoManager() {
         return (
             <div className="flex items-center justify-center py-12">
                 <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            </div>
+        );
+    }
+
+    if (!hasPermission('tenant.setting.read')) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[400px] bg-white rounded-xl border border-slate-200 p-12 text-center">
+                <div className="p-4 bg-red-50 rounded-full mb-4">
+                    <ShieldAlert className="w-12 h-12 text-red-500" />
+                </div>
+                <h3 className="text-xl font-bold text-slate-800">Access Denied</h3>
+                <p className="text-slate-500 mt-2">You do not have permission to view SEO settings.</p>
             </div>
         );
     }

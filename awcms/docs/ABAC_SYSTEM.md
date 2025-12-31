@@ -224,6 +224,16 @@ CREATE TABLE role_permissions (
 | Contacts | `tenant.contacts.*` | read, create, update, delete, restore, permanent_delete |
 | Contact Messages | `tenant.contact_messages.*` | read, create, update, delete, restore, permanent_delete |
 | Regions | `tenant.region.*` | read, create, update, delete |
+| Visual Pages | `tenant.page.*` | read, create, update, delete, restore |
+
+#### Mobile & IoT
+
+| Module | Permission Prefix | Actions |
+| :--- | :--- | :--- |
+| Mobile Users | `tenant.mobile_users.*` | read, create, update, delete |
+| Push Notif | `tenant.push_notifications.*` | read, create, delete |
+| Mobile Config | `tenant.mobile_config.*` | read, update |
+| IoT Devices | `tenant.iot_devices.*` | read, create, update, delete |
 
 ### C. Public / Consumption
 

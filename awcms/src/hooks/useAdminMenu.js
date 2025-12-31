@@ -16,7 +16,9 @@ const DEFAULT_MENU_CONFIG = [
   { id: 'testimonials', key: 'testimonials', label: 'Testimonials', path: 'testimonies', icon: 'MessageSquareQuote', permission: 'tenant.testimonies.read', group_label: 'CONTENT', group_order: 10, order: 60, is_visible: true },
   { id: 'announcements', key: 'announcements', label: 'Announcements', path: 'announcements', icon: 'Megaphone', permission: 'tenant.announcements.read', group_label: 'CONTENT', group_order: 10, order: 70, is_visible: true },
   { id: 'promotions', key: 'promotions', label: 'Promotions', path: 'promotions', icon: 'Tag', permission: 'tenant.promotions.read', group_label: 'CONTENT', group_order: 10, order: 80, is_visible: true },
-  { id: 'inbox', key: 'inbox', label: 'Contact Messages', path: 'inbox', icon: 'Inbox', permission: 'tenant.contact_messages.read', group_label: 'CONTENT', group_order: 10, order: 90, is_visible: true },
+  { id: 'promotions', key: 'promotions', label: 'Promotions', path: 'promotions', icon: 'Tag', permission: 'tenant.promotions.read', group_label: 'CONTENT', group_order: 10, order: 80, is_visible: true },
+  { id: 'contact_messages', key: 'contact_messages', label: 'Contact Messages', path: 'messages', icon: 'Inbox', permission: 'tenant.contact_messages.read', group_label: 'CONTENT', group_order: 10, order: 90, is_visible: true },
+  { id: 'contacts', key: 'contacts', label: 'Contacts CRM', path: 'contacts', icon: 'Contact', permission: 'tenant.contacts.read', group_label: 'CONTENT', group_order: 10, order: 95, is_visible: true },
 
   // MEDIA Group
   { id: 'files', key: 'files', label: 'Media Library', path: 'files', icon: 'FolderOpen', permission: 'tenant.media.read', group_label: 'MEDIA', group_order: 20, order: 10, is_visible: true },
@@ -47,6 +49,7 @@ const DEFAULT_MENU_CONFIG = [
   { id: 'audit_logs', key: 'audit_logs', label: 'Audit Logs', path: 'audit-logs', icon: 'FileClock', permission: 'tenant.audit.read', group_label: 'SYSTEM', group_order: 60, order: 60, is_visible: true },
 
   // CONFIGURATION Group
+  { id: 'settings_general', key: 'settings_general', label: 'General Settings', path: 'settings/general', icon: 'Settings', permission: 'tenant.setting.read', group_label: 'CONFIGURATION', group_order: 70, order: 5, is_visible: true },
   { id: 'settings_branding', key: 'branding', label: 'Branding', path: 'settings/branding', icon: 'Palette', permission: 'tenant.setting.update', group_label: 'CONFIGURATION', group_order: 70, order: 10, is_visible: true },
   { id: 'sso', key: 'sso', label: 'SSO & Security', path: 'sso', icon: 'Lock', permission: 'platform.setting.read', group_label: 'CONFIGURATION', group_order: 70, order: 20, is_visible: true },
   { id: 'email_settings', key: 'email_settings', label: 'Email Settings', path: 'email-settings', icon: 'Mail', permission: 'tenant.setting.update', group_label: 'CONFIGURATION', group_order: 70, order: 30, is_visible: true },

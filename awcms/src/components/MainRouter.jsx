@@ -94,12 +94,11 @@ const PushNotificationsManager = lazy(() => import('@/pages/cmspanel/PushNotific
 const MobileAppConfig = lazy(() => import('@/pages/cmspanel/MobileAppConfig'));
 
 // Plugins (Lazy Loaded)
-const BackupSettings = lazy(() => import('@/plugins/backup/BackupSettings'));
-const EmailSettings = lazy(() => import('@/plugins/mailketing/components/EmailSettings'));
-const EmailLogs = lazy(() => import('@/plugins/mailketing/components/EmailLogs'));
+
+
 
 // Plugin Dynamic Routes
-import PluginRoutes from '@/components/routing/PluginRoutes';
+import { usePluginRoutes } from '@/components/routing/PluginRoutes';
 
 
 // Loading Screen
@@ -137,6 +136,8 @@ const ProtectedRoute = ({ children }) => {
 import PublicRegisterPage from '@/pages/public/PublicRegisterPage';
 
 const MainRouter = () => {
+  const { routes: pluginRoutes } = usePluginRoutes();
+
   return (
     <BrowserRouter>
       <Routes>
@@ -284,11 +285,28 @@ const MainRouter = () => {
 
 
           <Route path="visual-editor" element={<VisualPageBuilder />} />
-          <Route path="backup" element={<BackupSettings />} />
+
 
           {/* Email/Mailketing Plugin */}
-          <Route path="email-settings" element={<EmailSettings />} />
-          <Route path="email-logs" element={<EmailLogs />} />
+          {/* Plugin Routes */}
+          {pluginRoutes.map((route) => {
+            const Element = route.element;
+            return (
+              <Route
+                key={route.path}
+                path={route.path}
+                element={
+                  route.lazy ? (
+                    <Suspense fallback={<PageLoader />}>
+                      <Element />
+                    </Suspense>
+                  ) : (
+                    <Element />
+                  )
+                }
+              />
+            );
+          })}
 
           {/* ESP32 IoT Devices */}
           <Route path="devices" element={<DevicesManager />} />

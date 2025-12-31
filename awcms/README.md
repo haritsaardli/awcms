@@ -194,10 +194,16 @@ VITE_SUPABASE_ANON_KEY=your-anon-key
 - **Testimonials**: Customer testimonials and reviews management.
 - **Galleries**: Photo & Video collections with playlists.
 
-#### Marketing Modules
+#### Marketing & CRM Modules
 
+- **Contacts CRM**: Customer relationship management and lead tracking.
 - **Announcements**: System-wide alerts with priority levels and scheduling.
 - **Promotions**: Sales and discounts with codes and validity periods.
+
+#### Mobile & IoT Modules
+
+- **Mobile App**: User management (`mobile_users`), push notifications, and app configuration.
+- **IoT Devices**: IoT device management and real-time monitoring.
 
 #### System Modules
 

@@ -2,13 +2,28 @@ import React, { useState } from 'react';
 import PagesManager from './PagesManager';
 import ThemeLayoutManager from './ThemeLayoutManager';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Layers, Palette } from 'lucide-react';
+import { Layers, Palette, ShieldAlert } from 'lucide-react';
+import { usePermissions } from '@/contexts/PermissionContext';
 
 /**
  * VisualPagesManager
  * Manages both regular visual pages and system theme layouts.
  */
 const VisualPagesManager = () => {
+    const { hasPermission } = usePermissions();
+
+    if (!hasPermission('tenant.page.read')) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[400px] bg-white rounded-xl border border-slate-200 p-12 text-center">
+                <div className="p-4 bg-red-50 rounded-full mb-4">
+                    <ShieldAlert className="w-12 h-12 text-red-500" />
+                </div>
+                <h3 className="text-xl font-bold text-slate-800">Access Denied</h3>
+                <p className="text-slate-500 mt-2">You do not have permission to view this page.</p>
+            </div>
+        );
+    }
+
     return (
         <div className="space-y-6">
             <div className="flex flex-col gap-2">
