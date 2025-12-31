@@ -11,11 +11,13 @@ import React from 'react';
 // Each plugin exports: { components, manifest, register, activate, deactivate }
 import * as BackupPlugin from '@/plugins/backup/index.js';
 import * as HelloWorldPlugin from '@/plugins/helloworld/HelloWorld.jsx';
+import * as MailketingPlugin from '@/plugins/mailketing/index.js';
 
 // Plugin Registry Map
 const PLUGIN_REGISTRY = {
     'backup': BackupPlugin,
-    'helloworld': HelloWorldPlugin
+    'helloworld': HelloWorldPlugin,
+    'mailketing': MailketingPlugin
 };
 
 /**

@@ -41,6 +41,7 @@ Welcome to the AWCMS documentation. This index provides a roadmap to help you na
 
 - [API Documentation](API_DOCUMENTATION.md): Supabase API usage and patterns.
 - [Database Schema](DATABASE_SCHEMA.md): Database tables, relationships, and RLS.
+- [Email Integration](EMAIL_INTEGRATION.md): Mailketing email service integration.
 - [Component Guide](COMPONENT_GUIDE.md): Reusable UI components library.
 - [Mobile Development](MOBILE_DEVELOPMENT.md): Guide for mobile-responsive development.
 - [Agents & AI](AGENTS.md): Integration with AI agents.

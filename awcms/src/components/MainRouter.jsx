@@ -95,6 +95,8 @@ const MobileAppConfig = lazy(() => import('@/pages/cmspanel/MobileAppConfig'));
 
 // Plugins (Lazy Loaded)
 const BackupSettings = lazy(() => import('@/plugins/backup/BackupSettings'));
+const EmailSettings = lazy(() => import('@/plugins/mailketing/components/EmailSettings'));
+const EmailLogs = lazy(() => import('@/plugins/mailketing/components/EmailLogs'));
 
 // Plugin Dynamic Routes
 import PluginRoutes from '@/components/routing/PluginRoutes';
@@ -283,6 +285,10 @@ const MainRouter = () => {
 
           <Route path="visual-editor" element={<VisualPageBuilder />} />
           <Route path="backup" element={<BackupSettings />} />
+
+          {/* Email/Mailketing Plugin */}
+          <Route path="email-settings" element={<EmailSettings />} />
+          <Route path="email-logs" element={<EmailLogs />} />
 
           {/* ESP32 IoT Devices */}
           <Route path="devices" element={<DevicesManager />} />
