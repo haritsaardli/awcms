@@ -19,8 +19,8 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import SlugGenerator from '@/components/dashboard/slug/SlugGenerator';
-import ImageUpload from '@/components/ui/ImageUpload'; // Assessing imports
-import MultiImageUpload from '@/components/ui/MultiImageUpload';
+import { ImageUpload } from '@/components/ui/ImageUpload';
+import { MultiImageUpload } from '@/components/ui/MultiImageUpload';
 import RichTextEditor from '@/components/ui/RichTextEditor';
 import TagInput from '@/components/ui/TagInput';
 import ResourceSelect from '@/components/dashboard/ResourceSelect'; // Assuming this exists or works
