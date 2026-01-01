@@ -31,6 +31,7 @@ import {
     MousePointer,
     AlertTriangle,
     Download,
+    ShieldAlert,
 } from 'lucide-react';
 import { getEmailLogs } from '../services/emailService';
 import { format } from 'date-fns';
@@ -107,17 +108,15 @@ function EmailLogs() {
         a.click();
     };
 
-    if (!canViewLogs) {
-        return (
-            <div className="p-6">
-                <Card>
-                    <CardContent className="py-8 text-center text-slate-500">
-                        You don't have permission to view email logs.
-                    </CardContent>
-                </Card>
+    return (
+        <div className="flex flex-col items-center justify-center min-h-[400px] bg-white rounded-xl border border-slate-200 p-12 text-center">
+            <div className="p-4 bg-red-50 rounded-full mb-4">
+                <ShieldAlert className="w-12 h-12 text-red-500" />
             </div>
-        );
-    }
+            <h3 className="text-xl font-bold text-slate-800">Access Denied</h3>
+            <p className="text-slate-500 mt-2">You do not have permission to view email logs.</p>
+        </div>
+    );
 
     return (
         <div className="space-y-6 p-6">

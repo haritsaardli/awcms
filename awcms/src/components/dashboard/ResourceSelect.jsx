@@ -1,0 +1,90 @@
+
+import React, { useState, useEffect } from 'react';
+import { supabase } from '@/lib/customSupabaseClient'; // Use custom client for tenant headers
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import { useToast } from '@/components/ui/use-toast';
+
+const ResourceSelect = ({
+    table,
+    labelKey = 'name',
+    valueKey = 'id',
+    value,
+    onChange,
+    placeholder = "Select item...",
+    filter = null // Optional filter object { column: 'value' } or function
+}) => {
+    const [items, setItems] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const { toast } = useToast();
+
+    useEffect(() => {
+        if (!table) return;
+
+        const fetchItems = async () => {
+            setLoading(true);
+            try {
+                let query = supabase
+                    .from(table)
+                    .select(`${valueKey}, ${labelKey}`)
+                    .is('deleted_at', null);
+
+                // Apply simple equality filters if provided
+                if (filter && typeof filter === 'object') {
+                    Object.entries(filter).forEach(([key, val]) => {
+                        query = query.eq(key, val);
+                    });
+                }
+
+                // Default limit to prevent massive loads in dropdowns
+                query = query.limit(100);
+
+                const { data, error } = await query;
+
+                if (error) throw error;
+                setItems(data || []);
+            } catch (err) {
+                console.error(`Error fetching resources for ${table}:`, err);
+                toast({
+                    variant: "destructive",
+                    title: "Error loading resources",
+                    description: err.message
+                });
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchItems();
+    }, [table, labelKey, valueKey, JSON.stringify(filter)]);
+
+    return (
+        <Select
+            value={value ? String(value) : undefined}
+            onValueChange={onChange}
+            disabled={loading}
+        >
+            <SelectTrigger className="w-full">
+                <SelectValue placeholder={loading ? "Loading..." : placeholder} />
+            </SelectTrigger>
+            <SelectContent>
+                {items.length === 0 && !loading ? (
+                    <div className="p-2 text-sm text-slate-500 text-center">No items found</div>
+                ) : (
+                    items.map(item => (
+                        <SelectItem key={item[valueKey]} value={String(item[valueKey])}>
+                            {item[labelKey] || `Item ${item[valueKey]}`}
+                        </SelectItem>
+                    ))
+                )}
+            </SelectContent>
+        </Select>
+    );
+};
+
+export default ResourceSelect;

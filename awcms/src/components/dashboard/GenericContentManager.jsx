@@ -280,37 +280,43 @@ const GenericContentManager = ({
                 />
             ) : (
                 <>
+
                     {/* Enhanced Breadcrumb Navigation */}
                     {showBreadcrumbs && (
-                        <nav className="flex items-center gap-1 text-sm mb-6">
-                            <Link
-                                to="/cmspanel"
-                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 hover:bg-blue-100 text-slate-600 hover:text-blue-700 transition-all duration-200 group"
-                            >
-                                <Home className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                                <span className="font-medium">Dashboard</span>
-                            </Link>
+                        <nav className="mb-6">
+                            <ol className="flex flex-wrap items-center gap-1.5 break-words text-sm text-slate-500 sm:gap-2.5">
+                                <li className="inline-flex items-center gap-1.5">
+                                    <Link to="/cmspanel" className="transition-colors hover:text-slate-950 flex items-center gap-1">
+                                        <Home className="w-4 h-4" />
+                                        Dashboard
+                                    </Link>
+                                </li>
+                                <li aria-hidden="true" className="[&>svg]:size-3.5"><ChevronRight /></li>
 
-                            <ChevronRight className="w-4 h-4 text-slate-300" />
-
-                            <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full font-semibold ${showTrash
-                                ? 'bg-slate-100 text-slate-600 cursor-pointer hover:bg-slate-200'
-                                : 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-sm'
-                                }`}
-                                onClick={showTrash ? () => setShowTrash(false) : undefined}
-                            >
-                                <span>{resourceName}s</span>
-                            </div>
-
-                            {showTrash && (
-                                <>
-                                    <ChevronRight className="w-4 h-4 text-slate-300" />
-                                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-red-500 to-red-600 text-white font-semibold shadow-sm">
-                                        <Trash2 className="w-3.5 h-3.5" />
-                                        <span>Trash</span>
+                                <li className="inline-flex items-center gap-1.5">
+                                    <div
+                                        className={`flex items-center gap-1.5 px-3 py-1 rounded-full font-medium transition-colors ${showTrash
+                                                ? 'bg-slate-100 text-slate-600 cursor-pointer hover:bg-slate-200'
+                                                : 'bg-blue-600 text-white shadow-sm'
+                                            }`}
+                                        onClick={showTrash ? () => setShowTrash(false) : undefined}
+                                    >
+                                        <span>{resourceName}s</span>
                                     </div>
-                                </>
-                            )}
+                                </li>
+
+                                {showTrash && (
+                                    <>
+                                        <li aria-hidden="true" className="[&>svg]:size-3.5"><ChevronRight /></li>
+                                        <li className="inline-flex items-center gap-1.5">
+                                            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-600 text-white font-medium shadow-sm">
+                                                <Trash2 className="w-3.5 h-3.5" />
+                                                <span>Trash</span>
+                                            </div>
+                                        </li>
+                                    </>
+                                )}
+                            </ol>
                         </nav>
                     )}
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">

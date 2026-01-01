@@ -86,24 +86,28 @@ function ArticlesManager() {
 
   return (
     <div className="space-y-6">
-      {/* Breadcrumb Navigation */}
-      <nav className="flex items-center text-sm text-slate-500">
-        <Link to="/cmspanel" className="hover:text-blue-600 transition-colors flex items-center gap-1">
-          <Home className="w-4 h-4" />
-          Dashboard
-        </Link>
-        <ChevronRight className="w-4 h-4 mx-2 text-slate-300" />
-        <span className="flex items-center gap-1 text-slate-700 font-medium">
-          <Layers className="w-4 h-4" />
-          Articles
-        </span>
-        {activeTab !== 'articles' && (
-          <>
-            <ChevronRight className="w-4 h-4 mx-2 text-slate-300" />
-            <span className="text-blue-600 font-medium capitalize">{activeTab}</span>
-          </>
-        )}
-      </nav>
+      {/* Standard Breadcrumb */}
+      <Breadcrumb className="mb-6">
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link to="/cmspanel">Dashboard</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Articles</BreadcrumbPage>
+          </BreadcrumbItem>
+          {activeTab !== 'articles' && (
+            <>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage className="capitalize text-blue-600">{activeTab}</BreadcrumbPage>
+              </BreadcrumbItem>
+            </>
+          )}
+        </BreadcrumbList>
+      </Breadcrumb>
 
       {/* Enhanced Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">

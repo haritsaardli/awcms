@@ -13,11 +13,17 @@ import * as BackupPlugin from '@/plugins/backup/index.js';
 import * as HelloWorldPlugin from '@/plugins/helloworld/HelloWorld.jsx';
 import * as MailketingPlugin from '@/plugins/mailketing/index.js';
 
+import * as RegionsPlugin from '@/plugins/regions/index.js';
+// Import Analytics Extension (Local Integration)
+import * as AnalyticsExtension from '@/extensions/ahliweb-analytics/src/index.js';
+
 // Plugin Registry Map
 const PLUGIN_REGISTRY = {
     'backup': BackupPlugin,
     'helloworld': HelloWorldPlugin,
-    'mailketing': MailketingPlugin
+    'mailketing': MailketingPlugin,
+    'regions': RegionsPlugin,
+    'awcms-ext-ahliweb-analytics': AnalyticsExtension
 };
 
 /**

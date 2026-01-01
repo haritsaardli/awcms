@@ -16,6 +16,7 @@ import {
     CreditCard,
     AlertCircle,
     CheckCircle,
+    ShieldAlert,
 } from 'lucide-react';
 import {
     getTenantEmailConfig,
@@ -133,6 +134,18 @@ function EmailSettings() {
         return (
             <div className="flex items-center justify-center h-64">
                 <RefreshCw className="w-6 h-6 animate-spin text-slate-400" />
+            </div>
+        );
+    }
+
+    if (!canConfigure) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[400px] bg-white rounded-xl border border-slate-200 p-12 text-center">
+                <div className="p-4 bg-red-50 rounded-full mb-4">
+                    <ShieldAlert className="w-12 h-12 text-red-500" />
+                </div>
+                <h3 className="text-xl font-bold text-slate-800">Access Denied</h3>
+                <p className="text-slate-500 mt-2">You do not have permission to configure email settings.</p>
             </div>
         );
     }

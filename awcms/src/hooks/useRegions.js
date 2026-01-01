@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
-import { supabase } from '../lib/supabaseClient';
-import { useToast } from './useToast';
+import { supabase } from '@/lib/customSupabaseClient';
+import { useToast } from '@/components/ui/use-toast';
 
 /**
  * Hook for managing administrative regions

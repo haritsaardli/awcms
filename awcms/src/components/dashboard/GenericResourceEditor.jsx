@@ -10,7 +10,21 @@ import { ArrowLeft, Save, Loader2, Lock } from 'lucide-react';
 import { useTenant } from '@/contexts/TenantContext';
 import { useAuth } from '@/contexts/SupabaseAuthContext';
 import { usePermissions } from '@/contexts/PermissionContext';
-
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue
+} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import SlugGenerator from '@/components/dashboard/slug/SlugGenerator';
+import ImageUpload from '@/components/ui/ImageUpload'; // Assessing imports
+import MultiImageUpload from '@/components/ui/MultiImageUpload';
+import RichTextEditor from '@/components/ui/RichTextEditor';
+import TagInput from '@/components/ui/TagInput';
+import ResourceSelect from '@/components/dashboard/ResourceSelect'; // Assuming this exists or works
+// Missing imports fixed
 // ...
 
 const GenericResourceEditor = ({
@@ -229,16 +243,22 @@ const GenericResourceEditor = ({
                                     placeholder="Add tags..."
                                 />
                             ) : field.type === 'select' ? (
-                                <select
-                                    className="flex h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-                                    value={formData[field.key] || ''}
-                                    onChange={e => handleChange(field.key, e.target.value)}
+                                <Select
+                                    value={formData[field.key] || field.defaultValue || ''}
+                                    onValueChange={val => handleChange(field.key, val)}
                                     required={field.required}
                                 >
-                                    {field.options.map(opt => (
-                                        <option key={opt.value} value={opt.value}>{opt.label}</option>
-                                    ))}
-                                </select>
+                                    <SelectTrigger className="w-full">
+                                        <SelectValue placeholder={field.description || "Select an option"} />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {field.options.map(opt => (
+                                            <SelectItem key={opt.value} value={opt.value}>
+                                                {opt.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
                             ) : field.type === 'resource_select' || field.type === 'relation' ? (
                                 <ResourceSelect
                                     table={field.resourceTable || field.table}
@@ -248,14 +268,18 @@ const GenericResourceEditor = ({
                                     filter={field.filter}
                                 />
                             ) : field.type === 'boolean' || field.type === 'checkbox' ? (
-                                <div className="flex items-center gap-2">
-                                    <input
-                                        type="checkbox"
+                                <div className="flex items-center space-x-2">
+                                    <Checkbox
+                                        id={field.key}
                                         checked={!!formData[field.key]}
-                                        onChange={e => handleChange(field.key, e.target.checked)}
-                                        className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                                        onCheckedChange={(checked) => handleChange(field.key, checked)}
                                     />
-                                    <span className="text-sm text-slate-500">Enable</span>
+                                    <label
+                                        htmlFor={field.key}
+                                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-slate-700"
+                                    >
+                                        {field.placeholder || "Enable"}
+                                    </label>
                                 </div>
                             ) : field.type === 'date' ? (
                                 <Input
