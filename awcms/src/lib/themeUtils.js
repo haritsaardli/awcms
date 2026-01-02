@@ -8,28 +8,28 @@ export function cn(...inputs) {
 
 // Convert Hex to HSL for Shadcn/Tailwind
 export function hexToShadcnHsl(hex) {
-  if (!hex) return "0 0% 100%"; // Default white
-  
+  if (!hex) return "hsl(0 0% 100%)"; // Default white
+
   // Remove # if present
   hex = hex.replace('#', '');
-  
+
   // Parse r, g, b
   let r = parseInt(hex.substring(0, 2), 16);
   let g = parseInt(hex.substring(2, 4), 16);
   let b = parseInt(hex.substring(4, 6), 16);
-  
+
   // Convert to HSL
   r /= 255;
   g /= 255;
   b /= 255;
-  
+
   let cmin = Math.min(r, g, b),
-      cmax = Math.max(r, g, b),
-      delta = cmax - cmin,
-      h = 0,
-      s = 0,
-      l = 0;
-  
+    cmax = Math.max(r, g, b),
+    delta = cmax - cmin,
+    h = 0,
+    s = 0,
+    l = 0;
+
   if (delta === 0)
     h = 0;
   else if (cmax === r)
@@ -38,44 +38,53 @@ export function hexToShadcnHsl(hex) {
     h = (b - r) / delta + 2;
   else
     h = (r - g) / delta + 4;
-  
+
   h = Math.round(h * 60);
-  
+
   if (h < 0)
     h += 360;
-  
+
   l = (cmax + cmin) / 2;
-  
+
   s = delta === 0 ? 0 : delta / (1 - Math.abs(2 * l - 1));
-  
+
   s = +(s * 100).toFixed(1);
   l = +(l * 100).toFixed(1);
-  
-  return `${h} ${s}% ${l}%`;
+
+  // Return standard CSS HSL string for Tailwind v4 compatibility
+  // Using modern space-separated syntax inside the function
+  return `hsl(${h} ${s}% ${l}%)`;
 }
 
 // Convert Shadcn HSL string back to Hex for input[type=color]
 export function shadcnHslToHex(hslString) {
   if (!hslString) return "#ffffff";
-  
-  // Handle "H S% L%" format
-  const parts = hslString.split(' ').map(p => parseFloat(p));
+
+  // Handle both "H S% L%" (legacy) and "hsl(H S% L%)" (modern)
+  let cleanString = hslString;
+  if (hslString.startsWith('hsl(')) {
+    cleanString = hslString.replace('hsl(', '').replace(')', '');
+  }
+  // Remove commas if present (legacy syntax support)
+  cleanString = cleanString.replace(/,/g, '');
+
+  const parts = cleanString.split(' ').filter(Boolean).map(p => parseFloat(p));
   if (parts.length !== 3) return "#ffffff";
-  
+
   let h = parts[0];
   let s = parts[1];
   let l = parts[2];
-  
+
   s /= 100;
   l /= 100;
-  
+
   let c = (1 - Math.abs(2 * l - 1)) * s,
-      x = c * (1 - Math.abs(((h / 60) % 2) - 1)),
-      m = l - c / 2,
-      r = 0,
-      g = 0,
-      b = 0;
-  
+    x = c * (1 - Math.abs(((h / 60) % 2) - 1)),
+    m = l - c / 2,
+    r = 0,
+    g = 0,
+    b = 0;
+
   if (0 <= h && h < 60) {
     r = c; g = x; b = 0;
   } else if (60 <= h && h < 120) {
@@ -89,45 +98,53 @@ export function shadcnHslToHex(hslString) {
   } else if (300 <= h && h < 360) {
     r = c; g = 0; b = x;
   }
-  
+
   r = Math.round((r + m) * 255).toString(16);
   g = Math.round((g + m) * 255).toString(16);
   b = Math.round((b + m) * 255).toString(16);
-  
+
   if (r.length === 1) r = "0" + r;
   if (g.length === 1) g = "0" + g;
   if (b.length === 1) b = "0" + b;
-  
+
   return "#" + r + g + b;
 }
 
 export function applyTheme(config) {
   if (!config) return;
-  
+
   const root = document.documentElement;
-  
+
   // Apply Colors
   if (config.colors) {
     Object.entries(config.colors).forEach(([key, value]) => {
       // Convert camelCase to kebab-case for CSS variables if needed, 
       // but shadcn usually uses specific names.
       // Assuming keys match shadcn css variables (e.g. 'primary', 'background')
-      
+
       // Map config keys to CSS variable names
       const varName = `--${key.replace(/[A-Z]/g, m => "-" + m.toLowerCase())}`;
-      root.style.setProperty(varName, value);
+
+      let finalValue = value;
+      // Check if value is legacy Shadcn HSL (e.g. "222.2 84% 4.9%")
+      // It has spaces, no commas, and starts with a number.
+      if (typeof value === 'string' && /^\d+(\.\d+)?\s+\d+(\.\d+)?%?\s+\d+(\.\d+)?%?/.test(value) && !value.startsWith('hsl')) {
+        finalValue = `hsl(${value})`;
+      }
+
+      root.style.setProperty(varName, finalValue);
     });
   }
-  
+
   // Apply Radius
   if (config.radius !== undefined) {
     root.style.setProperty('--radius', `${config.radius}rem`);
   }
-  
+
   // Apply Fonts (This is trickier as it requires loading fonts, 
   // but for now we just set the variable)
   if (config.fonts) {
-      if (config.fonts.heading) root.style.setProperty('--font-heading', config.fonts.heading);
-      if (config.fonts.body) root.style.setProperty('--font-sans', config.fonts.body);
+    if (config.fonts.heading) root.style.setProperty('--font-heading', config.fonts.heading);
+    if (config.fonts.body) root.style.setProperty('--font-sans', config.fonts.body);
   }
 }

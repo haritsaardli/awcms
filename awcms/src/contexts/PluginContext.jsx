@@ -3,6 +3,7 @@ import { hooks } from '@/lib/hooks';
 import { supabase } from '@/lib/customSupabaseClient';
 import { getAllPlugins, getPlugin, getPluginComponent } from '@/lib/pluginRegistry';
 import { loadExternalExtension } from '@/lib/externalExtensionLoader';
+import ExtensionErrorBoundary from '@/components/ui/ExtensionErrorBoundary';
 
 const PluginContext = createContext(null);
 
@@ -29,9 +30,9 @@ export const PluginSlot = ({ name, args = {}, fallback = null }) => {
     return (
         <>
             {components.map((Comp, index) => (
-                <React.Fragment key={index}>
+                <ExtensionErrorBoundary key={index} extensionName={`Plugin: ${name}`}>
                     {React.isValidElement(Comp) ? Comp : <Comp {...args} />}
-                </React.Fragment>
+                </ExtensionErrorBoundary>
             ))}
         </>
     );

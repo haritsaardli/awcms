@@ -93,12 +93,9 @@ const MobileUsersManager = lazy(() => import('@/pages/cmspanel/MobileUsersManage
 const PushNotificationsManager = lazy(() => import('@/pages/cmspanel/PushNotificationsManager'));
 const MobileAppConfig = lazy(() => import('@/pages/cmspanel/MobileAppConfig'));
 
-// Plugins (Lazy Loaded)
-
-
-
 // Plugin Dynamic Routes
 import { usePluginRoutes } from '@/components/routing/PluginRoutes';
+import ExtensionErrorBoundary from '@/components/ui/ExtensionErrorBoundary';
 
 
 // Loading Screen
@@ -296,13 +293,15 @@ const MainRouter = () => {
                 key={route.path}
                 path={route.path}
                 element={
-                  route.lazy ? (
-                    <Suspense fallback={<PageLoader />}>
+                  <ExtensionErrorBoundary extensionName={`Route: ${route.path}`}>
+                    {route.lazy ? (
+                      <Suspense fallback={<PageLoader />}>
+                        <Element />
+                      </Suspense>
+                    ) : (
                       <Element />
-                    </Suspense>
-                  ) : (
-                    <Element />
-                  )
+                    )}
+                  </ExtensionErrorBoundary>
                 }
               />
             );

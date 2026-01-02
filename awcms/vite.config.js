@@ -19,6 +19,15 @@ export default defineConfig(({ mode }) => {
 			host: '::',
 			port: 3000,
 			cors: typeof corsAllowedOrigins === 'boolean' ? corsAllowedOrigins : { origin: corsAllowedOrigins },
+			// Vite 7 Warmup: Pre-transform critical modules to kill startup waterfall
+			warmup: {
+				clientFiles: [
+					'./src/main.jsx',
+					'./src/components/layouts/*.jsx',
+					'./src/contexts/*.jsx',
+					'./src/components/ui/*.jsx'
+				],
+			},
 			// Security headers (OWASP aligned)
 			headers: {
 				'X-Content-Type-Options': 'nosniff',
@@ -62,6 +71,7 @@ export default defineConfig(({ mode }) => {
 		// Build configuration
 		build: {
 			outDir: 'dist',
+			target: 'baseline-widely-available', // Vite 7 default for modern browsers
 			sourcemap: mode === 'development',
 			// Optimize chunk size
 			rollupOptions: {
