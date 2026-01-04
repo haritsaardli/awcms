@@ -5,6 +5,20 @@ All notable changes to the **AWCMS** project will be documented in this file.
 
 ## [Unreleased]
 
+## [2.5.0] "Catalyst" - 2026-01-04
+
+### Changed
+
+- **CI/CD Pipeline**: Upgraded Flutter from `3.27.0` to `3.38.3` (Dart 3.10.1).
+- **Flutter Mobile**: Updated SDK constraint from `^3.6.0` to `^3.10.0`.
+- **Flutter Mobile Dependencies**:
+  - `flutter_riverpod`: `^2.6.1` → `^3.1.0`
+  - `go_router`: `^14.6.2` → `^17.0.1`
+  - `flutter_lints`: `^5.0.0` → `^6.0.0`
+  - `drift`: `^2.22.0` → `^2.30.0`
+  - `drift_dev`: `^2.22.0` → `^2.30.0`
+  - `drift_flutter`: `^0.2.4` → `^0.2.8`
+
 ## [2.4.3] - 2026-01-04
 
 ### Fixed
