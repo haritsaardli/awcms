@@ -5,49 +5,54 @@ export const onRequest = defineMiddleware(async (context, next) => {
     const { request, locals } = context;
 
     // 1. Resolve Host
-    let host = request.headers.get("x-forwarded-host") || request.headers.get("host") || "";
-    if (host.includes(":")) {
-        host = host.split(":")[0];
+    try {
+        let host = request.headers.get("x-forwarded-host") || request.headers.get("host") || "";
+        if (host.includes(":")) {
+            host = host.split(":")[0];
+        }
+
+        // Dev override (add this to .env if needed)
+        console.log('[Middleware] DEV:', import.meta.env.DEV);
+        console.log('[Middleware] VITE_DEV_TENANT_HOST:', import.meta.env.VITE_DEV_TENANT_HOST);
+        if (import.meta.env.DEV && import.meta.env.VITE_DEV_TENANT_HOST) {
+            host = import.meta.env.VITE_DEV_TENANT_HOST;
+        }
+
+        // 2. Resolve Tenant ID via RPC
+        // Use Runtime Env if available (for Cloudflare)
+        const runtimeEnv = context.locals.runtime?.env || {};
+
+        // Create request-scoped client with runtime env
+        const SafeSupabase = createClientFromEnv(runtimeEnv);
+
+        // Debug Logging
+        console.log('[Middleware] Host:', host);
+        console.log('[Middleware] Runtime Env Keys:', Object.keys(runtimeEnv));
+        console.log('[Middleware] URL check:', !!runtimeEnv.VITE_SUPABASE_URL, !!import.meta.env.VITE_SUPABASE_URL);
+
+        if (!SafeSupabase) {
+            console.error('[Middleware] Failed to initialize Supabase client. Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY.');
+            return new Response('Service Unavailable: Invalid Configuration (Env Vars Missing)', { status: 503 });
+        }
+
+        // Using single-flight query to custom safe function
+        const { data: tenantId, error } = await SafeSupabase
+            .rpc('get_tenant_id_by_host', { lookup_host: host });
+
+        if (error || !tenantId) {
+            console.warn(`Tenant resolution failed for host: ${host}`);
+            // If no tenant found, return 404 or redirect to platform landing
+            // For now, strict 404
+            return new Response(`Tenant Not Found for host: ${host}`, { status: 404 });
+        }
+
+        // 3. Set Context
+        locals.tenant_id = tenantId as string;
+        locals.host = host;
+
+        return next();
+    } catch (e: any) {
+        console.error('[Middleware] CRITICAL ERROR:', e);
+        return new Response(`Critical Middleware Error: ${e.message}\nStack: ${e.stack}`, { status: 500 });
     }
-
-    // Dev override (add this to .env if needed)
-    console.log('[Middleware] DEV:', import.meta.env.DEV);
-    console.log('[Middleware] VITE_DEV_TENANT_HOST:', import.meta.env.VITE_DEV_TENANT_HOST);
-    if (import.meta.env.DEV && import.meta.env.VITE_DEV_TENANT_HOST) {
-        host = import.meta.env.VITE_DEV_TENANT_HOST;
-    }
-
-    // 2. Resolve Tenant ID via RPC
-    // Use Runtime Env if available (for Cloudflare)
-    const runtimeEnv = context.locals.runtime?.env || {};
-
-    // Create request-scoped client with runtime env
-    const SafeSupabase = createClientFromEnv(runtimeEnv);
-
-    // Debug Logging
-    console.log('[Middleware] Host:', host);
-    console.log('[Middleware] Runtime Env Keys:', Object.keys(runtimeEnv));
-    console.log('[Middleware] URL check:', !!runtimeEnv.VITE_SUPABASE_URL, !!import.meta.env.VITE_SUPABASE_URL);
-
-    if (!SafeSupabase) {
-        console.error('[Middleware] Failed to initialize Supabase client. Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY.');
-        return new Response('Service Unavailable: Invalid Configuration (Env Vars Missing)', { status: 503 });
-    }
-
-    // Using single-flight query to custom safe function
-    const { data: tenantId, error } = await SafeSupabase
-        .rpc('get_tenant_id_by_host', { lookup_host: host });
-
-    if (error || !tenantId) {
-        console.warn(`Tenant resolution failed for host: ${host}`);
-        // If no tenant found, return 404 or redirect to platform landing
-        // For now, strict 404
-        return new Response(`Tenant Not Found for host: ${host}`, { status: 404 });
-    }
-
-    // 3. Set Context
-    locals.tenant_id = tenantId as string;
-    locals.host = host;
-
-    return next();
 });
