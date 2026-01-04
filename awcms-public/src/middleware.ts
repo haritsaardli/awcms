@@ -20,8 +20,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
     // 2. Resolve Tenant ID via RPC
     // Using single-flight query to custom safe function
     const { data: tenantId, error } = await supabase
-        .rpc('get_tenant_id_by_host', { lookup_host: host })
-        .single();
+        .rpc('get_tenant_id_by_host', { lookup_host: host });
 
     if (error || !tenantId) {
         console.warn(`Tenant resolution failed for host: ${host}`);
