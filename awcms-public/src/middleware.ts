@@ -24,6 +24,16 @@ export const onRequest = defineMiddleware(async (context, next) => {
     // Create request-scoped client with runtime env
     const SafeSupabase = createClientFromEnv(runtimeEnv);
 
+    // Debug Logging
+    console.log('[Middleware] Host:', host);
+    console.log('[Middleware] Runtime Env Keys:', Object.keys(runtimeEnv));
+    console.log('[Middleware] URL check:', !!runtimeEnv.VITE_SUPABASE_URL, !!import.meta.env.VITE_SUPABASE_URL);
+
+    if (!SafeSupabase) {
+        console.error('[Middleware] Failed to initialize Supabase client. Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY.');
+        return new Response('Service Unavailable: Invalid Configuration (Env Vars Missing)', { status: 503 });
+    }
+
     // Using single-flight query to custom safe function
     const { data: tenantId, error } = await SafeSupabase
         .rpc('get_tenant_id_by_host', { lookup_host: host });

@@ -19,8 +19,8 @@ export const createClientFromEnv = (env: any = {}, headers: Record<string, strin
 
     if (!url || !key) {
         console.error('[Supabase] Missing URL or Key. Check Cloudflare Variables.');
-        // Return dummy client to prevent crash, but operations will fail
-        return {} as any;
+        // Return null to indicate failure
+        return null;
     }
 
     return createClient(url, key, {
