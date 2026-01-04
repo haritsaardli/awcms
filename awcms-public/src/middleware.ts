@@ -1,5 +1,5 @@
 import { defineMiddleware } from "astro/middleware";
-import { supabase } from "./lib/supabase";
+import { supabase, createClientFromEnv } from "./lib/supabase";
 
 export const onRequest = defineMiddleware(async (context, next) => {
     const { request, locals } = context;
@@ -18,8 +18,14 @@ export const onRequest = defineMiddleware(async (context, next) => {
     }
 
     // 2. Resolve Tenant ID via RPC
+    // Use Runtime Env if available (for Cloudflare)
+    const runtimeEnv = context.locals.runtime?.env || {};
+
+    // Create request-scoped client with runtime env
+    const SafeSupabase = createClientFromEnv(runtimeEnv);
+
     // Using single-flight query to custom safe function
-    const { data: tenantId, error } = await supabase
+    const { data: tenantId, error } = await SafeSupabase
         .rpc('get_tenant_id_by_host', { lookup_host: host });
 
     if (error || !tenantId) {

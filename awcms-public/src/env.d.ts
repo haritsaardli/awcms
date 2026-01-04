@@ -5,6 +5,13 @@ declare namespace App {
     interface Locals {
         tenant_id: string;
         host: string;
+        runtime?: {
+            env: {
+                VITE_SUPABASE_URL?: string;
+                VITE_SUPABASE_ANON_KEY?: string;
+                [key: string]: any;
+            }
+        };
     }
 }
 
