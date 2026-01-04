@@ -26,7 +26,7 @@ class SecurityGate extends ConsumerWidget {
         return child;
       },
       loading: () => const _LoadingScreen(),
-      error: (_, _) => child, // Proceed if check fails
+      error: (error, stackTrace) => child, // Proceed if check fails
     );
   }
 }
@@ -72,9 +72,9 @@ class _BlockedScreen extends StatelessWidget {
               Text(
                 'Perangkat Tidak Aman',
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: colorScheme.error,
-                ),
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.error,
+                    ),
               ),
               const SizedBox(height: 16),
               Text(

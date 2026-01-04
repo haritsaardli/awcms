@@ -145,7 +145,8 @@ jobs:
     name: Deploy to Cloudflare Pages
     runs-on: ubuntu-latest
     needs: [lint-test-admin, lint-build-public]
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    # Only deploy when on main branch AND secrets are configured
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push' && vars.CLOUDFLARE_ENABLED == 'true'
     
     steps:
       - name: Checkout code

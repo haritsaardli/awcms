@@ -5,6 +5,14 @@ All notable changes to the **AWCMS** project will be documented in this file.
 
 ## [Unreleased]
 
+## [2.4.2] - 2026-01-04
+
+### Fixed
+
+- **Flutter Mobile**: Corrected Dart SDK constraint (`^3.10.1` → `^3.6.0`) to match Flutter 3.27.0.
+- **Flutter Mobile**: Fixed duplicate `_` variable names in `offline_indicator.dart` and `security_gate.dart` (Dart 3.x compatibility).
+- **CI/CD Pipeline**: Added `CLOUDFLARE_ENABLED` variable check to skip deployment job when secrets are not configured.
+
 ## [2.4.1] - 2026-01-04
 
 ### Fixed

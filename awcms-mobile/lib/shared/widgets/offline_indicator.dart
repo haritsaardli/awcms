@@ -101,7 +101,7 @@ class OfflineIndicator extends ConsumerWidget {
         return const SizedBox.shrink();
       },
       loading: () => const SizedBox.shrink(),
-      error: (_, _) => const SizedBox.shrink(),
+      error: (error, stackTrace) => const SizedBox.shrink(),
     );
   }
 }
@@ -132,10 +132,10 @@ class SyncStatusChip extends ConsumerWidget {
               color: isOffline
                   ? colorScheme.errorContainer
                   : syncState.isSyncing
-                  ? colorScheme.primaryContainer
-                  : syncState.hasPending
-                  ? colorScheme.tertiaryContainer
-                  : colorScheme.surfaceContainerHighest,
+                      ? colorScheme.primaryContainer
+                      : syncState.hasPending
+                          ? colorScheme.tertiaryContainer
+                          : colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
@@ -155,8 +155,8 @@ class SyncStatusChip extends ConsumerWidget {
                     isOffline
                         ? Icons.cloud_off
                         : syncState.hasPending
-                        ? Icons.sync_problem
-                        : Icons.cloud_done,
+                            ? Icons.sync_problem
+                            : Icons.cloud_done,
                     size: 14,
                     color: isOffline
                         ? colorScheme.onErrorContainer
@@ -179,7 +179,7 @@ class SyncStatusChip extends ConsumerWidget {
         );
       },
       loading: () => const SizedBox.shrink(),
-      error: (_, _) => const SizedBox.shrink(),
+      error: (error, stackTrace) => const SizedBox.shrink(),
     );
   }
 }
