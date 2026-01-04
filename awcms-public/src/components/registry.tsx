@@ -153,6 +153,22 @@ export const COMPONENT_REGISTRY: Record<string, ComponentRegistryItem> = {
     'core/menu': { component: CoreMenu, schema: CoreMenuSchema },
 };
 
+// Import awtemplate01 registry and merge
+let mergedRegistry = { ...COMPONENT_REGISTRY };
+
+// Dynamic import for awtemplate01 (lazy loading)
+const initAwtemplate01 = async () => {
+    try {
+        const { awtemplate01Registry } = await import('../templates/awtemplate01/registry');
+        mergedRegistry = { ...COMPONENT_REGISTRY, ...awtemplate01Registry };
+    } catch (e) {
+        console.warn('[Registry] awtemplate01 not available:', e);
+    }
+};
+
+// Initialize on module load
+initAwtemplate01();
+
 export const getComponent = (type: string) => {
-    return COMPONENT_REGISTRY[type];
+    return mergedRegistry[type] || COMPONENT_REGISTRY[type];
 };

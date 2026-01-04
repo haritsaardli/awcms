@@ -6,29 +6,10 @@ import TenantGuard from '@/components/auth/TenantGuard';
 import LoginPage from '@/pages/cmspanel/LoginPage';
 import ForgotPasswordPage from '@/pages/cmspanel/ForgotPasswordPage';
 import UpdatePasswordPage from '@/pages/cmspanel/UpdatePasswordPage';
-// Public Pages (Keep Static for SEO/Speed on Landing)
-import Home from '@/pages/public/Home';
-import PublicLayout from '@/components/public/PublicLayout';
-import PublicArticles from '@/pages/public/PublicArticles';
-import PublicArticleDetail from '@/pages/public/PublicArticleDetail';
-import PublicPages from '@/pages/public/PublicPages';
-import PublicPageDetail from '@/pages/public/PublicPageDetail';
-import PublicProducts from '@/pages/public/PublicProducts';
-import PublicProductDetail from '@/pages/public/PublicProductDetail';
-import PublicPromotions from '@/pages/public/PublicPromotions';
-import PublicPromotionDetail from '@/pages/public/PublicPromotionDetail';
-import PublicPortfolio from '@/pages/public/PublicPortfolio';
-import PublicPortfolioDetail from '@/pages/public/PublicPortfolioDetail';
-import PublicTestimonies from '@/pages/public/PublicTestimonies';
-import PublicPhotoGallery from '@/pages/public/PublicPhotoGallery';
-import PublicPhotoGalleryDetail from '@/pages/public/PublicPhotoGalleryDetail';
-import PublicVideoGallery from '@/pages/public/PublicVideoGallery';
-import PublicVideoGalleryDetail from '@/pages/public/PublicVideoGalleryDetail';
-import PublicAnnouncements from '@/pages/public/PublicAnnouncements';
-import PublicAnnouncementDetail from '@/pages/public/PublicAnnouncementDetail';
-import PublicContact from '@/pages/public/PublicContact';
-import PublicPageResolver from '@/components/public/PublicPageResolver';
-import SitemapRedirect from '@/pages/public/SitemapRedirect';
+// Public Pages (Removed - Moved to awcms-public)
+// import PublicPageResolver from '@/components/public/PublicPageResolver'; 
+// import PublicLayout from '@/components/public/PublicLayout';
+
 
 // Admin Layout
 const AdminLayout = lazy(() => import('@/components/dashboard/AdminLayout'));
@@ -132,6 +113,7 @@ const ProtectedRoute = ({ children }) => {
 
 import PublicRegisterPage from '@/pages/public/PublicRegisterPage';
 
+
 const MainRouter = () => {
   const { routes: pluginRoutes } = usePluginRoutes();
 
@@ -148,46 +130,11 @@ const MainRouter = () => {
         <Route path="/cmspanel/update-password" element={<UpdatePasswordPage />} />
 
         {/* Public Routes */}
-        <Route element={<PublicLayout />}>
-          <Route path="/" element={<Home />} />
+        {/* Public Routes - DEPRECATED/REMOVED */}
+        {/* All public traffic is handled by awcms-public (Astro) */}
+        {/* Redirect root to login */}
+        <Route path="/" element={<Navigate to="/login" replace />} />
 
-          <Route path="/articles" element={<PublicArticles />} />
-          <Route path="/articles/category/:categorySlug" element={<PublicArticles />} />
-          <Route path="/articles/tag/:tagSlug" element={<PublicArticles />} />
-          <Route path="/articles/:slug" element={<PublicArticleDetail />} />
-
-          <Route path="/pages" element={<PublicPages />} />
-          <Route path="/pages/:slug" element={<PublicPageDetail />} />
-
-          <Route path="/products" element={<PublicProducts />} />
-          <Route path="/product/:slug" element={<PublicProductDetail />} />
-
-          <Route path="/promotions" element={<PublicPromotions />} />
-          <Route path="/promotion/:slug" element={<PublicPromotionDetail />} />
-
-          <Route path="/portfolio" element={<PublicPortfolio />} />
-          <Route path="/portfolio/:slug" element={<PublicPortfolioDetail />} />
-
-          <Route path="/testimonies" element={<PublicTestimonies />} />
-
-          <Route path="/gallery/photos" element={<PublicPhotoGallery />} />
-          <Route path="/gallery/photos/:slug" element={<PublicPhotoGalleryDetail />} />
-
-          <Route path="/gallery/videos" element={<PublicVideoGallery />} />
-          <Route path="/gallery/videos/:slug" element={<PublicVideoGalleryDetail />} />
-
-          <Route path="/announcements" element={<PublicAnnouncements />} />
-          <Route path="/announcement/:id" element={<PublicAnnouncementDetail />} />
-
-          <Route path="/contact" element={<PublicContact />} />
-
-          {/* Sitemap Routes */}
-          <Route path="/sitemap.xml" element={<SitemapRedirect />} />
-          <Route path="/sitemap" element={<SitemapRedirect />} />
-
-          {/* Dynamic Catch-all Resolver for Public Pages (Must be last) */}
-          <Route path="/:slug" element={<PublicPageResolver />} />
-        </Route>
 
         {/* CMS Panel Routes */}
         <Route

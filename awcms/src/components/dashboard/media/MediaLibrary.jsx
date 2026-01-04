@@ -36,9 +36,10 @@ const getFileUrl = (file) => {
 
 const MediaLibrary = ({ onSelect, selectionMode = false, refreshTrigger = 0, isTrashView = false }) => {
     const { toast } = useToast();
-    const { checkAccess, hasPermission } = usePermissions();
+    const { checkAccess, hasPermission, userRole } = usePermissions();
     const { currentTenant } = useTenant();
     const tenantId = currentTenant?.id;
+    const isPlatformAdmin = userRole === 'super_admin' || userRole === 'owner';
 
     const canUpload = checkAccess('create', 'media');
     const canDelete = checkAccess('delete', 'media');
@@ -66,9 +67,13 @@ const MediaLibrary = ({ onSelect, selectionMode = false, refreshTrigger = 0, isT
         try {
             let dbQuery = supabase
                 .from('files')
-                .select('*, users:uploaded_by(email, full_name)', { count: 'exact' })
-                .eq('tenant_id', tenantId) // Explicit Tenant Isolation
+                .select('*, users:uploaded_by(email, full_name), tenant:tenants(name)', { count: 'exact' })
                 .order('created_at', { ascending: false });
+
+            // Platform admins see all files, others are tenant-scoped
+            if (!isPlatformAdmin && tenantId) {
+                dbQuery = dbQuery.eq('tenant_id', tenantId);
+            }
 
             if (isTrashView) {
                 dbQuery = dbQuery.not('deleted_at', 'is', null);
@@ -557,6 +562,11 @@ const MediaLibrary = ({ onSelect, selectionMode = false, refreshTrigger = 0, isT
                                 </div>
                             </div>
                             <div className="p-2">
+                                {isPlatformAdmin && (
+                                    <span className="text-[9px] font-medium text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded mb-1 inline-block">
+                                        {file.tenant?.name || '(Unknown)'}
+                                    </span>
+                                )}
                                 <p className="text-xs font-medium truncate" title={file.name}>{file.name}</p>
                                 <p className="text-[10px] text-slate-500">{formatFileSize(file.file_size)}</p>
                             </div>
@@ -590,6 +600,14 @@ const MediaLibrary = ({ onSelect, selectionMode = false, refreshTrigger = 0, isT
                                     <div className="min-w-0 flex-1">
                                         <p className="text-sm font-medium truncate">{file.name}</p>
                                         <div className="flex items-center gap-2 text-xs text-slate-500">
+                                            {isPlatformAdmin && (
+                                                <>
+                                                    <span className="text-[10px] font-medium text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded">
+                                                        {file.tenant?.name || '(Unknown)'}
+                                                    </span>
+                                                    <span>•</span>
+                                                </>
+                                            )}
                                             <span>{formatFileSize(file.file_size)}</span>
                                             <span>•</span>
                                             <span>{new Date(file.created_at).toLocaleDateString()}</span>

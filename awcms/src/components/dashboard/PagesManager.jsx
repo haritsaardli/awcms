@@ -235,7 +235,7 @@ function PagesManager({ onlyVisual = false }) {
             columns={categoryColumns}
             formFields={categoryFormFields}
             permissionPrefix="categories"
-            customSelect="*, owner:users!created_by(email, full_name)"
+            customSelect="*, owner:users!created_by(email, full_name), tenant:tenants(name)"
             defaultFilters={{ type: 'page' }}
             showBreadcrumbs={false}
           />

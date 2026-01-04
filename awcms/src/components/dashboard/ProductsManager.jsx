@@ -212,7 +212,7 @@ function ProductsManager() {
           columns={productColumns}
           formFields={productFormFields}
           permissionPrefix="products"
-          customSelect="*, category:categories(name), product_type:product_types(name)"
+          customSelect="*, category:categories(name), product_type:product_types(name), owner:users!created_by(email, full_name), tenant:tenants(name)"
           showBreadcrumbs={false}
         />
       )}
@@ -235,7 +235,7 @@ function ProductsManager() {
           columns={categoryColumns}
           formFields={categoryFormFields}
           permissionPrefix="categories"
-          customSelect="*"
+          customSelect="*, owner:users!created_by(email, full_name), tenant:tenants(name)"
           defaultFilters={{ type: 'product' }}
           showBreadcrumbs={false}
         />

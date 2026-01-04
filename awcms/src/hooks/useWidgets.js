@@ -13,7 +13,7 @@ export const useWidgets = (areaId) => {
         try {
             const { data, error } = await supabase
                 .from('widgets')
-                .select('*')
+                .select('*, tenant:tenants(name)')
                 .eq('area_id', areaId)
                 .order('order', { ascending: true }); // Make sure 'order' column exists and is used
 

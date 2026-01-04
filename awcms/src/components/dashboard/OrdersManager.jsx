@@ -155,7 +155,7 @@ function OrdersManager() {
                 formFields={formFields}
                 permissionPrefix="orders"
                 canCreate={false}
-                customSelect="*, user:users(id, email, full_name)"
+                customSelect="*, user:users(id, email, full_name), owner:users!created_by(email, full_name), tenant:tenants(name)"
                 showBreadcrumbs={false}
             />
         </div>

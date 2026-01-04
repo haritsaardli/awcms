@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import AWT01Layout from '../templates/awtemplate01/Layout.astro';
 import { createScopedClient } from '../lib/supabase';
 import { PuckRenderer } from '../components/PuckRenderer';
 import { TipTapRenderer } from '../components/TipTapRenderer';
@@ -38,6 +39,7 @@ const assignmentMap = {};
 (assignments || []).forEach(a => assignmentMap[a.route_type] = a.template_id);
 
 // 3. Determine Flow
+let currentTemplateSlug = null;
 let templateId = null;
 let pageContent = null;
 let meta = { title: 'Page', description: '' };
@@ -63,12 +65,9 @@ if (pageData) {
 } else {
     // Page Not Found
     if (currentSlug === 'home') {
-        // Homepage route but no page record 'home' exists
-        // Use 'home' template if available
         templateId = assignmentMap['home'];
         meta.title = 'Home';
     } else {
-        // 404
         is404 = true;
         templateId = assignmentMap['404'];
         meta.title = 'Page Not Found';
@@ -87,6 +86,7 @@ if (templateId) {
         .maybeSingle();
 
     if (template) {
+        currentTemplateSlug = template.slug;
         // Get Parts
         const parts = template.parts || {}; // e.g. { header: 'uuid', footer: 'uuid' }
         const partIds = Object.values(parts).filter(Boolean);
@@ -113,28 +113,16 @@ if (templateId) {
              mergedContent.push(...headerContent);
         }
 
-        if (pageContent && pageContent.content) {
+        // Merge Content:
+        // Priority: Page Content -> Template Content
+        const pageHasContent = pageContent && pageContent.content && pageContent.content.length > 0;
+        
+        if (pageHasContent) {
              mergedContent.push(...pageContent.content);
-        } else if (is404) {
-             // 404 might have content in the template itself (as 'main' part or just template data?)
-             // Templates currently have `data` (Puck JSON).
-             // Does the Template's OWN `data` field contain content?
-             // Yes, `templates` table has `data`.
-             // If Template has its own content, we should use it?
-             // A Page Template usually has a "Slot" for the page content.
-             // If we treat Template.data as the master layout, we need to inject Page Content into it.
-             // Simplification: We merge arrays.
-             // Template.data.content + Header + Footer?
-             // Usually Template Data IS the layout.
-             // Let's assume Template Data has the static parts of the template (if any)
-             // AND we append/prepend Headers/Footers.
-             
-             // If it's a 404 template, the content IS in the template.data.
+        } else {
+             // Use template content as fallback (Master Template)
              const templateContent = template.data?.content || [];
              mergedContent.push(...templateContent);
-        } else if (pageContent) {
-             // Generic fallback
-             mergedContent.push(...(pageContent.content || []));
         }
 
         if (parts.footer && partDataMap[parts.footer]) {
@@ -167,9 +155,12 @@ if (pageData?.tiptap_doc_jsonb) {
     // We'll leave it out for this iteration as users focus on Visual Builder (Puck).
 }
 
+// ... (lines 145-149) NOT MATCHED
+const LayoutComponent = (currentTemplateSlug === 'awtemplate01') ? AWT01Layout : Layout;
+
 ---
 
-<Layout title={meta.title} description={meta.description}>
+<LayoutComponent title={meta.title} description={meta.description}>
   <main>
     {finalPuckData.content.length > 0 ? (
        <PuckRenderer data={finalPuckData} />
@@ -186,4 +177,4 @@ if (pageData?.tiptap_doc_jsonb) {
        </div>
     )}
   </main>
-</Layout>
+</LayoutComponent>

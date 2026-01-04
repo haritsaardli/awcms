@@ -50,6 +50,9 @@ function SettingsManager() {
                 permissionPrefix="setting"
                 viewPermission="tenant.setting.read"
                 createPermission="tenant.setting.create"
+                customSelect="*"
+                enableSoftDelete={false}
+                defaultSortColumn="key"
                 showBreadcrumbs={false}
             />
         </div>

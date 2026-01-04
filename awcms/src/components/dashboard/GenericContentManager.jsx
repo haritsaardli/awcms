@@ -34,7 +34,9 @@ const GenericContentManager = ({
     createPermission,
     restorePermission,
     permanentDeletePermission,
-    showBreadcrumbs = true
+    showBreadcrumbs = true,
+    enableSoftDelete = true,
+    defaultSortColumn = 'created_at'
 }) => {
     const { toast } = useToast();
     const { user } = useAuth();
@@ -83,7 +85,7 @@ const GenericContentManager = ({
         setLoading(true);
         try {
             // Updated default select query to use valid PostgREST syntax for embedding 'users' via 'created_by' column.
-            const selectQuery = customSelect || '*, owner:users!created_by(email, full_name)';
+            const selectQuery = customSelect || '*, owner:users!created_by(email, full_name), tenant:tenants(name)';
 
             // UnifiedDataManager Integration
             let q = udm.from(tableName)
@@ -101,10 +103,12 @@ const GenericContentManager = ({
                 return;
             }
 
-            if (showTrash) {
-                q = q.not('deleted_at', 'is', null);
-            } else {
-                q = q.is('deleted_at', null);
+            if (enableSoftDelete) {
+                if (showTrash) {
+                    q = q.not('deleted_at', 'is', null);
+                } else {
+                    q = q.is('deleted_at', null);
+                }
             }
 
             // Apply default filters (e.g., { type: 'articles' } for categories)
@@ -124,7 +128,7 @@ const GenericContentManager = ({
 
             const { data, count, error } = await q
                 .range(from, to)
-                .order('created_at', { ascending: false });
+                .order(defaultSortColumn, { ascending: false });
 
             if (error) throw error;
 
@@ -169,17 +173,20 @@ const GenericContentManager = ({
             const deletedAt = new Date().toISOString();
 
             // UnifiedDataManager Update
-            const { data, error } = await udm.from(tableName)
-                .update({ deleted_at: deletedAt })
-                .eq('id', itemToDelete.id); // UDM update expects filters to apply to update WHERE clause
+            if (enableSoftDelete) {
+                const { error } = await udm.from(tableName)
+                    .update({ deleted_at: deletedAt })
+                    .eq('id', itemToDelete.id);
 
-            if (error) throw error;
+                if (error) throw error;
+                toast({ title: 'Success', description: `${resourceName} moved to trash` });
+            } else {
+                const { error } = await udm.from(tableName).delete().eq('id', itemToDelete.id);
 
-            // Note: UDM update returns { data: payload } for optimistic, so checks on data might need adjustment 
-            // but our UDM wrapper returns standard {data, error} format.
-            // If offline, data is just the payload.
+                if (error) throw error;
+                toast({ title: 'Success', description: `${resourceName} deleted permanently` });
+            }
 
-            toast({ title: 'Success', description: `${resourceName} moved to trash` });
             fetchItems();
         } catch (err) {
             console.error('Delete error:', err);
@@ -252,14 +259,15 @@ const GenericContentManager = ({
         }
     ];
 
-    // Added Tenant Column for Platform Admins (if not filtered by tenant)
-    if (!currentTenant?.id && hasPermission('manage_platform')) {
+    // Added Tenant Column for Platform Admins (owner, super_admin)
+    const isPlatformAdmin = hasPermission('manage_platform');
+    if (isPlatformAdmin) {
         displayColumns.unshift({
             key: 'tenant_id',
-            label: 'Tenant',
+            label: 'Nama Tenant',
             render: (_, row) => (
-                <span className="text-[10px] font-mono bg-slate-100 text-slate-500 px-1 rounded">
-                    {row.tenant_id?.substring(0, 8)}...
+                <span className="text-xs font-medium text-slate-600 bg-slate-100 px-2 py-0.5 rounded">
+                    {row.tenant?.name || '(Unknown Tenant)'}
                 </span>
             )
         });
@@ -328,14 +336,16 @@ const GenericContentManager = ({
                             <p className="text-muted-foreground">Manage {resourceName.toLowerCase()} entries.</p>
                         </div>
                         <div className="flex gap-2">
-                            <Button
-                                variant={showTrash ? "destructive" : "outline"}
-                                onClick={() => { setShowTrash(!showTrash); setCurrentPage(1); }}
-                                className={showTrash ? "bg-destructive hover:bg-destructive/90" : ""}
-                            >
-                                {showTrash ? <RotateCcw className="w-4 h-4 mr-2" /> : <Trash2 className="w-4 h-4 mr-2" />}
-                                {showTrash ? "Back to Active" : "Trash"}
-                            </Button>
+                            {enableSoftDelete && (
+                                <Button
+                                    variant={showTrash ? "destructive" : "outline"}
+                                    onClick={() => { setShowTrash(!showTrash); setCurrentPage(1); }}
+                                    className={showTrash ? "bg-destructive hover:bg-destructive/90" : ""}
+                                >
+                                    {showTrash ? <RotateCcw className="w-4 h-4 mr-2" /> : <Trash2 className="w-4 h-4 mr-2" />}
+                                    {showTrash ? "Back to Active" : "Trash"}
+                                </Button>
+                            )}
                             {canCreate && !showTrash && (
                                 <Button onClick={() => { setSelectedItem(null); setShowEditor(true); }} className="bg-primary text-primary-foreground hover:bg-primary/90">
                                     <Plus className="w-4 h-4 mr-2" /> New {resourceName}

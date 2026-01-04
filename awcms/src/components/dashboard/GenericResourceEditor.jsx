@@ -29,7 +29,13 @@ import ResourceSelect from '@/components/dashboard/ResourceSelect'; // Assuming 
 
 const GenericResourceEditor = ({
     tableName,
-    // ...
+    resourceName,
+    fields,
+    initialData,
+    onClose,
+    onSuccess,
+    permissionPrefix,
+    createPermission
 }) => {
     const { user } = useAuth();
     const { toast } = useToast();
@@ -38,7 +44,19 @@ const GenericResourceEditor = ({
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({});
 
-    // ...
+    // Initialize form data
+    useEffect(() => {
+        if (initialData) {
+            setFormData(initialData);
+        } else {
+            // Reset for new entry
+            const defaults = {};
+            fields.forEach(f => {
+                if (f.defaultValue !== undefined) defaults[f.key] = f.defaultValue;
+            });
+            setFormData(defaults);
+        }
+    }, [initialData, fields]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();

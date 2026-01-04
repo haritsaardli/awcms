@@ -72,13 +72,14 @@ const ThemesManager = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [themeToDelete, setThemeToDelete] = useState(null);
 
-    const { hasPermission } = usePermissions();
+    const { hasPermission, userRole } = usePermissions();
+    const isPlatformAdmin = userRole === 'super_admin' || userRole === 'owner';
 
     const fetchThemes = useCallback(async () => {
         setLoading(true);
         const { data, error } = await supabase
             .from('themes')
-            .select('*')
+            .select('*, tenant:tenants(name)')
             .order('is_active', { ascending: false })
             .order('created_at', { ascending: false });
 
@@ -304,7 +305,12 @@ const ThemesManager = () => {
                                 <div className="flex justify-between items-start mb-2">
                                     <div>
                                         <h3 className="font-semibold text-foreground truncate pr-2" title={theme.name}>{theme.name}</h3>
-                                        <p className="text-xs text-muted-foreground line-clamp-2 min-h-[2.5em]">{theme.description || 'No description provided.'}</p>
+                                        {isPlatformAdmin && (
+                                            <span className="text-xs font-medium text-slate-600 bg-slate-100 px-2 py-0.5 rounded">
+                                                {theme.tenant?.name || '(Unknown Tenant)'}
+                                            </span>
+                                        )}
+                                        <p className="text-xs text-muted-foreground line-clamp-2 min-h-[2.5em] mt-1">{theme.description || 'No description provided.'}</p>
                                     </div>
 
                                     <DropdownMenu>

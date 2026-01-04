@@ -99,7 +99,7 @@ function TagsManager() {
             if (showTrash) {
                 const { data: trashData, error } = await supabase
                     .from('tags')
-                    .select('*')
+                    .select('*, tenant:tenants(name)')
                     .not('deleted_at', 'is', null);
 
                 if (error) throw error;
@@ -115,6 +115,7 @@ function TagsManager() {
                     tag_is_active: t.is_active,
                     tag_created_at: t.created_at,
                     tag_updated_at: t.updated_at,
+                    tenant_name: t.tenant?.name,
                     module: 'trash', // dummy
                     count: 0
                 }));
@@ -123,7 +124,7 @@ function TagsManager() {
                 // Regular View
                 const { data: allTags, error: tagsError } = await supabase
                     .from('tags')
-                    .select('*')
+                    .select('*, tenant:tenants(name)')
                     .is('deleted_at', null);
 
                 if (tagsError) throw tagsError;
@@ -147,6 +148,7 @@ function TagsManager() {
                         tag_is_active: t.is_active,
                         tag_created_at: t.created_at,
                         tag_updated_at: t.updated_at,
+                        tenant_name: t.tenant?.name,
                         count: 0,
                         modules: new Set(),
                         breakdown: {}
@@ -480,6 +482,7 @@ function TagsManager() {
                     <table className="w-full">
                         <thead className="bg-muted/50 border-b border-border">
                             <tr>
+                                {isPlatformAdmin && <th className="px-6 py-4 text-left text-xs font-bold text-muted-foreground uppercase">Nama Tenant</th>}
                                 <th
                                     className="px-6 py-4 text-left text-xs font-bold text-muted-foreground uppercase cursor-pointer hover:text-foreground group"
                                     onClick={() => handleSort('name')}
@@ -527,6 +530,13 @@ function TagsManager() {
                                         animate={{ opacity: 1 }}
                                         className="hover:bg-muted/50 transition-colors"
                                     >
+                                        {isPlatformAdmin && (
+                                            <td className="px-6 py-4">
+                                                <span className="text-xs font-medium text-slate-600 bg-slate-100 px-2 py-0.5 rounded">
+                                                    {tag.tenant_name || '(Unknown Tenant)'}
+                                                </span>
+                                            </td>
+                                        )}
                                         <td className="px-6 py-4">
                                             <div className="flex flex-col">
                                                 <div className="flex items-center gap-2">

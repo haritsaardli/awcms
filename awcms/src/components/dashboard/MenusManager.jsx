@@ -19,7 +19,8 @@ import {
 
 function MenusManager() {
   const { toast } = useToast();
-  const { hasPermission } = usePermissions();
+  const { hasPermission, userRole } = usePermissions();
+  const isPlatformAdmin = userRole === 'super_admin' || userRole === 'owner';
 
   // Data State
   const [menus, setMenus] = useState([]); // This will store the TREE structure
@@ -54,7 +55,7 @@ function MenusManager() {
     try {
       const { data, error } = await supabase
         .from('menus')
-        .select('*')
+        .select('*, tenant:tenants(name)')
         .is('deleted_at', null)
         .order('order', { ascending: true });
 
@@ -306,6 +307,7 @@ function MenusManager() {
                 onDelete={handleDelete}
                 onPerms={openPermissions}
                 onChildReorder={(newChildren) => handleChildReorder(menu.id, newChildren)}
+                isPlatformAdmin={isPlatformAdmin}
               />
             ))}
           </Reorder.Group>
@@ -428,7 +430,7 @@ function MenusManager() {
   );
 }
 
-const MenuReorderItem = ({ menu, canEdit, canDelete, onEdit, onDelete, onPerms, onChildReorder }) => {
+const MenuReorderItem = ({ menu, canEdit, canDelete, onEdit, onDelete, onPerms, onChildReorder, isPlatformAdmin }) => {
   const hasChildren = menu.children && menu.children.length > 0;
   const [isOpen, setIsOpen] = useState(true);
 
@@ -438,6 +440,11 @@ const MenuReorderItem = ({ menu, canEdit, canDelete, onEdit, onDelete, onPerms, 
         <GripVertical className="w-5 h-5 text-slate-400 cursor-grab active:cursor-grabbing flex-shrink-0" />
 
         <div className="flex-1 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 overflow-hidden">
+          {isPlatformAdmin && (
+            <span className="text-[10px] font-medium text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded">
+              {menu.tenant?.name || '(Unknown)'}
+            </span>
+          )}
           <div className="font-bold text-slate-800 flex items-center gap-2 truncate">
             {menu.label}
             {!menu.is_active && <span className="text-[10px] bg-red-100 text-red-600 px-1.5 py-0.5 rounded border border-red-200">Inactive</span>}

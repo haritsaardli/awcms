@@ -3,6 +3,14 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import GenericContentManager from '@/components/dashboard/GenericContentManager';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import { FileText, FolderOpen, Tag, ChevronRight, Home, Layers } from 'lucide-react';
 
 function ArticlesManager() {
@@ -158,7 +166,7 @@ function ArticlesManager() {
           formFields={categoryFormFields}
           permissionPrefix="categories"
           showBreadcrumbs={false}
-          customSelect="*, owner:users!created_by(email, full_name)"
+          customSelect="*, owner:users!created_by(email, full_name), tenant:tenants(name)"
           defaultFilters={{ type: 'article' }}
         />
       )}

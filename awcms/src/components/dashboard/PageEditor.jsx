@@ -16,11 +16,61 @@ function PageEditor({ page, onClose, onSuccess }) {
     const { user } = useAuth();
     const { currentTenant } = useTenant(); // Get Current Tenant
     const { hasPermission, userRole } = usePermissions();
-    // ... existing variables
+    const [loading, setLoading] = useState(false);
+    const [categories, setCategories] = useState([]);
 
-    // ... existing useEffect
+    const [formData, setFormData] = useState({
+        title: page?.title || '',
+        slug: page?.slug || '',
+        content: page?.content || '',
+        excerpt: page?.excerpt || '',
+        featured_image: page?.featured_image || '',
+        status: page?.status || 'draft',
+        is_public: page?.is_public ?? false,
+        category_id: page?.category_id || '',
+        tags: page?.tags || [],
 
-    // ... existing fetch functions
+        // SEO
+        meta_title: page?.meta_title || '',
+        meta_description: page?.meta_description || '',
+        meta_keywords: page?.meta_keywords || '',
+        canonical_url: page?.canonical_url || '',
+        robots: page?.robots || 'index, follow',
+
+        // Social
+        og_title: page?.og_title || '',
+        og_description: page?.og_description || '',
+        og_image: page?.og_image || '',
+        twitter_card_type: page?.twitter_card_type || 'summary',
+        twitter_image: page?.twitter_image || '',
+
+        published_at: page?.published_at ? new Date(page.published_at).toISOString().slice(0, 16) : ''
+    });
+
+    const isEditMode = !!page;
+
+    // Permissions
+    const canEdit = hasPermission('tenant.pages.update') || (user?.id === page?.created_by);
+    const canPublish = hasPermission('tenant.pages.publish');
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                let q = supabase.from('categories').select('id, name').eq('type', 'pages');
+                if (currentTenant?.id) q = q.eq('tenant_id', currentTenant.id);
+                const { data, error } = await q;
+                if (!error) setCategories(data || []);
+            } catch (e) { console.error(e); }
+        };
+        fetchCategories();
+    }, [currentTenant?.id]);
+
+    const generateSlug = (text) => {
+        return text
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/(^-|-$)/g, '');
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();

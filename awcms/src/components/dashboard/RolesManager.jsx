@@ -51,7 +51,7 @@ function RolesManager() {
     try {
       let dbQuery = supabase
         .from('roles')
-        .select('*, owner:users!created_by(email), role_permissions(count)')
+        .select('*, owner:users!created_by(email), role_permissions(count), tenant:tenants(name)')
         .is('deleted_at', null)
         .order('created_at', { ascending: true });
 
@@ -164,9 +164,9 @@ function RolesManager() {
   if (isPlatformAdmin) {
     columns.push({
       key: 'tenant_id',
-      label: 'Tenant ID',
-      className: 'text-xs text-slate-400 font-mono',
-      render: (tid) => tid ? tid.slice(0, 8) + '...' : 'Global'
+      label: 'Tenant Name',
+      className: 'text-xs text-slate-500',
+      render: (tid, row) => row.tenant?.name || (tid ? 'Unknown Tenant' : 'Global')
     });
   }
 

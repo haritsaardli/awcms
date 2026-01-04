@@ -11,6 +11,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
     }
 
     // Dev override (add this to .env if needed)
+    console.log('[Middleware] DEV:', import.meta.env.DEV);
+    console.log('[Middleware] VITE_DEV_TENANT_HOST:', import.meta.env.VITE_DEV_TENANT_HOST);
     if (import.meta.env.DEV && import.meta.env.VITE_DEV_TENANT_HOST) {
         host = import.meta.env.VITE_DEV_TENANT_HOST;
     }

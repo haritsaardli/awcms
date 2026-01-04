@@ -16,11 +16,89 @@ function ArticleEditor({ article, onClose, onSuccess }) {
     const { user } = useAuth();
     const { currentTenant } = useTenant(); // Get Current Tenant
     const { hasPermission, userRole } = usePermissions();
-    // ... existing state
+    const [loading, setLoading] = useState(false);
+    const [categories, setCategories] = useState([]);
+    const [currentState, setCurrentState] = useState(article?.workflow_state || 'draft');
 
-    // ... existing useEffects
+    // Initial Form Data State
+    const [formData, setFormData] = useState({
+        title: article?.title || '',
+        slug: article?.slug || '',
+        content: article?.content || '',
+        excerpt: article?.excerpt || '',
+        featured_image: article?.featured_image || '',
+        status: article?.status || 'draft',
+        workflow_state: article?.workflow_state || 'draft',
+        is_active: article?.is_active ?? true,
+        is_public: article?.is_public ?? false,
+        category_id: article?.category_id || '',
+        tags: article?.tags || [],
 
-    // ... existing fetch functions
+        // SEO
+        meta_title: article?.meta_title || '',
+        meta_description: article?.meta_description || '',
+        meta_keywords: article?.meta_keywords || '',
+        canonical_url: article?.canonical_url || '',
+        robots: article?.robots || 'index, follow',
+
+        // Social
+        og_title: article?.og_title || '',
+        og_description: article?.og_description || '',
+        og_image: article?.og_image || '',
+        twitter_card_type: article?.twitter_card_type || 'summary',
+        twitter_image: article?.twitter_image || '',
+
+        published_at: article?.published_at ? new Date(article.published_at).toISOString().slice(0, 16) : ''
+    });
+
+    const isEditMode = !!article;
+    const WORKFLOW_STATES = {
+        DRAFT: 'draft',
+        REVIEWED: 'reviewed',
+        APPROVED: 'approved',
+        PUBLISHED: 'published',
+        ARCHIVED: 'archived'
+    };
+
+    // Permissions
+    const canEdit = hasPermission('tenant.articles.update') || (user?.id === article?.author_id);
+    const canPublish = hasPermission('tenant.articles.publish');
+
+    useEffect(() => {
+        fetchCategories();
+    }, []);
+
+    const fetchCategories = async () => {
+        try {
+            // Fetch categories for articles
+            let q = supabase
+                .from('categories')
+                .select('id, name')
+                .eq('type', 'articles');
+
+            if (currentTenant?.id) {
+                q = q.eq('tenant_id', currentTenant.id);
+            }
+
+            const { data, error } = await q;
+            if (error) throw error;
+            setCategories(data || []);
+        } catch (error) {
+            console.error('Error fetching categories:', error);
+            // Non-critical, just log
+        }
+    };
+
+    const canTransition = (targetState) => {
+        if (!isEditMode) return false; // Simple logic for now
+        // Implement complex workflow transition guards here if needed
+        return true;
+    };
+
+    // Handle Workflow Action
+    const handleWorkflowAction = async (newState) => {
+        await saveArticle(newState);
+    };
 
     const saveArticle = async (workflowStateOverride = null) => {
         if (!canEdit) {

@@ -5,6 +5,42 @@ All notable changes to the **AWCMS** project will be documented in this file.
 
 ## [Unreleased]
 
+## [2.6.0] "Clarity" - 2026-01-04
+
+### Added
+
+- **Nama Tenant Column**: Platform admins (`owner`, `super_admin`) now see tenant names in list views across all 20 modules.
+- **Public Template System**: New `awtemplate01` template with dedicated layout, header, footer, and components.
+- **Domain Aliasing**: `get_tenant_id_by_host` RPC now supports `-public` domain suffix aliasing.
+- **RLS Pre-request Hook**: Fixed `current_tenant_id()` function to read `app.current_tenant_id` for anonymous users.
+
+### Changed
+
+- **Admin/Public Separation**: Main router now redirects `/` to `/login`, removing all public routes from admin panel.
+- **Visibility Logic**: Nama Tenant column now uses role-based check (`userRole === 'super_admin' || userRole === 'owner'`) instead of tenant context check.
+
+### Fixed
+
+- **GenericContentManager**: Column was only visible when no tenant was selected; now visible for platform admins regardless.
+- **Custom Modules**: Added tenant query joins and display badges to TagsManager, ThemesManager, MenusManager, MediaLibrary, and WidgetsManager.
+- **Permission Deduplication**: Removed duplicate permissions and synced `owner` role with `super_admin` (313 permissions each).
+- **Editor Initialization**: Fixed blank page issues in ArticleEditor and PageEditor due to missing state hooks.
+- **SettingsManager**: Fixed `PGRST200` error with `customSelect="*"` and soft-delete/sort column issues.
+
+### Security
+
+- **ABAC Enforcement**: All Nama Tenant displays respect existing ABAC policies - no cross-tenant data leakage.
+- **Tenant Isolation**: RLS policies remain active; platform admins can view all tenants but isolation is enforced.
+
+### Database Migrations
+
+- `20260104000001_seed_awtemplate01.sql` - Template seeding
+- `20260104000002_fix_tenant_lookup_rpc.sql` - Tenant lookup fix
+- `20260104000003_enable_public_tenant_access.sql` - Public access policies
+- `20260104000004_fix_current_tenant_id.sql` - RLS function fix
+- `20260104000005_support_public_domain_alias.sql` - Domain aliasing
+- `20260104000006_deduplicate_permissions.sql` - Permission cleanup
+
 ## [2.5.1] - 2026-01-04
 
 ### Changed

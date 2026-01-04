@@ -9,10 +9,13 @@ import {
 import { useTemplates } from '@/hooks/useTemplates';
 import { useWidgets } from '@/hooks/useWidgets';
 import { getWidgets as getRegistryWidgets } from '@/lib/widgetRegistry';
+import { usePermissions } from '@/contexts/PermissionContext';
 import WidgetEditor from './WidgetEditor';
 
 const WidgetsManager = () => {
     const { templateParts } = useTemplates();
+    const { userRole } = usePermissions();
+    const isPlatformAdmin = userRole === 'super_admin' || userRole === 'owner';
 
     // Filter only widget areas
     const widgetAreas = templateParts.filter(p => p.type === 'widget_area');
@@ -62,7 +65,7 @@ const WidgetsManager = () => {
                 {/* Main: Widgets List */}
                 <div className="md:col-span-3">
                     {selectedAreaId ? (
-                        <AreaEditor areaId={selectedAreaId} areaName={widgetAreas.find(a => a.id === selectedAreaId)?.name} />
+                        <AreaEditor areaId={selectedAreaId} areaName={widgetAreas.find(a => a.id === selectedAreaId)?.name} isPlatformAdmin={isPlatformAdmin} />
                     ) : (
                         <div className="h-64 flex items-center justify-center border-2 border-dashed rounded-lg bg-slate-50 text-slate-400">
                             Select an area to manage widgets
@@ -74,7 +77,7 @@ const WidgetsManager = () => {
     );
 };
 
-const AreaEditor = ({ areaId, areaName }) => {
+const AreaEditor = ({ areaId, areaName, isPlatformAdmin }) => {
     const { widgets, loading, addWidget, updateWidget, deleteWidget } = useWidgets(areaId);
     const availableWidgets = getRegistryWidgets();
     const [editingWidget, setEditingWidget] = useState(null);
@@ -147,6 +150,11 @@ const AreaEditor = ({ areaId, areaName }) => {
                                     </div>
                                     <div>
                                         <div className="font-medium text-slate-900">{def?.name || widget.type}</div>
+                                        {isPlatformAdmin && (
+                                            <span className="text-[10px] font-medium text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded mr-2">
+                                                {widget.tenant?.name || '(Unknown)'}
+                                            </span>
+                                        )}
                                         <div className="text-xs text-slate-500 truncate max-w-[300px]">
                                             {/* Preview config values */}
                                             {Object.values(widget.config || {}).filter(v => typeof v === 'string').join(', ') || 'No content'}
