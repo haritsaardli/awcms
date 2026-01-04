@@ -5,6 +5,14 @@ All notable changes to the **AWCMS** project will be documented in this file.
 
 ## [Unreleased]
 
+## [2.4.1] - 2026-01-04
+
+### Fixed
+
+- **CI/CD Pipeline**: Fixed Flutter SDK version mismatch (`3.24.0` → `3.27.0`) to match `pubspec.yaml` requirement of `^3.10.1`.
+- **CI/CD Pipeline**: Fixed `npm ci` failure in Public Portal by switching to `npm install` for better lock file tolerance.
+- **Public Portal**: Regenerated `package-lock.json` to sync with `package.json` dependencies.
+
 ## [2.4.0] "Blaze" - 2026-01-04
 
 ### Added
