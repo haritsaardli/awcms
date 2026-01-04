@@ -13,30 +13,13 @@ const rawSlug = slug || '';
 const currentSlug = rawSlug === '' ? 'home' : rawSlug; // Normalize root to 'home'
 
 // Get Tenant Context
-const { tenant_id } = Astro.locals;
+const { tenant_id, runtime } = Astro.locals;
+const env = runtime?.env || {};
 
 // Initialize Scoped Client
 const supabase = createScopedClient({
     'x-tenant-id': tenant_id
-});
-
-// 1. Fetch Page
-const { data: pageData } = await supabase
-    .from('pages') // Query raw 'pages' table (assuming RLS allows read public) or use view
-    .select('*')
-    .eq('slug', currentSlug)
-    .eq('status', 'published') // Ensure only published
-    .maybeSingle();
-
-// 2. Fetch Template Assignments
-const { data: assignments } = await supabase
-    .from('template_assignments')
-    .select('route_type, template_id')
-    .eq('channel', 'web')
-    .in('route_type', ['home', '404', 'archive', 'search', 'single']);
-
-const assignmentMap = {};
-(assignments || []).forEach(a => assignmentMap[a.route_type] = a.template_id);
+}, env);
 
 // 3. Determine Flow
 let currentTemplateSlug = null;
@@ -44,99 +27,139 @@ let templateId = null;
 let pageContent = null;
 let meta = { title: 'Page', description: '' };
 let is404 = false;
-
-if (pageData) {
-    // Page Found
-    meta.title = pageData.meta_title || pageData.title;
-    meta.description = pageData.meta_description;
-    pageContent = pageData.puck_layout_jsonb || { content: [], root: {} };
-
-    // Determine Template
-    if (pageData.template && pageData.template !== 'default') {
-        templateId = pageData.template;
-    } else {
-        // Fallback to assigned templates
-        if (currentSlug === 'home') {
-            templateId = assignmentMap['home'];
-        } else {
-            templateId = assignmentMap['single']; // Default for standard pages
-        }
-    }
-} else {
-    // Page Not Found
-    if (currentSlug === 'home') {
-        templateId = assignmentMap['home'];
-        meta.title = 'Home';
-    } else {
-        is404 = true;
-        templateId = assignmentMap['404'];
-        meta.title = 'Page Not Found';
-        Astro.response.status = 404;
-    }
-}
-
-// 4. Fetch Template & Parts
 let mergedContent = [];
 
-if (templateId) {
-    const { data: template } = await supabase
-        .from('templates')
-        .select('*')
-        .eq('id', templateId)
-        .maybeSingle();
+// Error State
+let errorState = null;
 
-    if (template) {
-        currentTemplateSlug = template.slug;
-        // Get Parts
-        const parts = template.parts || {}; // e.g. { header: 'uuid', footer: 'uuid' }
-        const partIds = Object.values(parts).filter(Boolean);
-        
-        // Fetch Part Data
-        let partDataMap = {};
-        if (partIds.length > 0) {
-            const { data: partsData } = await supabase
-                .from('template_parts')
-                .select('*')
-                .in('id', partIds);
-                
-            (partsData || []).forEach(p => partDataMap[p.id] = p);
-        }
-
-        // Construct Layout: Header -> Page Content -> Footer
-        // We assume 'parts' keys define order or we hardcode specific zones?
-        // Let's assume a standard structure for now: Header, Main (Content), Footer.
-        // Or strictly follow the order in `parts` entries if it was an array? It's JSONB.
-        // We'll look for specific keys: 'header', 'footer'.
-        
-        if (parts.header && partDataMap[parts.header]) {
-             const headerContent = partDataMap[parts.header].data?.content || [];
-             mergedContent.push(...headerContent);
-        }
-
-        // Merge Content:
-        // Priority: Page Content -> Template Content
-        const pageHasContent = pageContent && pageContent.content && pageContent.content.length > 0;
-        
-        if (pageHasContent) {
-             mergedContent.push(...pageContent.content);
-        } else {
-             // Use template content as fallback (Master Template)
-             const templateContent = template.data?.content || [];
-             mergedContent.push(...templateContent);
-        }
-
-        if (parts.footer && partDataMap[parts.footer]) {
-             const footerContent = partDataMap[parts.footer].data?.content || [];
-             mergedContent.push(...footerContent);
-        }
-        
-    } else {
-        // Template assigned but not found? Fallback to just page content
-        if (pageContent) mergedContent = pageContent.content || [];
-    }
+if (!supabase) {
+    console.error('[Page] Critical: Supabase Client Failed to Initialize. Missing Env Vars?');
+    errorState = "Service Configuration Error";
+    Astro.response.status = 500;
 } else {
-    // No template assigned. Just render page content.
-    if (pageContent) mergedContent = pageContent.content || [];
+    try {
+        // 1. Fetch Page
+        const { data: pageData, error: pageError } = await supabase
+            .from('pages') // Query raw 'pages' table (assuming RLS allows read public) or use view
+            .select('*')
+            .eq('slug', currentSlug)
+            .eq('status', 'published') // Ensure only published
+            .maybeSingle();
+
+        if (pageError) throw pageError;
+
+        // 2. Fetch Template Assignments
+        const { data: assignments, error: assignmentError } = await supabase
+            .from('template_assignments')
+            .select('route_type, template_id')
+            .eq('channel', 'web')
+            .in('route_type', ['home', '404', 'archive', 'search', 'single']);
+            
+        if (assignmentError) console.warn('[Page] Template Assignment Fetch Warning:', assignmentError);
+
+        const assignmentMap = {};
+        (assignments || []).forEach(a => assignmentMap[a.route_type] = a.template_id);
+
+
+        if (pageData) {
+            // Page Found
+            meta.title = pageData.meta_title || pageData.title;
+            meta.description = pageData.meta_description;
+            pageContent = pageData.puck_layout_jsonb || { content: [], root: {} };
+
+            // Determine Template
+            if (pageData.template && pageData.template !== 'default') {
+                templateId = pageData.template;
+            } else {
+                // Fallback to assigned templates
+                if (currentSlug === 'home') {
+                    templateId = assignmentMap['home'];
+                } else {
+                    templateId = assignmentMap['single']; // Default for standard pages
+                }
+            }
+        } else {
+            // Page Not Found
+            if (currentSlug === 'home') {
+                templateId = assignmentMap['home'];
+                meta.title = 'Home';
+            } else {
+                is404 = true;
+                templateId = assignmentMap['404'];
+                meta.title = 'Page Not Found';
+                Astro.response.status = 404;
+            }
+        }
+
+        // 4. Fetch Template & Parts
+        if (templateId) {
+            const { data: template, error: templateError } = await supabase
+                .from('templates')
+                .select('*')
+                .eq('id', templateId)
+                .maybeSingle();
+            
+            if (templateError) console.warn('[Page] Template Fetch Warning:', templateError);
+
+            if (template) {
+                currentTemplateSlug = template.slug;
+                // Get Parts
+                const parts = template.parts || {}; // e.g. { header: 'uuid', footer: 'uuid' }
+                const partIds = Object.values(parts).filter(Boolean);
+                
+                // Fetch Part Data
+                let partDataMap = {};
+                if (partIds.length > 0) {
+                    const { data: partsData } = await supabase
+                        .from('template_parts')
+                        .select('*')
+                        .in('id', partIds);
+                        
+                    (partsData || []).forEach(p => partDataMap[p.id] = p);
+                }
+
+                // Construct Layout: Header -> Page Content -> Footer
+                // We assume 'parts' keys define order or we hardcode specific zones?
+                // Let's assume a standard structure for now: Header, Main (Content), Footer.
+                // Or strictly follow the order in `parts` entries if it was an array? It's JSONB.
+                // We'll look for specific keys: 'header', 'footer'.
+                
+                if (parts.header && partDataMap[parts.header]) {
+                     const headerContent = partDataMap[parts.header].data?.content || [];
+                     mergedContent.push(...headerContent);
+                }
+
+                // Merge Content:
+                // Priority: Page Content -> Template Content
+                const pageHasContent = pageContent && pageContent.content && pageContent.content.length > 0;
+                
+                if (pageHasContent) {
+                     mergedContent.push(...pageContent.content);
+                } else {
+                     // Use template content as fallback (Master Template)
+                     const templateContent = template.data?.content || [];
+                     mergedContent.push(...templateContent);
+                }
+
+                if (parts.footer && partDataMap[parts.footer]) {
+                     const footerContent = partDataMap[parts.footer].data?.content || [];
+                     mergedContent.push(...footerContent);
+                }
+                
+            } else {
+                // Template assigned but not found? Fallback to just page content
+                if (pageContent) mergedContent = pageContent.content || [];
+            }
+        } else {
+            // No template assigned. Just render page content.
+            if (pageContent) mergedContent = pageContent.content || [];
+        }
+
+    } catch (err: any) {
+        console.error('[Page] Render Error:', err);
+        errorState = err.message || "Unknown Render Error";
+        Astro.response.status = 500;
+    }
 }
 
 const finalPuckData = {
@@ -150,31 +173,41 @@ const finalPuckData = {
 // For now, if mergedContent is empty, maybe fallback to TipTap?
 // Or append TipTap as a RichText block?
 // Let's append if present and `pageData` exists.
-if (pageData?.tiptap_doc_jsonb) {
+// if (pageData?.tiptap_doc_jsonb) {
     // TODO: Need a way to render TipTap inside Puck or after.
     // We'll leave it out for this iteration as users focus on Visual Builder (Puck).
-}
+// }
 
-// ... (lines 145-149) NOT MATCHED
 const LayoutComponent = (currentTemplateSlug === 'awtemplate01') ? AWT01Layout : Layout;
 
 ---
 
 <LayoutComponent title={meta.title} description={meta.description}>
   <main>
-    {finalPuckData.content.length > 0 ? (
-       <PuckRenderer data={finalPuckData} />
+    {errorState ? (
+        <div class="container mx-auto py-20 text-center text-red-600">
+            <h1 class="text-4xl font-bold mb-4">500 - Server Error</h1>
+            <p className="font-mono bg-gray-100 p-4 rounded inline-block text-left text-sm text-gray-800">
+                {errorState}
+            </p>
+        </div>
     ) : (
-       <div class="container mx-auto py-20 text-center">
-         {is404 ? (
-            <div>
-                <h1 class="text-4xl font-bold mb-4">404 - Not Found</h1>
-                <p>The page you are looking for does not exist.</p>
+        <>
+            {finalPuckData.content.length > 0 ? (
+            <PuckRenderer data={finalPuckData} />
+            ) : (
+            <div class="container mx-auto py-20 text-center">
+                {is404 ? (
+                    <div>
+                        <h1 class="text-4xl font-bold mb-4">404 - Not Found</h1>
+                        <p>The page you are looking for does not exist.</p>
+                    </div>
+                ) : (
+                    <p>No content found.</p>
+                )}
             </div>
-         ) : (
-            <p>No content found.</p>
-         )}
-       </div>
+            )}
+        </>
     )}
   </main>
 </LayoutComponent>

@@ -1,15 +1,9 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
-
-if (!supabaseUrl || !supabaseAnonKey) {
-    console.error('Missing Supabase environment variables');
-}
-
-export const supabase = (supabaseUrl && supabaseAnonKey)
-    ? createClient(supabaseUrl, supabaseAnonKey)
-    : {} as any; // Fail gracefully or allow partial usage (middleware will catch error)
+// Global instance removed to prevent startup crashes on Cloudflare
+// where import.meta.env might not be fully populated at module-level.
+// Use creatingClientFromEnv with runtime variables instead.
+export const supabase = null;
 
 // Helper to create client from Runtime Env (Cloudflare) or Build Env (Import Meta)
 export const createClientFromEnv = (env: any = {}, headers: Record<string, string> = {}) => {
