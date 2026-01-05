@@ -5,6 +5,14 @@ All notable changes to the **AWCMS** project will be documented in this file.
 
 ## [Unreleased]
 
+## [2.6.4] - 2026-01-05
+
+### Fixed
+
+- **Turnstile CSP**: Resolved `Error 600010` by adding `unsafe-eval` to `Content-Security-Policy` header in `public/_headers` (required for Cloudflare WebAssembly).
+- **Turnstile Config**: Temporarily hardcoded Production Site Key in Auth pages (`LoginPage`, `RegisterPage`) to resolve environment variable mismatch on Cloudflare Pages.
+- **Offline Module**: Fixed `st: not a statement` initialization crash by removing trailing semicolons from `schema.js` SQL definitions.
+
 ## [2.6.3] - 2026-01-04
 
 ### Fixed
