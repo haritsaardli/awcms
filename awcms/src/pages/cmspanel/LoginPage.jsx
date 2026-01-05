@@ -358,7 +358,7 @@ const LoginPage = () => {
                   appearance="interaction-only"
                 />
                 {!turnstileReady && !turnstileError && (
-                  <p className="text-xs text-slate-400 text-center mt-1">Verifying security...</p>
+                  <p className="text-xs text-slate-400 text-center mt-1">Verifying security (v2.0)...</p>
                 )}
               </div>
             </div>

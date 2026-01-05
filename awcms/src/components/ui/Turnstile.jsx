@@ -125,9 +125,10 @@ const Turnstile = ({
                     console.warn('[Turnstile] Timeout');
                     if (widgetIdRef.current && window.turnstile) window.turnstile.reset(widgetIdRef.current);
                 },
-                'retry': 'auto',
-                'retry-interval': 2000,
+                'retry': 'never', // Stop looping on error
             };
+
+            console.log('%c [Turnstile] v2 loaded: Checking parameters...', 'background: #222; color: #bada55');
 
             // STRICT validation for Invisible widgets (Error 400020 prevention)
             if (appearance === 'interaction-only') {
