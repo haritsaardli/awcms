@@ -128,16 +128,24 @@ const Turnstile = ({
                 'retry': 'never', // Stop looping on error
             };
 
-            console.log('%c [Turnstile] v2.1 loaded: Standard Managed Mode', 'background: #222; color: #00ff00');
+            console.log('%c [Turnstile] v2.2 loaded: Sanitized Options', 'background: #222; color: #00ffff');
 
-            // STRICT validation for Invisible widgets (Error 400020 prevention)
+            // Construct options object cleanly - no undefined keys
+            renderOptions.appearance = appearance || 'always'; // Default to always if undefined
+            renderOptions.theme = theme || 'auto';
+
+            // Only add size if it is explicitly defined
+            if (size) {
+                renderOptions.size = size;
+            }
+
+            // SAFETY: Force interaction-only if that mode is requested (cleaning regular props)
             if (appearance === 'interaction-only') {
-                renderOptions.appearance = 'interaction-only';
-                // DO NOT include 'size' or 'theme' for invisible widgets
-            } else {
-                renderOptions.appearance = appearance;
-                renderOptions.theme = theme;
-                if (size) renderOptions.size = size;
+                // For interaction-only, we MUST NOT send size or theme if we want to be invisible compliant
+                // But since we are in Standard Managed mode now, this block might be skipped.
+                // Keeping it for safety but relying on "Standard" flow primarily.
+                delete renderOptions.size;
+                delete renderOptions.theme;
             }
 
             console.log('[Turnstile] Render options:', { ...renderOptions });

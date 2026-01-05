@@ -358,7 +358,7 @@ const LoginPage = () => {
                   theme="light"
                 />
                 {!turnstileReady && !turnstileError && (
-                  <p className="text-xs text-slate-400 text-center mt-1">Verifying security (v2.1)...</p>
+                  <p className="text-xs text-slate-400 text-center mt-1">Verifying security (v2.2)...</p>
                 )}
               </div>
             </div>
