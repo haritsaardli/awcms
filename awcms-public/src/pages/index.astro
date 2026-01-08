@@ -1,0 +1,17 @@
+---
+/**
+ * Root Index Page
+ * 
+ * Redirects to the default tenant (primary) or shows tenant selector.
+ * This ensures legacy URLs without tenant prefix are properly handled.
+ */
+
+// SSR Mode
+export const prerender = false;
+
+// Default tenant for root redirect
+const DEFAULT_TENANT = 'primary';
+
+// Redirect to default tenant
+return Astro.redirect(`/${DEFAULT_TENANT}/`, 301);
+---

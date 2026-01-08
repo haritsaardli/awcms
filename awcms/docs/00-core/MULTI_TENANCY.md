@@ -14,11 +14,15 @@ AWCMS uses a **Logical Isolation** model on a **Shared Database**. This allows f
 
 ### Public Portal
 
-* **Context**: Visitors access `tenant.com` or `tenant.awcms.com`.
-* **Resolution**:
-    1. **Middleware**: `src/middleware.ts` intercepts the Request.
-    2. **Lookup**: Queries `get_tenant_id_by_host(host)` RPC function.
-    3. **Context**: Sets `Astro.locals.tenant_id`.
+* **Context**: Visitors access `example.com/{tenant}/` or legacy `tenant.awcms.com`.
+* **Resolution** (Priority Order):
+    1. **Path Parameter** (Primary): Extract tenant slug from first URL segment (`/{tenant}/...`).
+    2. **Host Header** (Fallback): Queries `get_tenant_id_by_host(host)` RPC function.
+* **Middleware**: `src/middleware.ts` intercepts the Request.
+* **Context**: Sets `Astro.locals.tenant_id` and `Astro.locals.tenant_slug`.
+* **Redirects**: Host-resolved tenants are redirected to canonical path-based URLs.
+
+> See [Migration Guide](../01-guides/MIGRATION.md) for URL structure details.
 
 ## 2. Row Level Security (RLS)
 

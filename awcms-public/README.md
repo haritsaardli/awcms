@@ -1,43 +1,96 @@
-# Astro Starter Kit: Minimal
+# AWCMS Public Portal
 
-```sh
-npm create astro@latest -- --template minimal
+The public-facing frontend for AWCMS multi-tenant content management system, built with Astro.
+
+## 🏗️ Architecture
+
+This is a **Server-Side Rendered (SSR)** Astro application deployed to Cloudflare Pages. It serves public content for multiple tenants using path-based routing.
+
+### URL Structure
+
+```txt
+/{tenant}/{page-slug}
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+**Examples:**
 
-## 🚀 Project Structure
+```txt
+/primary/              → Primary tenant homepage
+/primary/articles/     → Articles listing
+/primary/pages/about/  → About page
+/tenant-b/             → Another tenant's homepage
+```
 
-Inside of your Astro project, you'll see the following folders and files:
+## 🚀 Getting Started
 
-```text
+### Prerequisites
+
+* Node.js 20+
+* npm or pnpm
+
+### Installation
+
+```bash
+cd awcms-public
+npm install
+```
+
+### Development
+
+```bash
+npm run dev
+```
+
+The dev server runs at `http://localhost:4321`. By default, it uses the `VITE_DEV_TENANT_HOST` environment variable for tenant resolution.
+
+### Environment Variables
+
+Create `.env` based on `.env.example`:
+
+```env
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key
+VITE_DEV_TENANT_HOST=localhost  # For local development
+```
+
+## 📁 Project Structure
+
+```txt
 /
-├── public/
+├── public/             # Static assets
 ├── src/
-│   └── pages/
-│       └── index.astro
+│   ├── components/     # Astro/React components
+│   ├── layouts/        # Page layouts
+│   ├── lib/            # Utilities (supabase, url builder)
+│   ├── pages/
+│   │   ├── index.astro           # Root redirect
+│   │   └── [tenant]/
+│   │       └── [...slug].astro   # Tenant-scoped pages
+│   ├── styles/         # Global CSS
+│   └── templates/      # Template themes
+├── astro.config.mjs    # Astro configuration
 └── package.json
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+## 🔗 Tenant Resolution
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+The middleware resolves tenants in this order:
 
-Any static assets, like images, can be placed in the `public/` directory.
+1. **Path Parameter** (Primary): Extracts tenant slug from URL path (`/{tenant}/...`)
+2. **Host Header** (Fallback): Looks up tenant by domain/subdomain
 
-## 🧞 Commands
+If resolved from host, the user is redirected to the canonical path-based URL.
 
-All commands are run from the root of the project, from a terminal:
+## 🛠️ Commands
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+| Command | Action |
+| :--- | :--- |
+| `npm run dev` | Start dev server at `localhost:4321` |
+| `npm run build` | Build for production |
+| `npm run preview` | Preview production build locally |
 
-## 👀 Want to learn more?
+## 📚 Documentation
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+* [Migration Guide](../awcms/docs/01-guides/MIGRATION.md) - URL structure changes
+* [Deployment Guide](../awcms/docs/01-guides/DEPLOYMENT.md) - Cloudflare Pages setup
+* [Main Documentation](../awcms/docs/INDEX.md) - Full documentation index

@@ -1,14 +1,23 @@
 ---
-import '../styles/global.css'; // Assume we'll create this or use tailwind integration to inject
+import '../styles/global.css';
+import Navbar from '../components/Navbar.astro';
+import Footer from '../components/Footer.astro';
+import { tenantUrl, absoluteTenantUrl } from '../lib/url';
 
 interface Props {
   title: string;
   description?: string;
+  tenantSlug?: string;
 }
 
-const { title, description } = Astro.props;
-import Navbar from '../components/Navbar.astro';
-import Footer from '../components/Footer.astro';
+const { title, description, tenantSlug } = Astro.props;
+
+// Get tenant_slug from props or locals
+const resolvedTenantSlug = tenantSlug || Astro.locals.tenant_slug || 'primary';
+
+// Build canonical URL
+const canonicalPath = tenantUrl(resolvedTenantSlug, Astro.url.pathname.replace(`/${resolvedTenantSlug}`, '') || '/');
+const canonicalUrl = new URL(canonicalPath, Astro.url.origin).href;
 ---
 
 <!doctype html>
@@ -20,12 +29,21 @@ import Footer from '../components/Footer.astro';
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href={canonicalUrl} />
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description || "AWCMS Content"} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:type" content="website" />
   </head>
   <body class="bg-white min-h-screen flex flex-col font-sans antialiased text-slate-900">
-    <Navbar />
+    <Navbar tenantSlug={resolvedTenantSlug} />
     <main class="flex-1">
       <slot />
     </main>
-    <Footer />
+    <Footer tenantSlug={resolvedTenantSlug} />
   </body>
 </html>

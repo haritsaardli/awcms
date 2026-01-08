@@ -1,10 +1,19 @@
 ---
 import { createScopedClient } from '../lib/supabase';
+import { tenantUrl } from '../lib/url';
 import { Menu, X, ChevronDown } from 'lucide-react';
 import DarkModeToggle from './DarkModeToggle';
 
-const { tenant_id, runtime } = Astro.locals;
+interface Props {
+    tenantSlug?: string;
+}
+
+const { tenantSlug: propTenantSlug } = Astro.props;
+const { tenant_id, tenant_slug: localTenantSlug, runtime } = Astro.locals;
 const env = runtime?.env || {};
+
+// Use prop or fallback to locals
+const tenantSlug = propTenantSlug || localTenantSlug || 'primary';
 
 // Initialize Scoped Client
 const supabase = createScopedClient({
@@ -12,18 +21,11 @@ const supabase = createScopedClient({
 }, env);
 
 // Fetch Menu Items for 'main' menu of this tenant
-// Schema: menus -> menu_items
-// We need to join them.
-// Optimized Query:
-// We verify 'menus' are public readable?
-// Usually public menus are readable by anon if tenant_id matches using RLS.
-// Assuming 'menus' and 'menu_items' have RLS setup for public read.
-
 let menuItems = [];
-let brandName = "AWCMS"; // Default
+let brandName = "AWCMS";
 
 if (tenant_id && supabase) {
-    // 1. Get Tenant Name (Simple cacheable lookup)
+    // 1. Get Tenant Name
     const { data: tenantData } = await supabase
         .from('tenants')
         .select('name')
@@ -39,7 +41,7 @@ if (tenant_id && supabase) {
         .from('menus')
         .select('id')
         .eq('tenant_id', tenant_id)
-        .eq('slug', 'main') // Standard slug for primary nav
+        .eq('slug', 'main')
         .eq('is_active', true)
         .single();
     
@@ -56,7 +58,7 @@ if (tenant_id && supabase) {
     }
 }
 
-// Fallback items if no menu defined (Development / First time)
+// Fallback items if no menu defined
 if (menuItems.length === 0) {
     menuItems = [
         { label: 'Home', url: '/' },
@@ -64,19 +66,22 @@ if (menuItems.length === 0) {
         { label: 'Contact', url: '/contact' },
     ];
 }
+
+// Build tenant-aware URLs
+const buildUrl = (path: string) => tenantUrl(tenantSlug, path);
 ---
 
 <header class="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
     <div class="container flex h-16 items-center justify-between">
         <div class="flex items-center gap-6">
-            <a href="/" class="flex items-center space-x-2 font-heading font-bold text-xl text-primary">
+            <a href={buildUrl('/')} class="flex items-center space-x-2 font-heading font-bold text-xl text-primary">
                 {brandName}
             </a>
             
             <nav class="hidden md:flex items-center gap-6 text-sm font-medium">
                 {menuItems.map((item) => (
                     <a 
-                        href={item.url} 
+                        href={buildUrl(item.url)} 
                         class="transition-colors hover:text-foreground/80 text-foreground/60"
                     >
                         {item.label}

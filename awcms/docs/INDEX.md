@@ -25,6 +25,7 @@ Welcome to the AWCMS documentation. This index provides a roadmap to navigate al
 
 * [Deployment Guide](01-guides/DEPLOYMENT.md) - General deployment instructions
 * [Cloudflare Deployment](01-guides/CLOUDFLARE_DEPLOYMENT.md) - Cloudflare Pages setup
+* [Migration Guide](01-guides/MIGRATION.md) - Public URL structure migration
 * [CI/CD Pipeline](01-guides/CI_CD.md) - GitHub Actions workflow
 
 ### Development

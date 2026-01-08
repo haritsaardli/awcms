@@ -1,20 +1,27 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import AWT01Layout from '../templates/awtemplate01/Layout.astro';
-import { createScopedClient } from '../lib/supabase';
-import { PuckRenderer } from '../components/PuckRenderer';
-import { TipTapRenderer } from '../components/TipTapRenderer';
+import Layout from '../../layouts/Layout.astro';
+import AWT01Layout from '../../templates/awtemplate01/Layout.astro';
+import { createScopedClient } from '../../lib/supabase';
+import { PuckRenderer } from '../../components/PuckRenderer';
+import { TipTapRenderer } from '../../components/TipTapRenderer';
 
 // SSR Mode
 export const prerender = false;
 
-const { slug } = Astro.params;
+const { tenant, slug } = Astro.params;
 const rawSlug = slug || '';
 const currentSlug = rawSlug === '' ? 'home' : rawSlug; // Normalize root to 'home'
 
-// Get Tenant Context
-const { tenant_id, runtime } = Astro.locals;
+// Get Tenant Context from middleware
+const { tenant_id, tenant_slug, runtime } = Astro.locals;
 const env = runtime?.env || {};
+
+// Validate tenant param matches resolved tenant
+if (tenant !== tenant_slug) {
+    // Tenant mismatch - could be invalid tenant or spoofed URL
+    console.warn(`[Page] Tenant mismatch: URL param "${tenant}" vs resolved "${tenant_slug}"`);
+    return Astro.redirect(`/${tenant_slug}/${rawSlug}`, 301);
+}
 
 // Initialize Scoped Client
 const supabase = createScopedClient({
@@ -40,10 +47,10 @@ if (!supabase) {
     try {
         // 1. Fetch Page
         const { data: pageData, error: pageError } = await supabase
-            .from('pages') // Query raw 'pages' table (assuming RLS allows read public) or use view
+            .from('pages')
             .select('*')
             .eq('slug', currentSlug)
-            .eq('status', 'published') // Ensure only published
+            .eq('status', 'published')
             .maybeSingle();
 
         if (pageError) throw pageError;
@@ -75,7 +82,7 @@ if (!supabase) {
                 if (currentSlug === 'home') {
                     templateId = assignmentMap['home'];
                 } else {
-                    templateId = assignmentMap['single']; // Default for standard pages
+                    templateId = assignmentMap['single'];
                 }
             }
         } else {
@@ -103,11 +110,9 @@ if (!supabase) {
 
             if (template) {
                 currentTemplateSlug = template.slug;
-                // Get Parts
-                const parts = template.parts || {}; // e.g. { header: 'uuid', footer: 'uuid' }
+                const parts = template.parts || {};
                 const partIds = Object.values(parts).filter(Boolean);
                 
-                // Fetch Part Data
                 let partDataMap = {};
                 if (partIds.length > 0) {
                     const { data: partsData } = await supabase
@@ -118,25 +123,16 @@ if (!supabase) {
                     (partsData || []).forEach(p => partDataMap[p.id] = p);
                 }
 
-                // Construct Layout: Header -> Page Content -> Footer
-                // We assume 'parts' keys define order or we hardcode specific zones?
-                // Let's assume a standard structure for now: Header, Main (Content), Footer.
-                // Or strictly follow the order in `parts` entries if it was an array? It's JSONB.
-                // We'll look for specific keys: 'header', 'footer'.
-                
                 if (parts.header && partDataMap[parts.header]) {
                      const headerContent = partDataMap[parts.header].data?.content || [];
                      mergedContent.push(...headerContent);
                 }
 
-                // Merge Content:
-                // Priority: Page Content -> Template Content
                 const pageHasContent = pageContent && pageContent.content && pageContent.content.length > 0;
                 
                 if (pageHasContent) {
                      mergedContent.push(...pageContent.content);
                 } else {
-                     // Use template content as fallback (Master Template)
                      const templateContent = template.data?.content || [];
                      mergedContent.push(...templateContent);
                 }
@@ -147,11 +143,9 @@ if (!supabase) {
                 }
                 
             } else {
-                // Template assigned but not found? Fallback to just page content
                 if (pageContent) mergedContent = pageContent.content || [];
             }
         } else {
-            // No template assigned. Just render page content.
             if (pageContent) mergedContent = pageContent.content || [];
         }
 
@@ -164,25 +158,20 @@ if (!supabase) {
 
 const finalPuckData = {
     content: mergedContent,
-    root: { title: meta.title } // Root props
+    root: { title: meta.title }
 };
-
-// TipTap content?
-// Currently ignoring `tiptap_doc_jsonb` unless we have a specific block for it in Puck.
-// Ideally, we convert TipTap to a Puck block.
-// For now, if mergedContent is empty, maybe fallback to TipTap?
-// Or append TipTap as a RichText block?
-// Let's append if present and `pageData` exists.
-// if (pageData?.tiptap_doc_jsonb) {
-    // TODO: Need a way to render TipTap inside Puck or after.
-    // We'll leave it out for this iteration as users focus on Visual Builder (Puck).
-// }
 
 const LayoutComponent = (currentTemplateSlug === 'awtemplate01') ? AWT01Layout : Layout;
 
+// Pass tenant_slug to layout for link building
+const layoutProps = {
+    title: meta.title,
+    description: meta.description,
+    tenantSlug: tenant_slug
+};
 ---
 
-<LayoutComponent title={meta.title} description={meta.description}>
+<LayoutComponent {...layoutProps}>
   <main>
     {errorState ? (
         <div class="container mx-auto py-20 text-center text-red-600">

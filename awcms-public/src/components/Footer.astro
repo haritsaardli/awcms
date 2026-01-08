@@ -1,6 +1,20 @@
 ---
+import { tenantUrl } from '../lib/url';
+
+interface Props {
+    tenantSlug?: string;
+}
+
+const { tenantSlug: propTenantSlug } = Astro.props;
+const { tenant_id, tenant_slug: localTenantSlug } = Astro.locals;
+
+// Use prop or fallback to locals
+const tenantSlug = propTenantSlug || localTenantSlug || 'primary';
+
 const year = new Date().getFullYear();
-const { tenant_id } = Astro.locals;
+
+// Build tenant-aware URLs
+const buildUrl = (path: string) => tenantUrl(tenantSlug, path);
 ---
 
 <footer class="border-t bg-slate-50 mt-auto">
@@ -16,18 +30,18 @@ const { tenant_id } = Astro.locals;
             <div class="col-span-1">
                 <h3 class="font-semibold mb-4">Content</h3>
                 <ul class="space-y-2 text-sm text-muted-foreground">
-                    <li><a href="/articles" class="hover:text-primary">Articles</a></li>
-                    <li><a href="/categories" class="hover:text-primary">Categories</a></li>
-                    <li><a href="/tags" class="hover:text-primary">Tags</a></li>
+                    <li><a href={buildUrl('/articles')} class="hover:text-primary">Articles</a></li>
+                    <li><a href={buildUrl('/categories')} class="hover:text-primary">Categories</a></li>
+                    <li><a href={buildUrl('/tags')} class="hover:text-primary">Tags</a></li>
                 </ul>
             </div>
 
             <div class="col-span-1">
                 <h3 class="font-semibold mb-4">Company</h3>
                 <ul class="space-y-2 text-sm text-muted-foreground">
-                    <li><a href="/about" class="hover:text-primary">About Us</a></li>
-                    <li><a href="/contact" class="hover:text-primary">Contact</a></li>
-                    <li><a href="/privacy" class="hover:text-primary">Privacy Policy</a></li>
+                    <li><a href={buildUrl('/about')} class="hover:text-primary">About Us</a></li>
+                    <li><a href={buildUrl('/contact')} class="hover:text-primary">Contact</a></li>
+                    <li><a href={buildUrl('/privacy')} class="hover:text-primary">Privacy Policy</a></li>
                 </ul>
             </div>
             
@@ -38,7 +52,7 @@ const { tenant_id } = Astro.locals;
         
         <div class="border-t mt-8 pt-8 text-center text-xs text-muted-foreground">
             <p>&copy; {year} All rights reserved.</p>
-            {import.meta.env.DEV && <p class="mt-2 font-mono opacity-50">Tenant ID: {tenant_id}</p>}
+            {import.meta.env.DEV && <p class="mt-2 font-mono opacity-50">Tenant: {tenantSlug} | ID: {tenant_id}</p>}
         </div>
     </div>
 </footer>

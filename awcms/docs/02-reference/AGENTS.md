@@ -61,7 +61,7 @@ Agents must be aware of the exact versions in use:
 | Leaflet          | 1.9.4    | Maps                                    |
 
 > [!IMPORTANT]
-> **React 18 Required**: This project strictly uses React 18.3.1 because the Puck visual editor is not yet compatible with React 19. Do not upgrade to React 19 until Puck adds support.
+> **React Version Split**: The Admin Panel uses React 18.3.1 (required for Puck visual editor compatibility). The Public Portal uses React 19.2.3 (Astro Islands architecture). Do not mix these versions across projects.
 
 ---
 
@@ -220,7 +220,8 @@ To prevent API hallucinations and ensure adherence to the latest library standar
 
 ### Available Tools
 
-- `resolve-library-id`: Search for a library's Context7 ID.
+* `resolve-library-id`: Search for a library's Context7 ID.
+
 * `query-docs`: Query specific documentation using a Library ID.
 
 ### Core Library IDs

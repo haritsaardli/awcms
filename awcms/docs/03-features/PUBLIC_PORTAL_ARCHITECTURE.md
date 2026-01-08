@@ -6,13 +6,17 @@ The Public Portal is a high-performance, secure, multi-tenant frontend built wit
 
 ## 1. Multi-Tenancy Architecture
 
-- **Tenant Resolution**:
-  - Host-based resolution via `src/middleware.ts`.
-  - Maps `Host` header -> `public.tenants` (via Cached RPC `get_tenant_id_by_host`).
-  - Sets `locals.tenant_id` for use in Astro pages and components.
+- **Tenant Resolution** (Priority Order):
+  1. **Path Parameter** (Primary): Extracts tenant slug from first URL segment (`/{tenant}/...`).
+  2. **Host Header** (Fallback): Maps `Host` header → `public.tenants` (via RPC `get_tenant_id_by_host`).
+  - Middleware (`src/middleware.ts`) sets `locals.tenant_id` and `locals.tenant_slug`.
+  - Host-resolved tenants are redirected to canonical path-based URLs (301).
+- **URL Structure**: `/{tenant}/{slug}` (e.g., `/primary/articles/`)
 - **Data Isolation**:
   - **RLS**: Row-Level Security policies on `articles` table compel tenant check.
   - **View**: `published_articles_view` filters `tenant_id` and ensures only `published` content is accessible.
+
+> See [Migration Guide](../01-guides/MIGRATION.md) for URL structure details.
 
 ## 2. Rendering Pipeline
 
@@ -52,11 +56,17 @@ The Public Portal is a high-performance, secure, multi-tenant frontend built wit
 
 ## 5. Template System Integration
 
-- **Dynamic Routing** (`[...slug].astro`):
+- **Dynamic Routing** (`[tenant]/[...slug].astro`):
+  - Validates tenant param matches resolved tenant from middleware.
   - Fetches page data from `pages` table.
   - Fetches `template_assignments` for the current channel.
   - Determines template from page override or channel assignment.
   - Merges **Header Part** + **Page Content** + **Footer Part** into final layout.
+- **Root Redirect** (`index.astro`):
+  - Redirects `/` to `/primary/` (default tenant).
+- **URL Builder** (`src/lib/url.ts`):
+  - `tenantUrl(slug, path)`: Builds tenant-prefixed URLs.
+  - Used by Navbar, Footer, and all internal links.
 - **Component Registry** (`registry.tsx`):
   - Whitelists allowed components including Core Widgets (`core/text`, `core/image`, `core/menu`, `core/button`).
   - Validates props with Zod schemas.

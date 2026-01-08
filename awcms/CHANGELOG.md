@@ -5,6 +5,37 @@ All notable changes to the **AWCMS** project will be documented in this file.
 
 ## [Unreleased]
 
+## [2.8.0] "Pathfinder" - 2026-01-08
+
+### Added
+
+- **Path-Based Tenant Routing**: Public Portal now uses `/{tenant}/...` URL structure
+  - New route: `src/pages/[tenant]/[...slug].astro`
+  - Tenant-aware URL builder: `src/lib/url.ts`
+  - Root redirect: `/` → `/primary/`
+- **Documentation**: New `docs/01-guides/MIGRATION.md` for URL structure migration
+
+### Changed
+
+- **Public Portal Middleware**: Path-first tenant resolution with host fallback
+- **Navbar/Footer**: All links now use `tenantUrl()` helper for tenant-prefixed URLs
+- **URL Policy**: `trailingSlash: 'always'` enforced in `astro.config.mjs`
+- **Documentation Updates**:
+  - Updated `MULTI_TENANCY.md` with path-based resolution
+  - Updated `PUBLIC_PORTAL_ARCHITECTURE.md` with new routing
+  - Updated `AGENTS.md` to clarify React version per project
+  - Updated `docs/INDEX.md` with Migration Guide link
+
+### Fixed
+
+- **TypeScript**: Added `tenant_slug` to `App.Locals` interface
+
+### Documentation
+
+- Comprehensive documentation audit and synchronization
+- Fixed React version contradictions in `AGENTS.md`
+- Updated project READMEs to reflect current architecture
+
 ## [2.7.0] "Unified Admin Template" - 2026-01-05
 
 ### Added
