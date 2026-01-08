@@ -14,6 +14,7 @@ All notable changes to the **AWCMS** project will be documented in this file.
 - **Seed Data**: Idempotent seed script for primary tenant (3 menus, 3 categories, 3 tags)
 - **Menu Manager Sync**: Public module registry + "Sync Modules" button to add all available routes
 - **Menu Module Picker**: Quick select dropdown for adding menu items from predefined modules
+- **Tenant Channels**: Channel-aware domain configuration (web_admin, web_public, mobile, esp32)
 
 ### Fixed
 
