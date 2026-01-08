@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Reorder } from 'framer-motion';
-import { GripVertical, Plus, Save, Trash2, Lock, Edit, ChevronRight, ChevronDown } from 'lucide-react';
+import { GripVertical, Plus, Save, Trash2, Lock, Edit, ChevronRight, ChevronDown, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,6 +9,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/lib/customSupabaseClient';
 import { usePermissions } from '@/contexts/PermissionContext';
 import { useTenant } from '@/contexts/TenantContext';
+import { PUBLIC_MODULES, getModulesByGroup } from '@/lib/publicModuleRegistry';
 import {
   Dialog,
   DialogContent,
@@ -39,6 +40,8 @@ function MenusManager() {
   const [isPermEditorOpen, setIsPermEditorOpen] = useState(false);
   const [selectedMenuPerms, setSelectedMenuPerms] = useState(null);
   const [menuPermissions, setMenuPermissions] = useState({});
+  const [syncing, setSyncing] = useState(false);
+  const [selectedModule, setSelectedModule] = useState('');
 
   const canView = hasPermission('tenant.menu.read');
   const canCreate = hasPermission('tenant.menu.create');
@@ -272,6 +275,66 @@ function MenusManager() {
     }
   };
 
+  // Sync from public module registry
+  const syncFromModules = async () => {
+    if (!currentTenant?.id) {
+      toast({ variant: 'destructive', title: 'No tenant selected' });
+      return;
+    }
+    setSyncing(true);
+    try {
+      const existingUrls = new Set(flatMenus.map(m => m.url));
+      const modulesToAdd = PUBLIC_MODULES.filter(mod => !existingUrls.has(mod.url));
+
+      if (modulesToAdd.length === 0) {
+        toast({ title: 'All modules already exist', description: 'No new items to add' });
+        setSyncing(false);
+        return;
+      }
+
+      const maxOrder = Math.max(0, ...flatMenus.map(m => m.order || 0));
+      const newItems = modulesToAdd.map((mod, idx) => ({
+        label: mod.label,
+        name: mod.key,
+        url: mod.url,
+        icon: mod.icon,
+        parent_id: null,
+        order: maxOrder + ((idx + 1) * 10),
+        is_active: true,
+        is_public: true,
+        tenant_id: currentTenant.id,
+        created_at: new Date().toISOString(),
+      }));
+
+      const { error } = await supabase.from('menus').insert(newItems);
+      if (error) throw error;
+
+      toast({ title: 'Sync complete', description: `Added ${newItems.length} menu items` });
+      fetchMenus();
+    } catch (err) {
+      console.error(err);
+      toast({ variant: 'destructive', title: 'Sync failed', description: err.message });
+    } finally {
+      setSyncing(false);
+    }
+  };
+
+  // Handle module picker selection
+  const handleModuleSelect = (moduleKey) => {
+    setSelectedModule(moduleKey);
+    if (moduleKey) {
+      const mod = PUBLIC_MODULES.find(m => m.key === moduleKey);
+      if (mod) {
+        setMenuFormData(prev => ({
+          ...prev,
+          label: mod.label,
+          name: mod.key,
+          url: mod.url,
+        }));
+      }
+    }
+  };
+
   if (!canView) return <div className="p-8 text-center text-slate-500">Access Denied</div>;
 
   return (
@@ -281,7 +344,12 @@ function MenusManager() {
           <h2 className="text-3xl font-bold text-slate-800">Menu Management</h2>
           <p className="text-slate-600">Drag and drop to reorder navigation items</p>
         </div>
-        <div className="flex gap-3 w-full sm:w-auto">
+        <div className="flex gap-3 w-full sm:w-auto flex-wrap">
+          {canCreate && (
+            <Button onClick={syncFromModules} variant="outline" disabled={syncing} className="border-emerald-300 text-emerald-700 hover:bg-emerald-50 flex-1 sm:flex-none">
+              <RefreshCw className={`w-4 h-4 mr-2 ${syncing ? 'animate-spin' : ''}`} /> Sync Modules
+            </Button>
+          )}
           <Button onClick={saveOrder} variant="outline" className="border-slate-300 flex-1 sm:flex-none">
             <Save className="w-4 h-4 mr-2" /> Save Order
           </Button>
@@ -327,6 +395,26 @@ function MenusManager() {
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSaveMenu} className="space-y-4 py-4">
+            {/* Module Picker - only show for new items */}
+            {!editingMenu && (
+              <div className="space-y-2">
+                <Label>Quick Select (Optional)</Label>
+                <select
+                  className="flex h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                  value={selectedModule}
+                  onChange={e => handleModuleSelect(e.target.value)}
+                >
+                  <option value="">-- Select a module or enter custom --</option>
+                  {Object.entries(getModulesByGroup()).map(([group, modules]) => (
+                    <optgroup key={group} label={group}>
+                      {modules.map(mod => (
+                        <option key={mod.key} value={mod.key}>{mod.label} ({mod.url})</option>
+                      ))}
+                    </optgroup>
+                  ))}
+                </select>
+              </div>
+            )}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Label</Label>
