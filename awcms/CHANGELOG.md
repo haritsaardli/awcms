@@ -20,6 +20,8 @@ All notable changes to the **AWCMS** project will be documented in this file.
 - **Tenant Isolation Bug (TagsManager)**: Platform admins now create tags within active tenant context
 - **Tenant Isolation Bug (MenusManager)**: Menu inserts now include `tenant_id` from TenantContext
 - **NOT NULL Constraints**: Enforced `tenant_id NOT NULL` on categories, tags, menus, menu_permissions
+- **Photo Gallery Save Error**: Added missing `published_at`, `reviewed_at`, `approved_at` columns
+- **Photo Gallery Category Select**: Removed type filter that blocked category selection
 
 ### Security
 

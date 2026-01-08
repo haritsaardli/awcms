@@ -42,7 +42,7 @@ function PhotoGalleryManager() {
         { key: 'description', label: 'Description', type: 'richtext' },
         { key: 'cover_image', label: 'Cover Image', type: 'image', description: 'Main album thumbnail' },
         { key: 'photos', label: 'Photos', type: 'images', description: 'Add multiple photos to album', maxImages: 50 },
-        { key: 'category_id', label: 'Category', type: 'relation', table: 'categories', filter: { type: 'photo_gallery' } },
+        { key: 'category_id', label: 'Category', type: 'relation', table: 'categories' },
         { key: 'published_at', label: 'Publish Date', type: 'datetime', description: 'Schedule for future release (optional)' },
         {
             key: 'status', label: 'Status', type: 'select', options: [
