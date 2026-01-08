@@ -49,6 +49,22 @@ lib/
 │   ├── widgets/                 # OfflineIndicator, etc.
 │   └── themes/                  # Material 3 themes
 └── routes/                      # GoRouter config
+
+---
+
+## 📂 Tenant Folders
+
+Tenant-specific configuration lives under `/{tenant_code}/`:
+
+```text
+awcms-mobile/
+  primary/               # Default tenant
+    README.md            # Tenant config docs
+  lib/                   # Shared Flutter code
+```
+
+See [primary/README.md](./primary/README.md) for tenant-specific setup.
+
 ```
 
 ---
