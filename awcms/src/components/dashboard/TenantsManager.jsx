@@ -167,7 +167,7 @@ function TenantsManager() {
                 .select('id')
                 .eq('slug', formData.slug)
                 .neq('id', editingTenant?.id || '00000000-0000-0000-0000-000000000000') // Exclude self
-                .single();
+                .maybeSingle();
 
             if (existing) {
                 throw new Error('Tenant Slug is already taken. Please choose another.');
