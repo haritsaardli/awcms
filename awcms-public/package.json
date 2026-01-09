@@ -1,0 +1,11 @@
+{
+    "name": "awcms-public-root",
+    "version": "1.0.0",
+    "private": true,
+    "scripts": {
+        "build": "cd primary && npm install && npm run build"
+    },
+    "engines": {
+        "node": ">=20.0.0"
+    }
+}
