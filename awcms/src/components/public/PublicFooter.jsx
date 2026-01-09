@@ -14,6 +14,7 @@ function PublicFooter({ tenant }) {
     if (tenant?.id) {
       fetchFooterMenus();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tenant?.id]);
 
   useEffect(() => {

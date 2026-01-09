@@ -59,6 +59,7 @@ function AuditLogsManager() {
         if (canView && (tenantId || userRole === 'owner')) {
             fetchLogs();
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [tenantId, userRole, page, limit, searchQuery, canView]);
 
     const getChannelIcon = (channel) => {

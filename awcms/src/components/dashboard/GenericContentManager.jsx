@@ -5,7 +5,7 @@ import { usePermissions } from '@/contexts/PermissionContext';
 import { useToast } from '@/components/ui/use-toast';
 import { udm } from '@/lib/data/UnifiedDataManager'; // Changed from supabase
 import { Button } from '@/components/ui/button';
-import { Plus, Trash2, Search, X, RefreshCw, Archive, RotateCcw, ShieldAlert, User, Home, ChevronRight } from 'lucide-react';
+import { Plus, Trash2, Search, X, RefreshCw, RotateCcw, ShieldAlert, User, Home, ChevronRight } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/contexts/SupabaseAuthContext';
 import { Link } from 'react-router-dom';
@@ -144,6 +144,7 @@ const GenericContentManager = ({
 
     useEffect(() => {
         fetchItems();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentPage, itemsPerPage, query, canView, showTrash, tableName, currentTenant?.id]);
 
     const handleEdit = (item) => {
@@ -199,7 +200,7 @@ const GenericContentManager = ({
 
     const handleRestore = async (id) => {
         try {
-            const { data, error } = await udm.from(tableName)
+            const { error } = await udm.from(tableName)
                 .update({ deleted_at: null })
                 .eq('id', id);
 

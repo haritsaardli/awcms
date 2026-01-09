@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Save, X, Globe, Calendar, Lock, Layout, Image as ImageIcon, Share2, FolderOpen } from 'lucide-react';
+import { Save, X, Globe, Calendar, Lock, Layout, Share2, FolderOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -20,7 +20,7 @@ function PageEditor({ page, onClose, onSuccess }) {
     const { toast } = useToast();
     const { user } = useAuth();
     const { currentTenant } = useTenant(); // Get Current Tenant
-    const { hasPermission, userRole } = usePermissions();
+    const { hasPermission } = usePermissions();
     const [loading, setLoading] = useState(false);
     const [categories, setCategories] = useState([]);
 

@@ -14,6 +14,7 @@ import { Render } from '@measured/puck';
 import puckConfig from '@/components/visual-builder/config';
 import '@measured/puck/puck.css';
 import '@/components/visual-builder/puck-theme.css';
+import { sanitizeHTML } from '@/utils/sanitize';
 
 function PublicPageDetail() {
     const { slug } = useParams();
@@ -229,7 +230,7 @@ function PublicPageDetail() {
                                     </div>
                                 ) : (
                                     <div className="prose prose-slate prose-lg max-w-none prose-headings:font-bold prose-headings:text-slate-900 prose-headings:tracking-tight prose-a:text-blue-600 hover:prose-a:text-blue-700 prose-img:rounded-2xl prose-blockquote:border-l-4 prose-blockquote:border-blue-500 prose-blockquote:bg-slate-50 prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:not-italic prose-blockquote:rounded-r-lg">
-                                        <div dangerouslySetInnerHTML={{ __html: page.content }} />
+                                        <div dangerouslySetInnerHTML={sanitizeHTML(page.content)} />
                                     </div>
                                 )}
 

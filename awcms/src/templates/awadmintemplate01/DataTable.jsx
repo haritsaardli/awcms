@@ -1,7 +1,6 @@
 import React from 'react';
 import ContentTable from '@/components/dashboard/ContentTable';
 import { usePermissions } from '@/contexts/PermissionContext';
-import { useTenant } from '@/contexts/TenantContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Search, RefreshCw } from 'lucide-react';
@@ -46,7 +45,6 @@ const DataTable = ({
     emptyState = {},
 }) => {
     const { isPlatformAdmin } = usePermissions();
-    const { currentTenant } = useTenant();
 
     // Auto-inject tenant column for platform admins
     const displayColumns = React.useMemo(() => {

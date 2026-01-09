@@ -7,6 +7,7 @@ import { Calendar, User, ArrowLeft, Tag, Clock, Facebook, Twitter, Linkedin, Fil
 import SeoHelmet from '@/components/public/SeoHelmet';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { sanitizeHTML } from '@/utils/sanitize';
 
 function PublicArticleDetail() {
     const { slug } = useParams();
@@ -170,7 +171,7 @@ function PublicArticleDetail() {
                         className="bg-white rounded-2xl shadow-xl border border-slate-100 p-8 md:p-12"
                     >
                         <div className="prose prose-slate prose-lg max-w-none leading-relaxed text-slate-700">
-                            <div dangerouslySetInnerHTML={{ __html: article.content }} />
+                            <div dangerouslySetInnerHTML={sanitizeHTML(article.content)} />
                         </div>
 
                         {/* Footer of Content */}

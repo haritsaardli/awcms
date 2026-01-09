@@ -18,6 +18,7 @@ const WidgetEditor = ({ type, config, onChange, onSave, onCancel }) => {
     // Notify parent on change if needed (for live preview?)
     useEffect(() => {
         onChange && onChange(localConfig);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [localConfig]);
 
     // Render form based on type

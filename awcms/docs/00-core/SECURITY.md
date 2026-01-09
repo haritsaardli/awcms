@@ -68,8 +68,11 @@ The TipTap WYSIWYG editor is XSS-safe by default:
 ### Input Sanitization
 
 ```javascript
-// All user inputs are escaped before display
-import { sanitizeHTML } from '@/lib/utils';
+// All user inputs are escaped or sanitized before display
+import { sanitizeHTML } from '@/utils/sanitize';
+
+// Usage
+<div dangerouslySetInnerHTML={sanitizeHTML(rawContent)} />
 ```
 
 ---

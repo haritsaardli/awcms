@@ -3,8 +3,6 @@ import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Globe, Check } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/contexts/SupabaseAuthContext';
 import { supabase } from '@/lib/customSupabaseClient';
@@ -36,7 +34,7 @@ function LanguageSettings() {
   const handleLanguageChange = async (lang) => {
     i18n.changeLanguage(lang);
     localStorage.setItem('i18nextLng', lang);
-    
+
     if (user) {
       const { error } = await supabase
         .from('users')
@@ -72,18 +70,17 @@ function LanguageSettings() {
 
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
           <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-             <Globe className="w-5 h-5 text-blue-600" />
-             {t('settings.select_language')}
+            <Globe className="w-5 h-5 text-blue-600" />
+            {t('settings.select_language')}
           </h3>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <button
               onClick={() => handleLanguageChange('id')}
-              className={`flex items-center justify-between p-4 rounded-lg border transition-all ${
-                currentLang === 'id' 
-                  ? 'border-blue-600 bg-blue-50 ring-1 ring-blue-600' 
+              className={`flex items-center justify-between p-4 rounded-lg border transition-all ${currentLang === 'id'
+                  ? 'border-blue-600 bg-blue-50 ring-1 ring-blue-600'
                   : 'border-slate-200 hover:border-blue-300 hover:bg-slate-50'
-              }`}
+                }`}
             >
               <div className="flex items-center gap-3">
                 <span className="text-2xl">🇮🇩</span>
@@ -97,11 +94,10 @@ function LanguageSettings() {
 
             <button
               onClick={() => handleLanguageChange('en')}
-              className={`flex items-center justify-between p-4 rounded-lg border transition-all ${
-                currentLang === 'en' 
-                  ? 'border-blue-600 bg-blue-50 ring-1 ring-blue-600' 
+              className={`flex items-center justify-between p-4 rounded-lg border transition-all ${currentLang === 'en'
+                  ? 'border-blue-600 bg-blue-50 ring-1 ring-blue-600'
                   : 'border-slate-200 hover:border-blue-300 hover:bg-slate-50'
-              }`}
+                }`}
             >
               <div className="flex items-center gap-3">
                 <span className="text-2xl">🇺🇸</span>
@@ -116,12 +112,12 @@ function LanguageSettings() {
         </div>
 
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
-           <h3 className="text-lg font-bold mb-2">{t('settings.google_translate')}</h3>
-           <p className="text-slate-500 mb-4">{t('settings.google_translate_desc')}</p>
-           
-           <div className="p-4 bg-slate-50 rounded-lg border border-slate-200">
-              <div id="google_translate_element"></div>
-           </div>
+          <h3 className="text-lg font-bold mb-2">{t('settings.google_translate')}</h3>
+          <p className="text-slate-500 mb-4">{t('settings.google_translate_desc')}</p>
+
+          <div className="p-4 bg-slate-50 rounded-lg border border-slate-200">
+            <div id="google_translate_element"></div>
+          </div>
         </div>
       </motion.div>
     </div>

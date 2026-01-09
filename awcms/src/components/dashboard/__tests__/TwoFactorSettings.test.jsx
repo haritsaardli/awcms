@@ -2,6 +2,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import TwoFactorSettings from '../TwoFactorSettings';
 
+// Import mocked module to manipulate it
+import { useTwoFactor } from '@/hooks/useTwoFactor';
+
 // Mock dependencies
 vi.mock('@/hooks/useTwoFactor', () => ({
     useTwoFactor: vi.fn(() => ({
@@ -20,9 +23,6 @@ vi.mock('@/components/ui/use-toast', () => ({
         toast: vi.fn(),
     })),
 }));
-
-// Import mocked module to manipulate it
-import { useTwoFactor } from '@/hooks/useTwoFactor';
 
 describe('TwoFactorSettings', () => {
     beforeEach(() => {

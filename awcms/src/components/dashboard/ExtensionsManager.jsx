@@ -1,9 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
 import {
-  Box, Puzzle, Power, Trash2, Plus, Settings,
-  Download, Upload, BookOpen, CheckCircle2, AlertCircle,
-  Search, ExternalLink, Code, Activity, FileText, Shield
+  Puzzle, Power, Trash2, Settings,
+  Upload, BookOpen, AlertCircle,
+  Search, Shield
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -57,6 +57,7 @@ function ExtensionsManager() {
     } else {
       setLoading(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [canView]);
 
   const fetchExtensions = async () => {

@@ -6,6 +6,12 @@ import TenantGuard from '@/components/auth/TenantGuard';
 import LoginPage from '@/pages/cmspanel/LoginPage';
 import ForgotPasswordPage from '@/pages/cmspanel/ForgotPasswordPage';
 import UpdatePasswordPage from '@/pages/cmspanel/UpdatePasswordPage';
+
+// Plugin Dynamic Routes
+import { usePluginRoutes } from '@/components/routing/PluginRoutes';
+import ExtensionErrorBoundary from '@/components/ui/ExtensionErrorBoundary';
+
+import PublicRegisterPage from '@/pages/public/PublicRegisterPage';
 // Public Pages (Removed - Moved to awcms-public)
 // import PublicPageResolver from '@/components/public/PublicPageResolver'; 
 // import PublicLayout from '@/components/public/PublicLayout';
@@ -74,10 +80,6 @@ const MobileUsersManager = lazy(() => import('@/pages/cmspanel/MobileUsersManage
 const PushNotificationsManager = lazy(() => import('@/pages/cmspanel/PushNotificationsManager'));
 const MobileAppConfig = lazy(() => import('@/pages/cmspanel/MobileAppConfig'));
 
-// Plugin Dynamic Routes
-import { usePluginRoutes } from '@/components/routing/PluginRoutes';
-import ExtensionErrorBoundary from '@/components/ui/ExtensionErrorBoundary';
-
 
 // Loading Screen
 const PageLoader = () => (
@@ -110,8 +112,6 @@ const ProtectedRoute = ({ children }) => {
 
   return children;
 };
-
-import PublicRegisterPage from '@/pages/public/PublicRegisterPage';
 
 
 const MainRouter = () => {

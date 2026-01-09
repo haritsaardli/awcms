@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { RefreshCw, Calendar, ArrowRight } from 'lucide-react';
+import { RefreshCw, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useDashboardData } from '@/hooks/useDashboardData';
@@ -10,7 +10,6 @@ import { ActivityFeed } from './widgets/ActivityFeed';
 import { ContentDistribution } from './widgets/ContentDistribution';
 import { SystemHealth } from './widgets/SystemHealth';
 import { Link } from 'react-router-dom';
-import { format } from 'date-fns';
 import { PluginAction } from '@/contexts/PluginContext';
 import { PlatformOverview } from './widgets/PlatformOverview';
 import { MyApprovals } from './widgets/MyApprovals';
@@ -29,8 +28,6 @@ function AdminDashboard() {
         if (hour < 18) return 'Good Afternoon';
         return 'Good Evening';
     };
-
-    const formattedDate = format(new Date(), 'EEEE, MMMM do, yyyy');
 
     const headerActions = [
         {

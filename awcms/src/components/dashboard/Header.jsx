@@ -24,7 +24,7 @@ import { DarkModeToggle } from '@/components/ui/DarkModeToggle';
 function Header({ toggleSidebar, onNavigate }) {
   const { user, signOut } = useAuth();
   const { t } = useTranslation();
-  const { isPlatformAdmin, userRole } = usePermissions();
+  const { isPlatformAdmin } = usePermissions();
   const { currentTenant } = useTenant();
 
   const getInitials = (email) => {

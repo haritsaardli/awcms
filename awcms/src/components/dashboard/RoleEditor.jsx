@@ -10,17 +10,9 @@ import { supabase } from '@/lib/customSupabaseClient';
 import PermissionMatrix from '@/components/dashboard/PermissionMatrix';
 import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { usePermissions } from '@/contexts/PermissionContext';
-
-const PREDEFINED_TEMPLATES = {
-  'Viewer': ['tenant.article.read', 'tenant.page.read', 'tenant.product.read', 'tenant.portfolio.read', 'tenant.announcement.read', 'tenant.photo_gallery.read'],
-  'Editor': ['tenant.article.read', 'tenant.article.create', 'tenant.article.update', 'tenant.article.publish', 'tenant.page.read', 'tenant.page.create', 'tenant.page.update', 'tenant.product.read', 'tenant.product.create', 'tenant.product.update', 'tenant.media.read'],
-  'Manager': ['tenant.user.read', 'tenant.role.read', 'tenant.setting.read', 'tenant.audit.read', 'tenant.extensions.read', 'tenant.extensions.manage']
-};
 
 const RoleEditor = ({ role, onClose, onSave }) => {
   const { toast } = useToast();
-  const { hasPermission, isSuperAdmin } = usePermissions();
 
 
 

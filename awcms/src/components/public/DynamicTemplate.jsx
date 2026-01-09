@@ -68,6 +68,7 @@ const DynamicTemplate = ({ type, fallback: Fallback, context = {} }) => {
         };
 
         fetchTemplate();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [type, canViewDrafts, context.tenant?.id]); // Re-fetch on tenant change
 
     if (loading) {

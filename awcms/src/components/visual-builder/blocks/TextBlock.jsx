@@ -7,6 +7,8 @@ import React from 'react';
 import { RichTextField } from '../fields/RichTextField';
 import { ColorPickerField } from '../fields/ColorPickerField';
 
+import { sanitizeHTML } from '@/utils/sanitize';
+
 export const TextBlockFields = {
     content: {
         type: 'custom',
@@ -43,7 +45,7 @@ export const TextBlock = ({ content, alignment, textColor }) => {
                 minHeight: '2rem',
                 border: '1px dashed #ccc' // Keep subtle debug border
             }}
-            dangerouslySetInnerHTML={{ __html: content }}
+            dangerouslySetInnerHTML={sanitizeHTML(content)}
         />
     );
 };

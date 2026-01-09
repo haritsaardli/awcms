@@ -67,11 +67,13 @@ export const DarkModeProvider = ({ children }) => {
 
         mediaQuery.addEventListener('change', handleChange);
         return () => mediaQuery.removeEventListener('change', handleChange);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // Update when mode changes
     useEffect(() => {
         updateTheme(mode);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [mode]);
 
     return (

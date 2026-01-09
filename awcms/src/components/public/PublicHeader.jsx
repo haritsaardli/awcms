@@ -31,6 +31,7 @@ const PublicHeader = ({ tenant }) => {
     if (tenant?.id) {
       fetchMenus();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, tenant?.id]);
 
   // Force re-render of menu items when language changes

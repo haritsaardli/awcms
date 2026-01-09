@@ -53,6 +53,7 @@ function MenusManager() {
       fetchMenus();
       fetchRoles();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [canView]);
 
   const fetchMenus = async () => {

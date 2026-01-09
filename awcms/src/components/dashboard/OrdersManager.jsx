@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import GenericContentManager from '@/components/dashboard/GenericContentManager';
-import { Package, Truck, CreditCard, User, ShoppingCart, ChevronRight, Home } from 'lucide-react';
+import { User, ShoppingCart, ChevronRight, Home } from 'lucide-react';
 
 function OrdersManager() {
     const columns = [

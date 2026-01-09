@@ -105,7 +105,7 @@ const MediaLibrary = ({ onSelect, selectionMode = false, refreshTrigger = 0, isT
         } finally {
             setLoading(false);
         }
-    }, [query, toast, refreshTrigger, isTrashView, currentPage, itemsPerPage, tenantId]);
+    }, [query, toast, isTrashView, currentPage, itemsPerPage, tenantId, isPlatformAdmin]);
 
     const fetchUsageData = async () => {
         try {
@@ -128,7 +128,7 @@ const MediaLibrary = ({ onSelect, selectionMode = false, refreshTrigger = 0, isT
 
     useEffect(() => {
         fetchFiles();
-    }, [fetchFiles]);
+    }, [fetchFiles, refreshTrigger]);
 
     const onDrop = useCallback(async (acceptedFiles, fileRejections) => {
         // Handle rejections

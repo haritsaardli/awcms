@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import ContentTable from '@/components/dashboard/ContentTable';
 import UserEditor from '@/components/dashboard/UserEditor';
 import UserApprovalManager from '@/components/dashboard/UserApprovalManager';
-import { AdminPageLayout, PageHeader, PageTabs, TabsContent, NotAuthorized } from '@/templates/awadmintemplate01';
+import { AdminPageLayout, PageHeader, PageTabs, TabsContent } from '@/templates/awadmintemplate01';
 import { usePermissions } from '@/contexts/PermissionContext';
 import { useToast } from '@/components/ui/use-toast';
 import { udm } from '@/lib/data/UnifiedDataManager';

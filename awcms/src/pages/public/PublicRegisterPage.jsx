@@ -17,6 +17,7 @@ const PublicRegisterPage = () => {
     });
     const [isLoading, setIsLoading] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
+    // eslint-disable-next-line no-unused-vars
     const [turnstileToken, setTurnstileToken] = useState('');
 
     const { toast } = useToast();

@@ -6,10 +6,9 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/lib/customSupabaseClient';
-import { ArrowLeft, Save, Loader2, Lock } from 'lucide-react';
+import { ArrowLeft, Loader2, Lock } from 'lucide-react';
 import { useTenant } from '@/contexts/TenantContext';
 import { useAuth } from '@/contexts/SupabaseAuthContext';
-import { usePermissions } from '@/contexts/PermissionContext';
 import {
     Select,
     SelectContent,
@@ -39,7 +38,6 @@ const GenericResourceEditor = ({
 }) => {
     const { user } = useAuth();
     const { toast } = useToast();
-    const { checkAccess } = usePermissions();
     const { currentTenant } = useTenant(); // Get Current Tenant
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({});

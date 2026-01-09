@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Download, Star, ShieldCheck, AlertCircle } from 'lucide-react';
+import { Download, Star, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';

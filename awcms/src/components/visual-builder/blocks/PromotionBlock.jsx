@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { motion } from 'framer-motion';
 import { SelectField } from '../fields/SelectField';
+import { sanitizeHTML } from '@/utils/sanitize';
 
 export const PromotionBlockFields = {
     promotionId: {
@@ -167,7 +168,7 @@ export const PromotionBlock = ({ promotionId, variant = 'banner', showImage = tr
                                     className="w-full h-48 object-cover rounded-md mb-4"
                                 />
                             )}
-                            <div className="text-center mb-4 prose prose-sm" dangerouslySetInnerHTML={{ __html: promotion.description || '' }} />
+                            <div className="text-center mb-4 prose prose-sm" dangerouslySetInnerHTML={sanitizeHTML(promotion.description || '')} />
                             <CTA />
                             {promotion.code && (
                                 <div className="mt-4 bg-slate-100 px-3 py-1 rounded text-sm text-slate-700">
@@ -199,7 +200,7 @@ export const PromotionBlock = ({ promotionId, variant = 'banner', showImage = tr
                     )}
                     <div className="p-5">
                         <h3 className="font-bold text-lg text-slate-900 mb-2">{promotion.title}</h3>
-                        <div className="text-sm text-slate-600 line-clamp-3 prose prose-sm mb-4" dangerouslySetInnerHTML={{ __html: promotion.description || '' }} />
+                        <div className="text-sm text-slate-600 line-clamp-3 prose prose-sm mb-4" dangerouslySetInnerHTML={sanitizeHTML(promotion.description || '')} />
                         <CTA />
                         {promotion.code && (
                             <div className="mt-4 pt-4 border-t border-slate-100 flex justify-between items-center text-xs">
@@ -238,7 +239,7 @@ export const PromotionBlock = ({ promotionId, variant = 'banner', showImage = tr
                             </span>
                         )}
                         <h2 className="text-3xl md:text-4xl font-bold mb-4">{promotion.title}</h2>
-                        <div className="text-lg text-slate-200 mb-6 max-w-lg" dangerouslySetInnerHTML={{ __html: promotion.description || '' }} />
+                        <div className="text-lg text-slate-200 mb-6 max-w-lg" dangerouslySetInnerHTML={sanitizeHTML(promotion.description || '')} />
                         <div className="flex gap-4 items-center">
                             <CTA />
                             {promotion.code && (
@@ -273,7 +274,7 @@ export const PromotionBlock = ({ promotionId, variant = 'banner', showImage = tr
                 )}
                 <div className="flex-1 text-center md:text-left">
                     <h3 className="text-2xl font-bold mb-2">{promotion.title}</h3>
-                    <div className="text-blue-100 mb-4 prose-invert" dangerouslySetInnerHTML={{ __html: promotion.description || '' }} />
+                    <div className="text-blue-100 mb-4 prose-invert" dangerouslySetInnerHTML={sanitizeHTML(promotion.description || '')} />
                     <div className="flex flex-col md:flex-row items-center gap-4">
                         <CTA />
                         {promotion.code && (

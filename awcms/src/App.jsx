@@ -13,16 +13,16 @@ import { TenantProvider } from '@/contexts/TenantContext';
 
 import { useTenantTheme } from '@/hooks/useTenantTheme';
 
+import { useOfflineSync } from '@/hooks/useOfflineSync';
+
 // Wrapper to apply tenant theme
 const ThemeWrapper = ({ children }) => {
   useTenantTheme();
   return children;
 };
 
-import { useOfflineSync } from '@/hooks/useOfflineSync';
-
 function App() {
-  const { isSyncing } = useOfflineSync(); // Initialize Sync Engine
+  useOfflineSync(); // Initialize Sync Engine
 
   return (
     <DarkModeProvider>

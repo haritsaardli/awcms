@@ -2,7 +2,6 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { PermissionProvider, usePermissions } from './PermissionContext';
 import { useAuth } from './SupabaseAuthContext';
-import { udm } from '@/lib/data/UnifiedDataManager';
 
 // Mock dependencies
 vi.mock('./SupabaseAuthContext', () => ({

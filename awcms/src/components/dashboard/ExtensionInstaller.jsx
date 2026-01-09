@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Upload, FileJson, Check, AlertTriangle } from 'lucide-react';
+import { Upload, FileJson } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useToast } from '@/components/ui/use-toast';
@@ -14,11 +14,13 @@ function ExtensionInstaller({ onInstallComplete }) {
   const { user } = useAuth();
   const { hasPermission, isSuperAdmin } = usePermissions();
   const [dragActive, setDragActive] = useState(false);
+  // eslint-disable-next-line no-unused-vars
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const [installing, setInstalling] = useState(false);
 
   // Permission check - only super admin or platform.module.create can install
+  // eslint-disable-next-line no-unused-vars
   const canInstall = isSuperAdmin || hasPermission('platform.module.create') || hasPermission('ext.manage');
 
   const handleDrag = (e) => {

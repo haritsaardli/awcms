@@ -1,6 +1,7 @@
 import React from 'react';
 import { ChevronDown } from 'lucide-react';
 import { ColorPickerField } from '../fields/ColorPickerField';
+import { sanitizeHTML } from '@/utils/sanitize';
 
 export const AccordionBlock = ({ items = [] }) => {
     return (
@@ -12,7 +13,7 @@ export const AccordionBlock = ({ items = [] }) => {
                         <ChevronDown className="w-5 h-5 text-slate-400 transform group-open:rotate-180 transition-transform" />
                     </summary>
                     <div className="p-4 pt-0 leading-relaxed border-t border-transparent group-open:border-slate-100 bg-slate-50/50" style={{ color: item.contentColor || '#475569' }}>
-                        <div className="mt-4" dangerouslySetInnerHTML={{ __html: item.content }} />
+                        <div className="mt-4" dangerouslySetInnerHTML={sanitizeHTML(item.content)} />
                     </div>
                 </details>
             ))}
