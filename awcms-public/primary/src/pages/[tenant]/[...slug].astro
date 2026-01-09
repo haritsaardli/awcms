@@ -9,19 +9,32 @@ import { TipTapRenderer } from '../../components/TipTapRenderer';
 export const prerender = false;
 
 const { tenant, slug } = Astro.params;
-const rawSlug = slug || '';
-const currentSlug = rawSlug === '' ? 'home' : rawSlug; // Normalize root to 'home'
 
 // Get Tenant Context from middleware
-const { tenant_id, tenant_slug, runtime } = Astro.locals;
+const { tenant_id, tenant_slug, tenant_source, runtime } = Astro.locals;
 const env = runtime?.env || {};
 
-// Validate tenant param matches resolved tenant
-if (tenant !== tenant_slug) {
-    // Tenant mismatch - could be invalid tenant or spoofed URL
+// Determine the actual slug based on how tenant was resolved
+let rawSlug: string;
+let useTenantPrefix = true;
+
+if (tenant_source === 'host' && tenant !== tenant_slug) {
+    // Host-based resolution: the "tenant" URL param is actually part of the slug
+    // Example: /services matched as [tenant=services]/[slug=''] 
+    // We treat 'services' as the page slug, not as a tenant prefix
+    rawSlug = slug ? `${tenant}/${slug}` : tenant;
+    useTenantPrefix = false; // Don't use tenant prefix in URLs
+} else if (tenant !== tenant_slug) {
+    // Path-based resolution but tenant mismatch - redirect to correct tenant
     console.warn(`[Page] Tenant mismatch: URL param "${tenant}" vs resolved "${tenant_slug}"`);
-    return Astro.redirect(`/${tenant_slug}/${rawSlug}`, 301);
+    const fallbackSlug = slug || '';
+    return Astro.redirect(`/${tenant_slug}/${fallbackSlug}`, 301);
+} else {
+    // Correct path-based resolution
+    rawSlug = slug || '';
 }
+
+const currentSlug = rawSlug === '' ? 'home' : rawSlug; // Normalize root to 'home'
 
 // Initialize Scoped Client
 const supabase = createScopedClient({
@@ -163,11 +176,11 @@ const finalPuckData = {
 
 const LayoutComponent = (currentTemplateSlug === 'awtemplate01') ? AWT01Layout : Layout;
 
-// Pass tenant_slug to layout for link building
+// Pass tenant_slug to layout for link building (empty for host-based = clean URLs)
 const layoutProps = {
     title: meta.title,
     description: meta.description,
-    tenantSlug: tenant_slug
+    tenantSlug: useTenantPrefix ? tenant_slug : ''
 };
 ---
 

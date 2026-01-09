@@ -31,23 +31,26 @@ export const onRequest = defineMiddleware(async (context, next) => {
         // 4. Resolve tenant
         let tenantId: string | null = null;
         let tenantSlug: string | null = null;
+        let resolvedFromPath = false; // Track if actually resolved from PATH
 
         if (tenantSlugFromPath) {
             // Path-based resolution (PRIMARY)
             console.log('[Middleware] Resolving tenant from path:', tenantSlugFromPath);
 
-            const { data, error } = await SafeSupabase
-                .from('tenants')
-                .select('id, slug')
-                .eq('slug', tenantSlugFromPath)
+            // Use SECURITY DEFINER function to bypass RLS
+            const result = await SafeSupabase
+                .rpc('get_tenant_by_slug', { lookup_slug: tenantSlugFromPath })
                 .maybeSingle();
+            const tenantData = result.data as { id: string; slug: string } | null;
+            const tenantError = result.error;
 
-            if (data) {
-                tenantId = data.id;
-                tenantSlug = data.slug;
+            if (tenantData) {
+                tenantId = tenantData.id;
+                tenantSlug = tenantData.slug;
+                resolvedFromPath = true; // Actually resolved from path!
                 console.log('[Middleware] Tenant resolved from path:', tenantSlug, tenantId);
-            } else if (error) {
-                console.warn('[Middleware] Tenant lookup error:', error.message);
+            } else if (tenantError) {
+                console.warn('[Middleware] Tenant lookup error:', tenantError.message);
             }
         }
 
@@ -105,11 +108,11 @@ export const onRequest = defineMiddleware(async (context, next) => {
                 console.log('[Middleware] Fallback to primary tenant for host:', host);
                 // Set primary tenant context directly (no redirect)
                 tenantSlug = 'primary';
-                const { data: primaryTenant } = await SafeSupabase
-                    .from('tenants')
-                    .select('id')
-                    .eq('slug', 'primary')
+                // Use SECURITY DEFINER function to bypass RLS
+                const primaryResult = await SafeSupabase
+                    .rpc('get_tenant_by_slug', { lookup_slug: 'primary' })
                     .single();
+                const primaryTenant = primaryResult.data as { id: string; slug: string } | null;
                 if (primaryTenant) {
                     tenantId = primaryTenant.id;
                 } else {
@@ -124,6 +127,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
         locals.tenant_id = tenantId!;
         locals.tenant_slug = tenantSlug!;
         locals.host = request.headers.get("host") || "";
+        // Track how tenant was resolved - 'path' only if actually resolved from path lookup
+        locals.tenant_source = resolvedFromPath ? 'path' : 'host';
 
         return next();
     } catch (e: any) {

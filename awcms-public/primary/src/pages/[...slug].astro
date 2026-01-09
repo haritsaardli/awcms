@@ -6,22 +6,27 @@ import { PuckRenderer } from '../components/PuckRenderer';
 import { TipTapRenderer } from '../components/TipTapRenderer';
 
 /**
- * Root Index Page
+ * Root-level Catch-All Route
  * 
- * Serves the home page directly when tenant is resolved from host.
- * This avoids the /primary/ redirect for host-based tenant domains.
+ * Handles paths like /services, /about, /contact for host-based tenant resolution.
+ * When the tenant is resolved from the host (e.g., primarypublic.ahliweb.com),
+ * pages are served at root paths without requiring /primary/ prefix.
  */
 
 // SSR Mode
 export const prerender = false;
 
+const { slug } = Astro.params;
+const rawSlug = slug || '';
+const currentSlug = rawSlug === '' ? 'home' : rawSlug; // Normalize root to 'home'
+
 // Get Tenant Context from middleware
 const { tenant_id, tenant_slug, runtime } = Astro.locals;
 const env = runtime?.env || {};
 
-// If no tenant context, something is wrong
+// If no tenant context, something is wrong with middleware
 if (!tenant_id || !tenant_slug) {
-    console.error('[Index] No tenant context available');
+    console.error('[Page] No tenant context available');
     return new Response('Tenant Not Found', { status: 404 });
 }
 
@@ -30,25 +35,28 @@ const supabase = createScopedClient({
     'x-tenant-id': tenant_id
 }, env);
 
-// Content Variables
+// 3. Determine Flow
 let currentTemplateSlug = null;
 let templateId = null;
 let pageContent = null;
-let meta = { title: 'Home', description: '' };
+let meta = { title: 'Page', description: '' };
+let is404 = false;
 let mergedContent = [];
+
+// Error State
 let errorState = null;
 
 if (!supabase) {
-    console.error('[Index] Critical: Supabase Client Failed to Initialize.');
+    console.error('[Page] Critical: Supabase Client Failed to Initialize. Missing Env Vars?');
     errorState = "Service Configuration Error";
     Astro.response.status = 500;
 } else {
     try {
-        // 1. Fetch Home Page
+        // 1. Fetch Page
         const { data: pageData, error: pageError } = await supabase
             .from('pages')
             .select('*')
-            .eq('slug', 'home')
+            .eq('slug', currentSlug)
             .eq('status', 'published')
             .maybeSingle();
 
@@ -59,29 +67,45 @@ if (!supabase) {
             .from('template_assignments')
             .select('route_type, template_id')
             .eq('channel', 'web')
-            .in('route_type', ['home', '404']);
+            .in('route_type', ['home', '404', 'archive', 'search', 'single']);
             
-        if (assignmentError) console.warn('[Index] Template Assignment Fetch Warning:', assignmentError);
+        if (assignmentError) console.warn('[Page] Template Assignment Fetch Warning:', assignmentError);
 
         const assignmentMap = {};
         (assignments || []).forEach(a => assignmentMap[a.route_type] = a.template_id);
 
+
         if (pageData) {
-            meta.title = pageData.meta_title || pageData.title || 'Home';
+            // Page Found
+            meta.title = pageData.meta_title || pageData.title;
             meta.description = pageData.meta_description;
             pageContent = pageData.puck_layout_jsonb || { content: [], root: {} };
 
+            // Determine Template
             if (pageData.template && pageData.template !== 'default') {
                 templateId = pageData.template;
             } else {
-                templateId = assignmentMap['home'];
+                // Fallback to assigned templates
+                if (currentSlug === 'home') {
+                    templateId = assignmentMap['home'];
+                } else {
+                    templateId = assignmentMap['single'];
+                }
             }
         } else {
-            // No home page, use template default
-            templateId = assignmentMap['home'];
+            // Page Not Found
+            if (currentSlug === 'home') {
+                templateId = assignmentMap['home'];
+                meta.title = 'Home';
+            } else {
+                is404 = true;
+                templateId = assignmentMap['404'];
+                meta.title = 'Page Not Found';
+                Astro.response.status = 404;
+            }
         }
 
-        // 3. Fetch Template & Parts
+        // 4. Fetch Template & Parts
         if (templateId) {
             const { data: template, error: templateError } = await supabase
                 .from('templates')
@@ -89,7 +113,7 @@ if (!supabase) {
                 .eq('id', templateId)
                 .maybeSingle();
             
-            if (templateError) console.warn('[Index] Template Fetch Warning:', templateError);
+            if (templateError) console.warn('[Page] Template Fetch Warning:', templateError);
 
             if (template) {
                 currentTemplateSlug = template.slug;
@@ -124,6 +148,7 @@ if (!supabase) {
                      const footerContent = partDataMap[parts.footer].data?.content || [];
                      mergedContent.push(...footerContent);
                 }
+                
             } else {
                 if (pageContent) mergedContent = pageContent.content || [];
             }
@@ -132,7 +157,7 @@ if (!supabase) {
         }
 
     } catch (err: any) {
-        console.error('[Index] Render Error:', err);
+        console.error('[Page] Render Error:', err);
         errorState = err.message || "Unknown Render Error";
         Astro.response.status = 500;
     }
@@ -149,7 +174,7 @@ const LayoutComponent = (currentTemplateSlug === 'awtemplate01') ? AWT01Layout :
 const layoutProps = {
     title: meta.title,
     description: meta.description,
-    tenantSlug: '' // Empty = no prefix in URLs
+    tenantSlug: '' // Empty string = no prefix in URLs
 };
 ---
 
@@ -158,7 +183,7 @@ const layoutProps = {
     {errorState ? (
         <div class="container mx-auto py-20 text-center text-red-600">
             <h1 class="text-4xl font-bold mb-4">500 - Server Error</h1>
-            <p class="font-mono bg-gray-100 p-4 rounded inline-block text-left text-sm text-gray-800">
+            <p className="font-mono bg-gray-100 p-4 rounded inline-block text-left text-sm text-gray-800">
                 {errorState}
             </p>
         </div>
@@ -168,7 +193,14 @@ const layoutProps = {
             <PuckRenderer data={finalPuckData} />
             ) : (
             <div class="container mx-auto py-20 text-center">
-                <p>No content found.</p>
+                {is404 ? (
+                    <div>
+                        <h1 class="text-4xl font-bold mb-4">404 - Not Found</h1>
+                        <p>The page you are looking for does not exist.</p>
+                    </div>
+                ) : (
+                    <p>No content found.</p>
+                )}
             </div>
             )}
         </>
