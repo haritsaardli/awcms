@@ -11,6 +11,9 @@ on:
       - '.mlc_config.json'
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   link-check:
     name: Check Documentation Links
