@@ -1,6 +1,6 @@
-
 import React, { useState } from 'react';
 import GenericContentManager from '@/components/dashboard/GenericContentManager';
+import ArticleEditor from '@/components/dashboard/ArticleEditor';
 import { AdminPageLayout, PageHeader, PageTabs, TabsContent } from '@/templates/awadmintemplate01';
 import { FileText, FolderOpen, Tag } from 'lucide-react';
 
@@ -124,6 +124,7 @@ function ArticlesManager() {
             formFields={articleFormFields}
             permissionPrefix="articles"
             showBreadcrumbs={false}
+            EditorComponent={ArticleEditor}
           />
         </TabsContent>
 

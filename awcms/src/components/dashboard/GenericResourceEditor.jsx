@@ -61,6 +61,9 @@ const GenericResourceEditor = ({
         setLoading(true);
         try {
             const payload = { ...formData };
+            // Remove joined relationship objects that shouldn't be sent to the DB
+            delete payload.owner;
+            delete payload.tenant;
 
             // ... slug logic
 

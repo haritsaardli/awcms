@@ -36,7 +36,8 @@ const GenericContentManager = ({
     permanentDeletePermission,
     showBreadcrumbs = true,
     enableSoftDelete = true,
-    defaultSortColumn = 'created_at'
+    defaultSortColumn = 'created_at',
+    EditorComponent // Optional custom editor component
 }) => {
     const { toast } = useToast();
     const { user } = useAuth();
@@ -277,16 +278,24 @@ const GenericContentManager = ({
     return (
         <div className="space-y-6">
             {showEditor ? (
-                <GenericResourceEditor
-                    tableName={tableName}
-                    resourceName={resourceName}
-                    fields={formFields}
-                    initialData={selectedItem}
-                    permissionPrefix={permissionPrefix}
-                    onClose={() => { setShowEditor(false); setSelectedItem(null); }}
-                    onSuccess={fetchItems}
-                    createPermission={createPermission}
-                />
+                EditorComponent ? (
+                    <EditorComponent
+                        article={selectedItem}
+                        onClose={() => { setShowEditor(false); setSelectedItem(null); }}
+                        onSuccess={fetchItems}
+                    />
+                ) : (
+                    <GenericResourceEditor
+                        tableName={tableName}
+                        resourceName={resourceName}
+                        fields={formFields}
+                        initialData={selectedItem}
+                        permissionPrefix={permissionPrefix}
+                        onClose={() => { setShowEditor(false); setSelectedItem(null); }}
+                        onSuccess={fetchItems}
+                        createPermission={createPermission}
+                    />
+                )
             ) : (
                 <>
 
