@@ -159,7 +159,7 @@ Deno.serve(async (req: Request) => {
             }
 
             case 'approve_application_super_admin': {
-                if (!isSuperAdmin) throw new Error('Forbidden: Super Admin only')
+                if (!isSuperAdmin) throw new Error(`Forbidden: Super Admin only. Role detected: '${roleName}' for User: ${requestingUser.email}`)
                 if (!request_id) throw new Error('request_id required')
 
                 // Get request

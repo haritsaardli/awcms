@@ -98,7 +98,21 @@ const UserApprovalManager = () => {
                 body: { action, request_id: request.id }
             });
 
-            if (error) throw error;
+            if (error) {
+                // Attempt to retrieve the specific error message from the response body
+                let detailedMessage = error.message;
+                if (error.context && typeof error.context.json === 'function') {
+                    try {
+                        const body = await error.context.json();
+                        if (body && body.error) {
+                            detailedMessage = body.error;
+                        }
+                    } catch (e) {
+                        console.warn('Failed to parse error context JSON:', e);
+                    }
+                }
+                throw new Error(detailedMessage);
+            }
             if (data?.error) throw new Error(data.error);
 
             toast({ title: "Success", description: data.message });

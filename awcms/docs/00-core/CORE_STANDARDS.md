@@ -1,6 +1,6 @@
 # AWCMS Core Standards
 
-> **Version**: 2.9.2 | **Last Updated**: 2026-01-09 | **React**: 18.3.1
+> **Version**: 2.9.6 | **Last Updated**: 2026-01-10 | **React**: 18.3.1
 
 This document establishes the definitive architecture and standardization pillars for the AWCMS ecosystem. All development, documentation, and extension work must align with these 5 Core Standards.
 

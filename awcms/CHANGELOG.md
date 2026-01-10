@@ -3,24 +3,18 @@
 
 All notable changes to the **AWCMS** project will be documented in this file.
 
-## [2.9.3] - 2026-01-09
+## [Unreleased]
+
+## [2.9.6] "Stabilization" - 2026-01-10
 
 ### Fixed
 
-- **Visual Page Builder Error**: Resolved `no such table: _sync_queue` error by ensuring `SyncEngine` tables are auto-initialized before any mutations are queued.
-- **UserProfile**: Improved error handling to catch and display user-friendly messages for `504 Gateway Timeout` and network failures during password updates.
-- **TenantsManager**:
-  - Fixed form overflow issues on smaller screens by making the modal content scrollable.
-  - Added "Channel Domains" configuration inputs to the *Create Tenant* form (previously only available in Edit).
+- **User Approval**: Resolved "Forbidden: Super Admin only" error by deploying updated `manage-users` Edge Function with improved role detection and debug parsing.
+- **Users Module**: Confirmed internal logic for SMTP email triggers (`resetPasswordForEmail`, `inviteUserByEmail`) correctly delegates to Supabase Native SMTP.
 
-## [2.9.4] - 2026-01-10
+### Security
 
-### Fixed
-
-- **Article Module Alignment**: Resolved inconsistencies between Article module and Category/Tag/Media modules.
-  - **TagsManager**: Added `tenant_id` filtering to ensure tags are scoped to current tenant (non-platform admins).
-  - **TagInput**: Added tenant context filtering to tag autocomplete suggestions.
-  - **ArticlesManager**: Aligned category `type` filter from `'article'` to `'articles'` for consistency with `ArticleEditor`.
+- **Edge Function**: Deployed `manage-users` with correct project root to ensure role-based access control is active.
 
 ## [2.9.5] "Velocity" - 2026-01-10
 
@@ -37,7 +31,24 @@ All notable changes to the **AWCMS** project will be documented in this file.
 
 - **Stability**: Resolved all application crashes related to `IDBBatchAtomicVFS` and `SQLITE_MISUSE`.
 
-## [Unreleased]
+## [2.9.4] - 2026-01-10
+
+### Fixed
+
+- **Article Module Alignment**: Resolved inconsistencies between Article module and Category/Tag/Media modules.
+  - **TagsManager**: Added `tenant_id` filtering to ensure tags are scoped to current tenant (non-platform admins).
+  - **TagInput**: Added tenant context filtering to tag autocomplete suggestions.
+  - **ArticlesManager**: Aligned category `type` filter from `'article'` to `'articles'` for consistency with `ArticleEditor`.
+
+## [2.9.3] - 2026-01-09
+
+### Fixed
+
+- **Visual Page Builder Error**: Resolved `no such table: _sync_queue` error by ensuring `SyncEngine` tables are auto-initialized before any mutations are queued.
+- **UserProfile**: Improved error handling to catch and display user-friendly messages for `504 Gateway Timeout` and network failures during password updates.
+- **TenantsManager**:
+  - Fixed form overflow issues on smaller screens by making the modal content scrollable.
+  - Added "Channel Domains" configuration inputs to the *Create Tenant* form (previously only available in Edit).
 
 ## [2.9.2] "Clarity" - 2026-01-09
 
