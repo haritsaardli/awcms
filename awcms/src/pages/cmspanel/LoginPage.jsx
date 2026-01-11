@@ -12,6 +12,7 @@ import Turnstile from '@/components/ui/Turnstile';
 import { Eye, EyeOff, Loader2, ShieldCheck, AlertCircle } from 'lucide-react';
 import * as OTPAuth from 'otpauth';
 
+
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -32,6 +33,7 @@ const LoginPage = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+
 
   // Guard: If user is already logged in on mount
   useEffect(() => {
@@ -147,7 +149,7 @@ const LoginPage = () => {
       // 1.5 Check if user is active/deleted in public.users
       const { data: userProfile } = await supabase
         .from('users')
-        .select('deleted_at')
+        .select('deleted_at, tenant_id')
         .eq('id', userId)
         .single();
 
@@ -156,6 +158,8 @@ const LoginPage = () => {
         await supabase.auth.signOut();
         throw new Error("Account is inactive.");
       }
+
+      const userTenantId = userProfile?.tenant_id;
 
       // 2. Check if user has 2FA enabled
       const { data: twoFactorData } = await supabase
@@ -172,6 +176,34 @@ const LoginPage = () => {
       }
 
       // No 2FA -> Proceed to dashboard
+      // Log successful login (get IP via edge function)
+      let clientIP = null;
+      try {
+        const ipResponse = await supabase.functions.invoke('get-client-ip');
+        console.log('[Login] IP response:', ipResponse);
+        if (!ipResponse.error && ipResponse.data?.ip) {
+          clientIP = ipResponse.data.ip;
+          console.log('[Login] Got IP:', clientIP);
+        } else if (ipResponse.error) {
+          console.warn('[Login] IP error:', ipResponse.error);
+        }
+      } catch (e) {
+        console.warn('[Login] IP fetch exception:', e);
+      }
+
+      await supabase.from('audit_logs').insert({
+        tenant_id: userTenantId,
+        user_id: userId,
+        action: 'user.login',
+        resource: 'auth',
+        channel: 'web',
+        ip_address: clientIP,
+        details: { user_agent: navigator.userAgent, status: 'success' },
+      });
+
+      // Cleanup old login audit logs (keep only 100 per tenant)
+      await supabase.rpc('cleanup_old_login_audit_logs');
+
       toast({
         title: "Welcome back!",
         description: "Successfully logged in.",
@@ -180,6 +212,26 @@ const LoginPage = () => {
 
     } catch (error) {
       console.error('Login error:', error);
+
+      // Log failed login attempt
+      try {
+        await supabase.from('audit_logs').insert({
+          tenant_id: null,
+          user_id: null,
+          action: 'user.login',
+          resource: 'auth',
+          channel: 'web',
+          details: {
+            status: 'failed',
+            error: error.message || 'Unknown error',
+            user_agent: navigator.userAgent,
+            attempted_email: email
+          },
+        });
+      } catch (logErr) {
+        console.warn('Failed to log login failure:', logErr);
+      }
+
       toast({
         variant: "destructive",
         title: "Login Failed",
@@ -245,6 +297,38 @@ const LoginPage = () => {
 
           toast({ title: "Verified", description: "Authentication successful." });
         }
+
+        // Log successful 2FA login
+        const { data: userProfile2FA } = await supabase
+          .from('users')
+          .select('tenant_id')
+          .eq('id', pendingUserId)
+          .single();
+
+        let clientIP2FA = null;
+        try {
+          const { data: ipData, error: ipError } = await supabase.functions.invoke('get-client-ip');
+          if (!ipError && ipData?.ip) {
+            clientIP2FA = ipData.ip;
+            console.log('[Login 2FA] Got IP:', clientIP2FA);
+          }
+        } catch (e) {
+          console.warn('[Login 2FA] IP fetch failed:', e);
+        }
+
+        await supabase.from('audit_logs').insert({
+          tenant_id: userProfile2FA?.tenant_id,
+          user_id: pendingUserId,
+          action: 'user.login',
+          resource: 'auth',
+          channel: 'web',
+          ip_address: clientIP2FA,
+          details: { user_agent: navigator.userAgent, twoFactor: true, status: 'success' },
+        });
+
+        // Cleanup old login audit logs (keep only 100 per tenant)
+        await supabase.rpc('cleanup_old_login_audit_logs');
+
         navigate('/cmspanel', { replace: true });
       } else {
         throw new Error("Invalid code. Please try again.");
@@ -252,6 +336,26 @@ const LoginPage = () => {
 
     } catch (err) {
       console.error(err);
+
+      // Log failed 2FA attempt
+      try {
+        await supabase.from('audit_logs').insert({
+          tenant_id: null,
+          user_id: pendingUserId,
+          action: 'user.login',
+          resource: 'auth',
+          channel: 'web',
+          details: {
+            status: 'failed',
+            error: err.message || '2FA verification failed',
+            user_agent: navigator.userAgent,
+            twoFactor: true
+          },
+        });
+      } catch (logErr) {
+        console.warn('Failed to log 2FA failure:', logErr);
+      }
+
       setVerificationError(err.message);
       setIsLoading(false);
     }

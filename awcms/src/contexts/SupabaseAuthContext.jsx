@@ -67,6 +67,55 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
+  const logSsoLoginEvent = useCallback(async (session) => {
+    const provider = session?.user?.app_metadata?.provider;
+    if (!provider || provider === 'email' || provider === 'phone') {
+      return;
+    }
+
+    let tenantId = session?.user?.app_metadata?.tenant_id || null;
+    if (!tenantId && session?.user?.id) {
+      const { data: userProfile, error } = await supabase
+        .from('users')
+        .select('tenant_id')
+        .eq('id', session.user.id)
+        .maybeSingle();
+
+      if (!error) {
+        tenantId = userProfile?.tenant_id || null;
+      }
+    }
+
+    if (!tenantId) {
+      console.warn('[Auth] Skipping SSO login audit log: missing tenant_id.');
+      return;
+    }
+
+    let clientIP = null;
+    try {
+      const { data: ipData, error: ipError } = await supabase.functions.invoke('get-client-ip');
+      if (!ipError && ipData?.ip) {
+        clientIP = ipData.ip;
+      }
+    } catch (e) {
+      console.warn('[Auth] IP lookup failed for SSO login audit log:', e);
+    }
+
+    const { error } = await supabase.from('audit_logs').insert({
+      tenant_id: tenantId,
+      user_id: session.user.id,
+      action: 'user.login',
+      resource: 'auth',
+      channel: 'sso',
+      ip_address: clientIP,
+      details: { provider, user_agent: navigator.userAgent },
+    });
+
+    if (error) {
+      console.warn('[Auth] Failed to log SSO login event:', error);
+    }
+  }, []);
+
   useEffect(() => {
     let mounted = true;
 
@@ -123,6 +172,7 @@ export const AuthProvider = ({ children }) => {
           if (mounted) handleSession(session);
         } else if (event === 'SIGNED_IN') {
           if (mounted) handleSession(session);
+          logSsoLoginEvent(session);
         } else {
           // Catch-all for other events
           if (mounted) handleSession(session);
@@ -134,7 +184,7 @@ export const AuthProvider = ({ children }) => {
       mounted = false;
       subscription.unsubscribe();
     };
-  }, [handleSession, clearLocalAuth]);
+  }, [handleSession, clearLocalAuth, logSsoLoginEvent]);
 
   const signUp = useCallback(async (email, password, options) => {
     try {

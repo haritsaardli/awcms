@@ -141,6 +141,7 @@ describe('useTwoFactor', () => {
     });
 
     it('verifyAndEnable fails with invalid token', async () => {
+        const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
         const { result } = renderHook(() => useTwoFactor());
 
         await waitFor(() => {
@@ -160,6 +161,7 @@ describe('useTwoFactor', () => {
 
         expect(verifyResult.success).toBe(false);
         expect(verifyResult.error).toBe('Invalid authentication code');
+        consoleSpy.mockRestore();
     });
 
     it('disable2FA returns success', async () => {
@@ -180,6 +182,10 @@ describe('useTwoFactor', () => {
 
     it('returns all required functions', async () => {
         const { result } = renderHook(() => useTwoFactor());
+
+        await waitFor(() => {
+            expect(result.current.isLoading).toBe(false);
+        });
 
         expect(typeof result.current.startSetup).toBe('function');
         expect(typeof result.current.verifyAndEnable).toBe('function');

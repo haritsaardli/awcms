@@ -1,25 +1,24 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import PublicHeader from '../PublicHeader';
 
 // Mock dependencies
-vi.mock('@/lib/customSupabaseClient', () => ({
-    supabase: {
-        from: vi.fn(() => ({
-            select: vi.fn(() => ({
-                eq: vi.fn(() => ({
-                    maybeSingle: vi.fn(() => Promise.resolve({ data: null })),
-                    is: vi.fn(() => ({
-                        eq: vi.fn(() => ({
-                            order: vi.fn(() => Promise.resolve({ data: [], error: null })),
-                        })),
-                    })),
-                })),
-            })),
-        })),
-    },
-}));
+vi.mock('@/lib/customSupabaseClient', () => {
+    const builder = {};
+    builder.select = vi.fn(() => builder);
+    builder.eq = vi.fn(() => builder);
+    builder.is = vi.fn(() => builder);
+    builder.order = vi.fn(() => Promise.resolve({ data: [], error: null }));
+    builder.maybeSingle = vi.fn(() => Promise.resolve({ data: null, error: null }));
+    builder.then = (resolve, reject) => Promise.resolve({ data: [], error: null }).then(resolve, reject);
+
+    return {
+        supabase: {
+            from: vi.fn(() => builder),
+        },
+    };
+});
 
 vi.mock('react-i18next', () => ({
     useTranslation: () => ({
@@ -61,41 +60,48 @@ const renderWithRouter = (ui) => {
     );
 };
 
+const renderHeader = async () => {
+    const utils = renderWithRouter(<PublicHeader tenant={mockTenant} />);
+    await waitFor(() => {
+        expect(screen.getByRole('banner')).toBeInTheDocument();
+    });
+    return utils;
+};
+
 describe('PublicHeader', () => {
     beforeEach(() => {
         vi.clearAllMocks();
     });
 
-    it('renders header element', () => {
-        renderWithRouter(<PublicHeader tenant={mockTenant} />);
+    it('renders header element', async () => {
+        await renderHeader();
 
-        const header = screen.getByRole('banner');
-        expect(header).toBeInTheDocument();
+        expect(screen.getByRole('banner')).toBeInTheDocument();
     });
 
-    it('displays brand logo', () => {
-        renderWithRouter(<PublicHeader tenant={mockTenant} />);
+    it('displays brand logo', async () => {
+        await renderHeader();
 
         expect(screen.getByAltText('AWCMS')).toBeInTheDocument();
         expect(screen.getByText('AWCMS')).toBeInTheDocument();
     });
 
-    it('has sticky positioning', () => {
-        renderWithRouter(<PublicHeader tenant={mockTenant} />);
+    it('has sticky positioning', async () => {
+        await renderHeader();
 
         const header = screen.getByRole('banner');
         expect(header).toHaveClass('sticky');
         expect(header).toHaveClass('top-0');
     });
 
-    it('includes language selector', () => {
-        renderWithRouter(<PublicHeader tenant={mockTenant} />);
+    it('includes language selector', async () => {
+        await renderHeader();
 
         expect(screen.getByTestId('language-selector')).toBeInTheDocument();
     });
 
-    it('shows login button for unauthenticated users', () => {
-        renderWithRouter(<PublicHeader tenant={mockTenant} />);
+    it('shows login button for unauthenticated users', async () => {
+        await renderHeader();
 
         // The link to login should exist
         const loginLinks = screen.getAllByRole('link');
@@ -103,8 +109,8 @@ describe('PublicHeader', () => {
         expect(loginLink).toBeDefined();
     });
 
-    it('renders mobile menu button', () => {
-        renderWithRouter(<PublicHeader tenant={mockTenant} />);
+    it('renders mobile menu button', async () => {
+        await renderHeader();
 
         // Find mobile menu toggle button (the lg:hidden button)
         const buttons = screen.getAllByRole('button');
@@ -112,8 +118,8 @@ describe('PublicHeader', () => {
         expect(buttons.length).toBeGreaterThan(0);
     });
 
-    it('toggles mobile menu on button click', () => {
-        const { container } = renderWithRouter(<PublicHeader tenant={mockTenant} />);
+    it('toggles mobile menu on button click', async () => {
+        const { container } = await renderHeader();
 
         // Find the mobile menu toggle button (last button in header)
         const mobileButton = container.querySelector('button.lg\\:hidden');
@@ -129,8 +135,8 @@ describe('PublicHeader', () => {
         // The component re-renders with mobileMenuOpen = true
     });
 
-    it('links to home page via logo', () => {
-        renderWithRouter(<PublicHeader tenant={mockTenant} />);
+    it('links to home page via logo', async () => {
+        await renderHeader();
 
         const homeLinks = screen.getAllByRole('link');
         const logoLink = homeLinks.find(link => link.getAttribute('href') === '/');

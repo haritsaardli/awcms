@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, act } from '@testing-library/react';
 import Turnstile from '../Turnstile';
 
 describe('Turnstile', () => {
@@ -35,16 +35,20 @@ describe('Turnstile', () => {
     it('shows error state when hasError is triggered', async () => {
         // Simulate script load timeout by mocking
         vi.useFakeTimers();
+        const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
 
         render(<Turnstile siteKey="test-key" onVerify={vi.fn()} onError={vi.fn()} />);
 
         // Advance past the 15 second timeout
-        await vi.advanceTimersByTimeAsync(16000);
+        await act(async () => {
+            await vi.advanceTimersByTimeAsync(16000);
+        });
 
         // Should show error message
         expect(screen.getByText(/Security check failed/i)).toBeInTheDocument();
 
         vi.useRealTimers();
+        consoleError.mockRestore();
     });
 
     it('calls onVerify callback when token is received', async () => {
@@ -128,6 +132,8 @@ describe('Turnstile', () => {
 
     it('handles error callback from widget', async () => {
         const onError = vi.fn();
+        const consoleWarn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+        const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
 
         window.turnstile = {
             render: vi.fn((container, options) => {
@@ -146,5 +152,8 @@ describe('Turnstile', () => {
         await waitFor(() => {
             expect(onError).toHaveBeenCalled();
         }, { timeout: 1000 });
+
+        consoleWarn.mockRestore();
+        consoleError.mockRestore();
     });
 });

@@ -5,6 +5,33 @@ All notable changes to the **AWCMS** project will be documented in this file.
 
 ## [Unreleased]
 
+## [2.10.0] "Sentinel" - 2026-01-11
+
+### Added
+
+- **Login Activity Logging**: Enhanced audit log tracking for user logins with email, IP address, and status.
+  - IP address captured via `get-client-ip` Edge Function.
+  - Status tracking: `success`, `failed`, or error description.
+  - Failed login attempts now logged with attempted email and error message.
+- **Login Activity Pagination**: Added Previous/Next navigation with 20 events per page (max 1000).
+- **Automatic Cleanup**: Database function `cleanup_old_login_audit_logs()` keeps only 100 most recent login events per tenant.
+- **SSO Security Tab**: New "Login Activity" tab in SSO & Security page with Time, Email, Status, Channel, and IP Address columns.
+
+### Changed
+
+- **Edge Function CORS**: Updated `get-client-ip` function to allow Supabase client headers (`x-tenant-id`, `x-application-name`).
+- **Audit Logs RLS**: Policy updated to allow login events with NULL tenant_id for pre-authentication logging.
+
+### Fixed
+
+- **Login Activity Refresh**: Fixed issue where clicking Refresh button resulted in empty table.
+
+### Security
+
+- **Function Search Path**: Fixed `cleanup_old_login_audit_logs()` with `SET search_path = ''` to resolve Supabase Security Advisor warning.
+- **RLS Performance**: Created optimized helper functions (`get_current_user_id()`, `get_current_tenant_id()`) to resolve Auth RLS Initialization Plan warnings.
+- **Policy Consolidation**: Consolidated multiple permissive policies on `audit_logs` to single INSERT and SELECT policies.
+
 ## [2.9.9] - 2026-01-11
 
 ### Changed

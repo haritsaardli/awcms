@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Shield, Key, Lock, Activity, RefreshCw, CheckCircle, XCircle, AlertTriangle, Users, Clock } from 'lucide-react';
+import { Shield, Key, Lock, Activity, RefreshCw, CheckCircle, XCircle, AlertTriangle, Users, Clock, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/lib/customSupabaseClient';
@@ -13,6 +13,10 @@ function SSOManager() {
   const { toast } = useToast();
   const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalCount, setTotalCount] = useState(0);
+  const PAGE_SIZE = 20;
+  const MAX_RECORDS = 1000;
   const [securityInfo, setSecurityInfo] = useState({
     authProviders: [],
     recentLogins: [],
@@ -23,29 +27,60 @@ function SSOManager() {
     }
   });
 
-  const fetchSecurityData = useCallback(async () => {
+  const fetchSecurityData = useCallback(async (page = 0) => {
     setLoading(true);
     try {
-      // Fetch recent login activity from audit_logs
+      const from = page * PAGE_SIZE;
+      const to = from + PAGE_SIZE - 1;
+
+      // Get total count first (capped at MAX_RECORDS)
+      const { count: rawCount } = await supabase
+        .from('audit_logs')
+        .select('id', { count: 'exact', head: true })
+        .eq('action', 'user.login');
+
+      const totalRecords = Math.min(rawCount || 0, MAX_RECORDS);
+      setTotalCount(totalRecords);
+
+      // Fetch recent login activity from audit_logs with user email
       const { data: auditData, error: auditError } = await supabase
         .from('audit_logs')
-        .select('*')
+        .select('*, user:users!user_id(email)')
         .eq('action', 'user.login')
         .order('created_at', { ascending: false })
-        .limit(20);
+        .range(from, to);
 
       if (auditError) {
         console.error('Audit logs fetch error:', auditError);
       }
 
-      // Get configured OAuth providers from Supabase settings
-      // Note: These are configured in Supabase Dashboard, not custom tables
-      const authProviders = [
-        { name: 'Email/Password', provider_id: 'email', enabled: true, icon: '📧' },
-        { name: 'Google OAuth', provider_id: 'google', enabled: true, icon: '🔵' },
-        { name: 'GitHub OAuth', provider_id: 'github', enabled: true, icon: '⚫' },
-        { name: 'Microsoft Azure', provider_id: 'azure', enabled: false, icon: '🔷' },
-      ];
+      // Get configured OAuth providers from database
+      const { data: dbProviders, error: providersError } = await supabase
+        .from('sso_providers')
+        .select('*')
+        .order('provider_id');
+
+      if (providersError) {
+        console.error('SSO providers fetch error:', providersError);
+      }
+
+      // Icon mapping
+      const iconMap = {
+        email: '📧',
+        google: '🔵',
+        github: '⚫',
+        azure: '🔷'
+      };
+
+      const authProviders = dbProviders?.map(p => ({
+        name: p.name,
+        provider_id: p.provider_id,
+        enabled: p.is_active,
+        icon: iconMap[p.provider_id] || '🔒'
+      })) || [];
+
+      // Fallback if no providers found in DB (e.g. fresh tenant), show defaults or keep empty
+      // Ideally the backend seeds this, which we did.
 
       setSecurityInfo({
         authProviders,
@@ -66,8 +101,9 @@ function SSOManager() {
   }, [t, toast]);
 
   useEffect(() => {
-    fetchSecurityData();
-  }, [fetchSecurityData]);
+    fetchSecurityData(0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const SecurityFeatureCard = ({ title, description, enabled, icon: Icon }) => (
     <div className="flex items-start gap-4 p-4 bg-slate-50 rounded-lg border">
@@ -108,7 +144,7 @@ function SSOManager() {
           <h2 className="text-3xl font-bold text-slate-800">{t('sso.title')}</h2>
           <p className="text-slate-600">{t('sso.subtitle')}</p>
         </div>
-        <Button onClick={fetchSecurityData} variant="outline" className="gap-2" disabled={loading}>
+        <Button onClick={() => { setCurrentPage(0); fetchSecurityData(0); }} variant="outline" className="gap-2" disabled={loading}>
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           {t('common.refresh')}
         </Button>
@@ -260,7 +296,7 @@ function SSOManager() {
                 <Activity className="w-5 h-5 text-slate-500" />
                 <CardTitle>Recent Login Activity</CardTitle>
               </div>
-              <CardDescription>Last 20 login events from audit logs</CardDescription>
+              <CardDescription>Login events from audit logs (page {currentPage + 1} of {Math.ceil(totalCount / PAGE_SIZE) || 1})</CardDescription>
             </CardHeader>
             <CardContent>
               {loading ? (
@@ -279,33 +315,70 @@ function SSOManager() {
                     <thead className="bg-slate-50 border-b">
                       <tr>
                         <th className="p-3 text-left font-medium">Time</th>
-                        <th className="p-3 text-left font-medium">User</th>
+                        <th className="p-3 text-left font-medium">Email</th>
+                        <th className="p-3 text-left font-medium">Status</th>
                         <th className="p-3 text-left font-medium">Channel</th>
                         <th className="p-3 text-left font-medium">IP Address</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y">
-                      {securityInfo.recentLogins.map((log, idx) => (
-                        <tr key={log.id || idx}>
-                          <td className="p-3 text-slate-600">
-                            <div className="flex items-center gap-2">
-                              <Clock className="w-4 h-4 text-slate-400" />
-                              {log.created_at ? format(new Date(log.created_at), 'dd MMM yyyy HH:mm') : '-'}
-                            </div>
-                          </td>
-                          <td className="p-3">{log.user_id || '-'}</td>
-                          <td className="p-3">
-                            <span className="px-2 py-1 bg-slate-100 rounded text-xs font-medium">
-                              {log.channel || 'web'}
-                            </span>
-                          </td>
-                          <td className="p-3 font-mono text-xs text-slate-500">
-                            {log.ip_address || '-'}
-                          </td>
-                        </tr>
-                      ))}
+                      {securityInfo.recentLogins.map((log, idx) => {
+                        const status = log.details?.status || 'success';
+                        const errorMsg = log.details?.error;
+                        return (
+                          <tr key={log.id || idx}>
+                            <td className="p-3 text-slate-600">
+                              <div className="flex items-center gap-2">
+                                <Clock className="w-4 h-4 text-slate-400" />
+                                {log.created_at ? format(new Date(log.created_at), 'dd MMM yyyy HH:mm:ss') : '-'}
+                              </div>
+                            </td>
+                            <td className="p-3">{log.user?.email || log.details?.attempted_email || log.user_id || '-'}</td>
+                            <td className="p-3">
+                              <span className={`px-2 py-1 rounded text-xs font-medium ${status === 'success'
+                                  ? 'bg-green-100 text-green-700'
+                                  : 'bg-red-100 text-red-700'
+                                }`} title={errorMsg || ''}>
+                                {status === 'success' ? '✓ Success' : `✗ ${errorMsg || 'Failed'}`}
+                              </span>
+                            </td>
+                            <td className="p-3">
+                              <span className="px-2 py-1 bg-slate-100 rounded text-xs font-medium">
+                                {log.channel || 'web'}
+                              </span>
+                            </td>
+                            <td className="p-3 font-mono text-xs text-slate-500">
+                              {log.ip_address || '-'}
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
+                  {/* Pagination Controls */}
+                  <div className="flex items-center justify-between p-3 border-t bg-slate-50">
+                    <div className="text-sm text-slate-500">
+                      Showing {currentPage * PAGE_SIZE + 1} - {Math.min((currentPage + 1) * PAGE_SIZE, totalCount)} of {totalCount}
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => { setCurrentPage(p => p - 1); fetchSecurityData(currentPage - 1); }}
+                        disabled={currentPage === 0}
+                      >
+                        <ChevronLeft className="w-4 h-4 mr-1" /> Previous
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => { setCurrentPage(p => p + 1); fetchSecurityData(currentPage + 1); }}
+                        disabled={(currentPage + 1) * PAGE_SIZE >= totalCount}
+                      >
+                        Next <ChevronRight className="w-4 h-4 ml-1" />
+                      </Button>
+                    </div>
+                  </div>
                 </div>
               )}
             </CardContent>

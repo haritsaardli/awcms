@@ -14,6 +14,7 @@ vi.mock('@/lib/data/UnifiedDataManager', () => ({
         from: vi.fn().mockReturnThis(),
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
+        is: vi.fn().mockReturnThis(),
         single: vi.fn().mockResolvedValue({ data: null, error: null }),
         in: vi.fn().mockReturnThis()
     }
