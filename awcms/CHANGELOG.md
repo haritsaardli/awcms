@@ -5,6 +5,30 @@ All notable changes to the **AWCMS** project will be documented in this file.
 
 ## [Unreleased]
 
+## [2.11.0] "Connect" - 2026-01-11
+
+### Added
+
+- **Public Portal Menu Sync**: Dynamic fetching of menu items from the `menus` table via `src/lib/menu.ts`.
+- **Content Seeding**: Automated SQL-based content seeding for "primary" tenant (About, Contact, Articles sample data).
+- **Public Portal Routing**: Implemented catch-all `[...slug].astro` to handle dynamic article routes (`/articles/slug`) and standard pages (`/about`, `/contact`).
+
+### Changed
+
+- **Database Synchronization**:
+  - Resolved `audit_logs_insert_unified` policy drift by restoring missing remote policies.
+  - Successfully synced local and remote schemas via `npx supabase db pull` with zero diffs.
+- **Dependency Management**: Standardized `awcms/package.json` version to `2.11.0`.
+
+### Fixed
+
+- **404 Errors**: Resolved "Page Not Found" issues on the public portal by ensuring proper routing and content existence.
+- **Migration History**: Repaired conflicting migration history (`20260111120509`, `...1548`) to ensure clean deployment.
+
+### Security
+
+- **Seed Data**: Switched from Anon Key to Direct SQL execution for seeding to bypass RLS restrictions on service-level data insertion.
+
 ### Fixed
 
 - **SSO Login Activity**: Log OAuth-based sign-ins to `audit_logs` so SSO login history is populated consistently.

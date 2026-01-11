@@ -67,7 +67,7 @@ if (!supabase) {
             .from('template_assignments')
             .select('route_type, template_id')
             .eq('channel', 'web')
-            .in('route_type', ['home', '404', 'archive', 'search', 'single']);
+            .in('route_type', ['home', '404', 'archive', 'search', 'single', 'post']); // Added 'post'
             
         if (assignmentError) console.warn('[Page] Template Assignment Fetch Warning:', assignmentError);
 
@@ -93,8 +93,78 @@ if (!supabase) {
                 }
             }
         } else {
-            // Page Not Found
-            if (currentSlug === 'home') {
+            // Page Not Found - Check for Special Routes (Articles)
+            
+            // Case: Article Detail (/articles/:slug)
+            const isArticlePath = currentSlug.startsWith('articles/') && currentSlug.split('/').length === 2;
+            
+            if (isArticlePath) {
+                const articleSlug = currentSlug.split('/')[1];
+                const { data: articleData, error: articleError } = await supabase
+                    .from('articles')
+                    .select('*')
+                    .eq('slug', articleSlug)
+                    .eq('status', 'published')
+                    .maybeSingle();
+
+                if (articleData) {
+                    meta.title = articleData.title;
+                    // Simple article content structure
+                    // In real app, we might use a dedicated 'post' template or injection
+                    pageContent = { 
+                        content: [
+                             {
+                                type: "ArticleDetail", // Hypothetical component or we construct standard blocks
+                                props: { article: articleData }
+                             }
+                        ],
+                        root: { title: articleData.title } 
+                    };
+                    
+                    // Use 'post' template if available, else 'single'
+                    templateId = assignmentMap['post'] || assignmentMap['single'];
+                    
+                    // Fallback content injection if no Puck content
+                    if (!pageContent.content[0].type && articleData.content) {
+                         // If we are strictly using PuckRenderer, we need compatible data.
+                         // For now, let's assume we render it via a simple block or just standard text.
+                         // But wait, the existing code pushes `pageContent.content`.
+                         // If I just want to show HTML content, I might need a specific block.
+                         // Let's create a generic "HTML" block representation for now.
+                         pageContent = {
+                             content: [{
+                                 type: "RichText",
+                                 props: { content: articleData.content }
+                             }],
+                             root: { title: articleData.title }
+                         };
+                    }
+                } else {
+                    is404 = true;
+                }
+            } 
+            // Case: Articles List (/articles)
+            else if (currentSlug === 'articles') {
+                 // No CMS Page named 'articles' found (checked above), so we render default list
+                 // Fetch recent articles
+                 const { data: recentArticles } = await supabase
+                    .from('articles')
+                    .select('title, slug, excerpt, published_at')
+                    .eq('status', 'published')
+                    .order('published_at', { ascending: false })
+                    .limit(10);
+                 
+                 meta.title = "Articles";
+                 pageContent = {
+                     content: [{
+                         type: "ArticleList", // Needs to correspond to a Puck component OR we handle it
+                         props: { articles: recentArticles || [] }
+                     }],
+                     root: { title: "Articles" }
+                 };
+                 templateId = assignmentMap['archive'] || assignmentMap['single'];
+            }
+            else if (currentSlug === 'home') {
                 templateId = assignmentMap['home'];
                 meta.title = 'Home';
             } else {
@@ -107,7 +177,14 @@ if (!supabase) {
 
         // 4. Fetch Template & Parts
         if (templateId) {
-            const { data: template, error: templateError } = await supabase
+            // ... (Template fetching logic remains similar, will be kept by replace but I need to ensure I don't break it)
+            // Wait, I am replacing a large block to insert logic.
+            // I should copy the template fetching part or ensure my replacement chunk connects correctly.
+            // The template fetching block is lines 109-155.
+            // I should include it in my replacement or stop before it if I can.
+            // My edit targets lines 54-164 (the try block).
+            // That's risky. I will paste the helper logic back.
+             const { data: template, error: templateError } = await supabase
                 .from('templates')
                 .select('*')
                 .eq('id', templateId)
@@ -161,6 +238,7 @@ if (!supabase) {
         errorState = err.message || "Unknown Render Error";
         Astro.response.status = 500;
     }
+
 }
 
 const finalPuckData = {

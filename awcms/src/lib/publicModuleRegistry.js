@@ -47,6 +47,17 @@ export const PUBLIC_MODULES = [
     { key: 'privacy', label: 'Privacy Policy', url: '/privacy', icon: 'Shield', group: 'Legal', order: 400 },
     { key: 'terms', label: 'Terms of Service', url: '/terms', icon: 'FileCheck', group: 'Legal', order: 410 },
     { key: 'faq', label: 'FAQ', url: '/faq', icon: 'HelpCircle', group: 'Legal', order: 420 },
+
+    // Discovery
+    { key: 'categories', label: 'Categories', url: '/categories', icon: 'FolderTree', group: 'Discovery', order: 500 },
+    { key: 'tags', label: 'Tags', url: '/tags', icon: 'Hash', group: 'Discovery', order: 510 },
+    { key: 'search', label: 'Search', url: '/search', icon: 'Search', group: 'Discovery', order: 520 },
+
+    // User
+    { key: 'login', label: 'Login', url: '/login', icon: 'LogIn', group: 'User', order: 600 },
+    { key: 'register', label: 'Register', url: '/register', icon: 'UserPlus', group: 'User', order: 610 },
+    { key: 'profile', label: 'Profile', url: '/profile', icon: 'User', group: 'User', order: 620 },
+    { key: 'cart', label: 'Cart', url: '/cart', icon: 'ShoppingCart', group: 'User', order: 630 },
 ];
 
 /**

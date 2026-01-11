@@ -140,6 +140,7 @@ function AuditLogsManager() {
                                 <tr>
                                     <th className="px-4 py-3 text-left font-medium text-muted-foreground">Timestamp</th>
                                     <th className="px-4 py-3 text-left font-medium text-muted-foreground">User</th>
+                                    <th className="px-4 py-3 text-left font-medium text-muted-foreground">IP Address</th>
                                     <th className="px-4 py-3 text-left font-medium text-muted-foreground">Action</th>
                                     <th className="px-4 py-3 text-left font-medium text-muted-foreground">Resource</th>
                                     <th className="px-4 py-3 text-left font-medium text-muted-foreground">Changes</th>
@@ -149,13 +150,13 @@ function AuditLogsManager() {
                             <tbody className="divide-y divide-border">
                                 {loading ? (
                                     <tr>
-                                        <td colSpan="6" className="p-8 text-center text-muted-foreground">
+                                        <td colSpan="7" className="p-8 text-center text-muted-foreground">
                                             Loading audit trail...
                                         </td>
                                     </tr>
                                 ) : logs.length === 0 ? (
                                     <tr>
-                                        <td colSpan="6" className="p-8 text-center text-muted-foreground">
+                                        <td colSpan="7" className="p-8 text-center text-muted-foreground">
                                             No logs found.
                                         </td>
                                     </tr>
@@ -170,6 +171,9 @@ function AuditLogsManager() {
                                                     {log.user?.full_name || 'Unknown'}
                                                 </div>
                                                 <div className="text-xs text-muted-foreground">{log.user?.email}</div>
+                                            </td>
+                                            <td className="px-4 py-3">
+                                                <span className="font-mono text-xs text-muted-foreground">{log.ip_address || '-'}</span>
                                             </td>
                                             <td className="px-4 py-3">{getActionBadge(log.action)}</td>
                                             <td className="px-4 py-3 text-muted-foreground">
