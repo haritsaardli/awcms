@@ -72,6 +72,14 @@ VITE_DEV_TENANT_HOST=localhost  # For local development
 └── package.json
 ```
 
+## 🎨 Styling (Tailwind CSS v4)
+
+Tailwind is wired via the Vite plugin in `astro.config.mjs`.
+
+- **Vite plugin**: `@tailwindcss/vite`
+- **Entry CSS**: `src/styles/global.css` uses `@config "../../tailwind.config.mjs";` + `@import "tailwindcss";`
+- **Config**: `tailwind.config.mjs` for content globs and theme extensions
+
 ## 🔗 Tenant Resolution
 
 The middleware resolves tenants in this order:

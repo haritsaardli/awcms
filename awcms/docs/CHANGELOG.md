@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Changed
+
+- Public Portal: Upgraded TailwindCSS to v4 with `@tailwindcss/vite` and removed `@astrojs/tailwind`.
+
 ## [2.9.7] - 2026-01-11
 
 ### Documentation

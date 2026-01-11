@@ -14,7 +14,6 @@
   "dependencies": {
     "@astrojs/cloudflare": "^12.6.12",
     "@astrojs/react": "^4.4.2",
-    "@astrojs/tailwind": "^6.0.2",
     "@measured/puck": "^0.20.2",
     "@supabase/supabase-js": "^2.89.0",
     "astro": "^5.16.6",
@@ -26,11 +25,13 @@
     "zod": "^4.2.1"
   },
   "devDependencies": {
+    "@tailwindcss/vite": "^4.1.18",
     "@tailwindcss/typography": "^0.5.19",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.1",
     "@vitejs/plugin-react": "^5.1.2",
     "jsdom": "^27.4.0",
+    "tailwindcss": "^4.1.18",
     "vitest": "^4.0.16"
   }
 }

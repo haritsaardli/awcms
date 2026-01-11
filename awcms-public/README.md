@@ -18,6 +18,10 @@ npm install
 npm run dev
 ```
 
+## Styling
+
+The public portal uses Tailwind CSS v4 via the Vite plugin in `awcms-public/primary/astro.config.mjs`.
+
 ## Documentation
 
 See [primary/README.md](./primary/README.md) for full documentation.

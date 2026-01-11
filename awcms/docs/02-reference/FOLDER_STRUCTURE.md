@@ -26,7 +26,7 @@ awcms-dev/              # Monorepo Root
     └── primary-analytics/ # Example external extension
 ```
 
-> **Note:** Admin uses TailwindCSS 4.x with CSS-based config; Public Portal uses TailwindCSS 3.x with `tailwind.config.mjs`.
+> **Note:** Admin uses TailwindCSS 4.x with CSS-based config; Public Portal uses TailwindCSS 4.x via Vite plugin with `tailwind.config.mjs`.
 
 ---
 

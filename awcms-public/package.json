@@ -3,6 +3,7 @@
     "version": "1.0.0",
     "private": true,
     "scripts": {
+        "dev": "pnpm -C primary dev",
         "build": "cd primary && npm install && npm run build"
     },
     "engines": {

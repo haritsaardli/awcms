@@ -34,7 +34,7 @@ AWCMS employs a "Headless" architecture with two distinct frontends sharing a co
 | **Language** | TypeScript | 5.x | Typed components and utilities |
 | **Deployment** | [Cloudflare Pages](https://pages.cloudflare.com/) | - | Edge Hosting |
 | **Validation** | [Zod](https://zod.dev/) | 4.2.1 | Runtime Prop Validation |
-| **Styling** | TailwindCSS | 3.4.19 | Utility CSS |
+| **Styling** | TailwindCSS | 4.1.18 | Utility CSS |
 
 > **Note**: The Public Portal uses a custom `PuckRenderer` and `@measured/puck` types only (no editor runtime).
 

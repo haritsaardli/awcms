@@ -101,7 +101,7 @@ VITE_SUPABASE_ANON_KEY=your-anon-key
 | -------- | ---------- |
 | Frontend (Admin) | React 18.3.1, Vite 7.2.7 |
 | Frontend (Public) | Astro 5.x, React 18.3.1, Cloudflare Pages |
-| Styling | TailwindCSS 4.1.18 (Admin), 3.4.19 (Public), Radix UI |
+| Styling | TailwindCSS 4.1.18 (Admin/Public), Radix UI |
 | Backend | Supabase (PostgreSQL, Auth, Storage) |
 | Editor | TipTap 3.13.0, Puck (@measured/puck) |
 | Animation | Framer Motion 12.23.26 |

@@ -130,9 +130,13 @@ Configuration is done in `awcms/src/index.css`:
 
 > **Note:** `tailwind.config.js` is not required for the Admin Panel under TailwindCSS 4.x.
 
-### Public Portal (TailwindCSS 3.4)
+### Public Portal (TailwindCSS 4.1)
 
-The Public Portal uses TailwindCSS 3.x and keeps configuration in `awcms-public/primary/tailwind.config.mjs`, with global styles in `awcms-public/primary/src/styles/global.css`.
+The Public Portal uses TailwindCSS 4.x via the Vite plugin in `awcms-public/primary/astro.config.mjs`.
+
+- **Vite plugin**: `@tailwindcss/vite`
+- **Entry CSS**: `awcms-public/primary/src/styles/global.css` uses `@config "../../tailwind.config.mjs";` + `@import "tailwindcss";`
+- **Config**: `awcms-public/primary/tailwind.config.mjs` for content globs and theme extensions
 
 ---
 

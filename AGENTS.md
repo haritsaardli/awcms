@@ -96,7 +96,7 @@ To ensure successful code generation and integration, Agents must adhere to the 
 | Language         | Admin Panel uses JavaScript ES2022+; Public Portal uses TypeScript/TSX |
 | **Admin Panel**  | React 18.3.1 (Strict), Vite 7              |
 | **Public Portal**| Astro 5, React 18.3.1, Cloudflare Pages    |
-| Styling          | Admin uses TailwindCSS 4 utilities; Public uses TailwindCSS 3 with `tailwind.config.mjs` |
+| Styling          | TailwindCSS 4 utilities in Admin/Public (Public uses Vite plugin + `tailwind.config.mjs`) |
 | Backend          | Supabase only (NO Node.js servers)         |
 
 ### Code Patterns
@@ -269,7 +269,7 @@ toast({ title: "Saved", description: "Changes saved successfully" });
 toast({ variant: "destructive", title: "Error", description: error.message });
 ```
 
-### TailwindCSS 4.1 Styling (Admin Panel)
+### TailwindCSS 4.1 Styling (Admin + Public)
 
 ```javascript
 // Use utility classes directly
