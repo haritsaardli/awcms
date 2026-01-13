@@ -1,8 +1,8 @@
-drop policy "audit_logs_insert_unified" on "public"."audit_logs";
+drop policy if exists "audit_logs_insert_unified" on "public"."audit_logs";
 
-drop policy "audit_logs_insert" on "public"."audit_logs";
+drop policy if exists "audit_logs_insert" on "public"."audit_logs";
 
-drop policy "audit_logs_select" on "public"."audit_logs";
+drop policy if exists "audit_logs_select" on "public"."audit_logs";
 
 alter table "public"."email_logs" add column "deleted_at" timestamp with time zone;
 
