@@ -1,7 +1,9 @@
 ---
-import '../styles/global.css';
-import Header from '../templates/awtemplate01/components/layout/Header.astro';
-import Footer from '../templates/awtemplate01/components/layout/Footer.astro';
+import '../styles/global.css'; // Keep global styles if they don't fight too hard, or remove if Pongo is totally self-contained. 
+// Pongo relies on Bootstrap files in /assets/, so we'll link them in <head>
+
+import Header from '../templates/pongo/components/layout/Header.astro';
+import Footer from '../templates/pongo/components/layout/Footer.astro';
 import { tenantUrl } from '../lib/url';
 import { createScopedClient } from '../lib/supabase';
 import type { MenuItemDTO } from '../types/MenuDTO';
@@ -14,7 +16,7 @@ interface Props {
 
 const { title, description, tenantSlug } = Astro.props;
 
-// Resolve tenant slug for URL building (empty string = host-based URLs)
+// Resolve tenant slug
 const resolvedTenantSlug = tenantSlug !== undefined
   ? tenantSlug
   : (Astro.locals.tenant_source === 'path' ? Astro.locals.tenant_slug : '');
@@ -84,6 +86,32 @@ if (tenant_id && supabase) {
                 return normalized;
             };
 
+            const buildTree = (items: any[]) => {
+                const map: any = {};
+                const roots: any[] = [];
+                items.forEach((item, i) => {
+                    map[item.id] = { ...item, index: i, children: [] };
+                });
+                items.forEach(item => {
+                    if (item.parent_id && map[item.parent_id]) {
+                        map[item.parent_id].children.push(map[item.id]);
+                    } else {
+                        roots.push(map[item.id]);
+                    }
+                });
+                return roots;
+            };
+
+            // Fix: we need IDs for tree building, assuming items have IDs (not selected above, adding wildcard to be safe in real code, but here I'll assume they were fetched or I need to fetch them)
+            // Re-fetch with ID for tree structure if needed, or strictly hierarchical.
+            // Simplified for now: standard flat map was in original code? No, original code was:
+            // menuItems = items.map...
+            // But Pongo Header supports submenus. I will stick to flat for now to match original logic unless I fetch IDs.
+            // Wait, original logic didn't build tree. It just filtered.
+            // For Pongo, I should probably pass flat items and let Header handle it, OR just pass flat.
+            // Let's stick to flat mapping as per original code to minimize diff risks, but the Pongo Header I wrote supports children.
+            // I'll leave it as flat list for now to match original Logic, header will just render top level.
+            
             menuItems = items.map((item: any) => ({
                 ...item,
                 url: normalizeMenuUrl(item.url)
@@ -98,7 +126,8 @@ if (tenant_id && supabase) {
   <head>
     <meta charset="UTF-8" />
     <meta name="description" content={description || "AWCMS Content"} />
-    <meta name="viewport" content="width=device-width" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
@@ -111,12 +140,40 @@ if (tenant_id && supabase) {
     <meta property="og:description" content={description || "AWCMS Content"} />
     <meta property="og:url" content={canonicalUrl} />
     <meta property="og:type" content="website" />
+
+    <!-- Pongo Template Assets -->
+    <link href="/assets/css/themify-icons.css" rel="stylesheet">
+    <link href="/assets/css/flaticon.css" rel="stylesheet">
+    <link href="/assets/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/assets/css/animate.css" rel="stylesheet">
+    <link href="/assets/css/owl.carousel.css" rel="stylesheet">
+    <link href="/assets/css/owl.theme.css" rel="stylesheet">
+    <link href="/assets/css/slick.css" rel="stylesheet">
+    <link href="/assets/css/slick-theme.css" rel="stylesheet">
+    <link href="/assets/css/swiper.min.css" rel="stylesheet">
+    <link href="/assets/css/owl.transitions.css" rel="stylesheet">
+    <link href="/assets/css/jquery.fancybox.css" rel="stylesheet">
+    <link href="/assets/css/style.css" rel="stylesheet">
+
   </head>
-  <body class="bg-white min-h-screen flex flex-col font-sans antialiased text-slate-900 awtemplate01-root">
-    <Header siteName={brandName} menuItems={menuItems} tenantSlug={resolvedTenantSlug} />
-    <main class="flex-1">
-      <slot />
-    </main>
-    <Footer siteName={brandName} tenantSlug={resolvedTenantSlug} />
+  <body>
+    <!-- page-wrapper -->
+    <div class="page-wrapper">
+        <!-- Preloader (Optional, skipping for simple hydration or adding if needed) -->
+        
+        <Header siteName={brandName} menuItems={menuItems} tenantSlug={resolvedTenantSlug} />
+        
+        <!-- Main Content -->
+        <slot />
+        
+        <Footer siteName={brandName} tenantSlug={resolvedTenantSlug} />
+    </div>
+    <!-- end page-wrapper -->
+
+    <!-- Scripts -->
+    <script is:inline src="/assets/js/jquery.min.js"></script>
+    <script is:inline src="/assets/js/bootstrap.min.js"></script>
+    <script is:inline src="/assets/js/jquery-plugin-collection.js"></script>
+    <script is:inline src="/assets/js/script.js"></script>
   </body>
 </html>

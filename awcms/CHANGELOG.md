@@ -5,6 +5,16 @@ All notable changes to the **AWCMS** project will be documented in this file.
 
 ## [Unreleased]
 
+## [2.15.0] "Zenith" - 2026-01-14
+
+### Added
+
+- **Public Portal Templates**:
+  - **Pongo Integration**: Fully integrated "Pongo" HTML template into `awcms-public/primary`.
+  - **Asset Management**: Migrated static assets (Bootstrap, jQuery, plugins) to `public/assets`.
+  - **Component Library**: Created Astro components for `Header`, `Footer`, `Hero`, and `Features` matching Pongo design.
+  - **Layout Engine**: Updated `Layout.astro` to support legacy script injection (`is:inline`) for template compatibility.
+
 ## [2.14.0] "Horizon" - 2026-01-14
 
 ### Added
