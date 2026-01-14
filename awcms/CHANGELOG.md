@@ -5,6 +5,18 @@ All notable changes to the **AWCMS** project will be documented in this file.
 
 ## [Unreleased]
 
+## [2.15.1] - 2026-01-14
+
+### Fixed
+
+- **Middleware Stability**: Completely rewrote `src/middleware.ts` to resolve persistent ESLint parsing errors and ensure robust tenant resolution.
+- **Linting & Type Safety**:
+  - Configured `eslint.config.js` to ignore `public/` directory assets.
+  - Fixed implicit `any` types and unused variables in `src/lib/supabase.ts` and `src/middleware.ts`.
+  - Added strict `App.Locals` type definitions in `src/env.d.ts` for `runtime`, `tenant_id`, and `host`.
+- **Database Synchronization**: Repaired migration history (`20260114045306` et al.) and successfully synced local schema with remote via `npx supabase db push`.
+- **Cleanup**: Removed unused `vitest.config.ts` and legacy imports in `src/pages/index.astro`.
+
 ## [2.15.0] "Zenith" - 2026-01-14
 
 ### Added

@@ -1,6 +1,6 @@
 import { defineMiddleware } from "astro/middleware";
 import { createClientFromEnv } from "./lib/supabase";
-import { extractTenantFromPath, extractPathAfterTenant } from "./lib/url";
+import { extractTenantFromPath } from "./lib/url";
 
 /**
  * AWCMS Public Middleware
@@ -131,8 +131,9 @@ export const onRequest = defineMiddleware(async (context, next) => {
         locals.tenant_source = resolvedFromPath ? 'path' : 'host';
 
         return next();
-    } catch (e: any) {
+    } catch (e) {
         console.error('[Middleware] CRITICAL ERROR:', e);
-        return new Response(`Critical Middleware Error: ${e.message}`, { status: 500 });
+        const errorMessage = e instanceof Error ? e.message : 'Unknown error';
+        return new Response(`Critical Middleware Error: ${errorMessage}`, { status: 500 });
     }
 });

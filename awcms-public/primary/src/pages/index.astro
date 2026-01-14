@@ -1,177 +1,463 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import AWT01Layout from '../templates/awtemplate01/Layout.astro';
-import { createScopedClient } from '../lib/supabase';
-import { PuckRenderer } from '../components/PuckRenderer';
+import Layout from '~/layouts/PageLayout.astro';
 
+import Hero from '~/components/widgets/Hero.astro';
+import Note from '~/components/widgets/Note.astro';
+import Features from '~/components/widgets/Features.astro';
+import Features2 from '~/components/widgets/Features2.astro';
+import Steps from '~/components/widgets/Steps.astro';
+import Content from '~/components/widgets/Content.astro';
+import Stats from '~/components/widgets/Stats.astro';
+import CallToAction from '~/components/widgets/CallToAction.astro';
+import Testimonials from '~/components/widgets/Testimonials.astro';
+import Brands from '~/components/widgets/Brands.astro';
+import Grid from '~/components/blog/Grid.astro';
+import WidgetWrapper from '~/components/ui/WidgetWrapper.astro';
+import Headline from '~/components/ui/Headline.astro';
 
-/**
- * Root Index Page
- * 
- * Serves the home page directly when tenant is resolved from host.
- * This avoids the /primary/ redirect for host-based tenant domains.
- */
+import { createClientFromEnv } from '~/lib/supabase';
 
-// SSR Mode
 export const prerender = false;
 
-// Get Tenant Context from middleware
-const { tenant_id, tenant_slug, runtime } = Astro.locals;
-const env = runtime?.env || {};
+const { tenant_id } = Astro.locals;
+const supabase = createClientFromEnv(import.meta.env);
 
-// If no tenant context, something is wrong
-if (!tenant_id || !tenant_slug) {
-    console.error('[Index] No tenant context available');
-    return new Response('Tenant Not Found', { status: 404 });
-}
+let services = [];
+let projects = [];
+let team = [];
+let testimonials = [];
+let funfacts = [];
+let partners = [];
 
-// Initialize Scoped Client
-const supabase = createScopedClient({
-    'x-tenant-id': tenant_id
-}, env);
+if (tenant_id && supabase) {
+  try {
+    // Services
+    const { data: servicesData } = await supabase
+      .from('services')
+      .select('*')
+      .eq('tenant_id', tenant_id)
+      .eq('status', 'published')
+      .order('display_order', { ascending: true })
+      .limit(6);
 
-// Content Variables
-let currentTemplateSlug = null;
-let templateId = null;
-let pageContent = null;
-let meta = { title: 'Home', description: '' };
-let mergedContent = [];
-let errorState = null;
-
-if (!supabase) {
-    console.error('[Index] Critical: Supabase Client Failed to Initialize.');
-    errorState = "Service Configuration Error";
-    Astro.response.status = 500;
-} else {
-    try {
-        // 1. Fetch Home Page
-        const { data: pageData, error: pageError } = await supabase
-            .from('pages')
-            .select('*')
-            .eq('slug', 'home')
-            .eq('status', 'published')
-            .maybeSingle();
-
-        if (pageError) throw pageError;
-
-        // 2. Fetch Template Assignments
-        const { data: assignments, error: assignmentError } = await supabase
-            .from('template_assignments')
-            .select('route_type, template_id')
-            .eq('channel', 'web')
-            .in('route_type', ['home', '404']);
-            
-        if (assignmentError) console.warn('[Index] Template Assignment Fetch Warning:', assignmentError);
-
-        const assignmentMap: Record<string, string> = {};
-        (assignments || []).forEach(a => assignmentMap[a.route_type] = a.template_id);
-
-        if (pageData) {
-            meta.title = pageData.meta_title || pageData.title || 'Home';
-            meta.description = pageData.meta_description;
-            pageContent = pageData.puck_layout_jsonb || { content: [], root: {} };
-
-            if (pageData.template && pageData.template !== 'default') {
-                templateId = pageData.template;
-            } else {
-                templateId = assignmentMap['home'];
-            }
-        } else {
-            // No home page, use template default
-            templateId = assignmentMap['home'];
-        }
-
-        // 3. Fetch Template & Parts
-        if (templateId) {
-            const { data: template, error: templateError } = await supabase
-                .from('templates')
-                .select('*')
-                .eq('id', templateId)
-                .maybeSingle();
-            
-            if (templateError) console.warn('[Index] Template Fetch Warning:', templateError);
-
-            if (template) {
-                currentTemplateSlug = template.slug;
-                const parts = template.parts || {};
-                const partIds = Object.values(parts).filter(Boolean);
-                
-                const partDataMap: Record<string, any> = {};
-                if (partIds.length > 0) {
-                    const { data: partsData } = await supabase
-                        .from('template_parts')
-                        .select('*')
-                        .in('id', partIds);
-                        
-                    (partsData || []).forEach(p => partDataMap[p.id] = p);
-                }
-
-                if (parts.header && partDataMap[parts.header]) {
-                     const headerContent = partDataMap[parts.header].data?.content || [];
-                     mergedContent.push(...headerContent);
-                }
-
-                const pageHasContent = pageContent && pageContent.content && pageContent.content.length > 0;
-                
-                if (pageHasContent) {
-                     mergedContent.push(...pageContent.content);
-                } else {
-                     const templateContent = template.data?.content || [];
-                     mergedContent.push(...templateContent);
-                }
-
-                if (parts.footer && partDataMap[parts.footer]) {
-                     const footerContent = partDataMap[parts.footer].data?.content || [];
-                     mergedContent.push(...footerContent);
-                }
-            } else {
-                if (pageContent) mergedContent = pageContent.content || [];
-            }
-        } else {
-            if (pageContent) mergedContent = pageContent.content || [];
-        }
-
-    } catch (err: any) {
-        console.error('[Index] Render Error:', err);
-        errorState = err.message || "Unknown Render Error";
-        Astro.response.status = 500;
+    if (servicesData) {
+      services = servicesData.map(s => ({
+        title: s.title,
+        description: s.description,
+        icon: 'tabler:check',
+      }));
     }
+
+    // Projects
+    const { data: projectsData } = await supabase
+      .from('projects')
+      .select('*')
+      .eq('tenant_id', tenant_id)
+      .eq('status', 'published')
+      .limit(6);
+    
+    if (projectsData) {
+       projects = projectsData.map(p => ({
+          id: p.id,
+          slug: p.slug || '#',
+          permalink: '#',
+          publishDate: new Date(p.date || Date.now()),
+          title: p.title,
+          excerpt: p.description,
+          image: p.image,
+       }));
+    }
+
+    // Team
+    const { data: teamData } = await supabase
+      .from('teams')
+      .select('*')
+      .eq('tenant_id', tenant_id)
+      .eq('status', 'published')
+      .order('display_order', { ascending: true });
+    
+    if (teamData) {
+      team = teamData.map(t => ({
+        name: t.name,
+        job: t.title,
+        testimonial: t.description || 'Commitment to excellence.',
+        image: t.image
+      }));
+    }
+
+    // Testimonials
+    const { data: testData } = await supabase
+      .from('testimonials')
+      .select('*')
+      .eq('tenant_id', tenant_id)
+      .eq('status', 'published')
+      .order('display_order', { ascending: true });
+
+    if (testData) {
+      testimonials = testData.map(t => ({
+        name: t.name,
+        job: t.title,
+        testimonial: t.quote,
+        image: t.image
+      }));
+    }
+
+    // FunFacts (Stats)
+    const { data: statsData } = await supabase
+      .from('funfacts')
+      .select('*')
+      .eq('tenant_id', tenant_id)
+      .eq('status', 'published')
+      .order('display_order', { ascending: true });
+
+    if (statsData) {
+      funfacts = statsData.map(s => ({
+        title: s.title,
+        amount: s.count,
+        icon: 'tabler:info-circle', // Fallback icon
+      }));
+    }
+
+    // Partners (Brands)
+    const { data: partnerData } = await supabase
+      .from('partners')
+      .select('*')
+      .eq('tenant_id', tenant_id)
+      .eq('status', 'published')
+      .order('display_order', { ascending: true });
+
+    if (partnerData) {
+      partners = partnerData.map(p => ({
+        src: p.image,
+        alt: p.name
+      }));
+    }
+
+  } catch (e) {
+    console.error("Error fetching data:", e);
+  }
 }
 
-const finalPuckData = {
-    content: mergedContent,
-    root: { title: meta.title, props: {} }
-};
-
-const LayoutComponent = (currentTemplateSlug === 'awtemplate01') ? AWT01Layout : Layout;
-
-// For host-based resolution, use root paths (no tenant prefix)
-const layoutProps = {
-    title: meta.title,
-    description: meta.description,
-    tenantSlug: '' // Empty = no prefix in URLs
+const metadata = {
+  title: 'Primary Tenant - Astrowind',
+  ignoreTitleTemplate: true,
 };
 ---
 
-<LayoutComponent {...layoutProps}>
-  <main>
-    {errorState ? (
-        <div class="container mx-auto py-20 text-center text-red-600">
-            <h1 class="text-4xl font-bold mb-4">500 - Server Error</h1>
-            <p class="font-mono bg-gray-100 p-4 rounded inline-block text-left text-sm text-gray-800">
-                {errorState}
-            </p>
-        </div>
-    ) : (
-        <>
-            {finalPuckData.content.length > 0 ? (
-            <PuckRenderer data={finalPuckData} />
-            ) : (
-            <div class="container mx-auto py-20 text-center">
-                <p>No content found.</p>
-            </div>
-            )}
-        </>
-    )}
-  </main>
-</LayoutComponent>
+<Layout metadata={metadata}>
+  <!-- Hero Widget ******************* -->
+
+  <Hero
+    actions={[
+      {
+        variant: 'primary',
+        text: 'Get template',
+        href: 'https://github.com/arthelokyo/astrowind',
+        target: '_blank',
+        icon: 'tabler:download',
+      },
+      { text: 'Learn more', href: '#features' },
+    ]}
+    image={{ src: '~/assets/images/hero-image.png', alt: 'AstroWind Hero Image' }}
+  >
+    <Fragment slot="title">
+      Free template for <span class="hidden xl:inline">creating websites with</span>
+      <span class="text-accent dark:text-white"> Astro 5.0</span> + Tailwind CSS
+    </Fragment>
+
+    <Fragment slot="subtitle">
+      <span class="hidden sm:inline">
+        <span class="font-semibold">AstroWind</span> is a free, customizable and production-ready template for Astro 5.0
+        + Tailwind CSS.</span
+      >
+      <span class="block mb-1 sm:hidden font-bold text-blue-600">AstroWind: Production-ready.</span>
+      Suitable for Startups, Small Business, SaaS websites, Professional Portfolios, Marketing websites, Landing Pages &
+      Blogs.
+    </Fragment>
+  </Hero>
+
+  <!-- Note Widget ******************* -->
+
+  <Note title="Philosophy:" description="Simplicity, Best Practices and High Performance" />
+
+  <!-- Features Widget *************** -->
+
+  <Features
+    id="features"
+    tagline="Features"
+    title="What you get with AstroWind"
+    subtitle="One of the most professional and comprehensive templates currently on the market. Most starred & forked Astro theme in 2022, 2023 and 2024."
+    items={[
+      {
+        title: 'Astro + Tailwind CSS Integration',
+        description:
+          'A seamless integration between two great frameworks that offer high productivity, performance and versatility.',
+        icon: 'tabler:brand-tailwind',
+      },
+      {
+        title: 'Ready-to-use Components',
+        description:
+          'Widgets made with Tailwind CSS ready to be used in Marketing Websites, SaaS, Blogs, Personal Profiles, Small Business...',
+        icon: 'tabler:components',
+      },
+      {
+        title: 'Best Practices',
+        description:
+          'Creating secure, efficient, and user-friendly websites that deliver exceptional experiences and lasting value.',
+        icon: 'tabler:list-check',
+      },
+      {
+        title: 'Excellent Page Speed',
+        description:
+          'Having a good page speed impacts organic search ranking, improves user experience (UI/UX) and increase conversion rates.',
+        icon: 'tabler:rocket',
+      },
+      {
+        title: 'Search Engine Optimization (SEO)',
+        description:
+          "SEO lies in its ability to enhance a website's visibility, driving organic traffic and enabling it to reach a wider audience.",
+        icon: 'tabler:arrows-right-left',
+      },
+      {
+        title: 'Open to new ideas and contributions',
+        description:
+          'Embracing a culture that is open to new ideas and contributions is integral fostering innovation, collaboration, and a dynamic user experience.',
+        icon: 'tabler:bulb',
+      },
+    ]}
+  />
+
+  <!-- Content Widget **************** -->
+
+  <Content
+    isReversed
+    tagline="Inside template"
+    title="AstroWind's Blueprint: Fun Meets Functionality!"
+    items={[
+      {
+        title: 'Built on top of Astro 5.0',
+        description:
+          'Benefiting from the performance and developer-friendly features of this modern static site generator.',
+      },
+      {
+        title: 'Styled using Tailwind CSS',
+        description:
+          'Facilitating rapid design and consistent styling with this highly popular utility-first CSS framework.',
+      },
+      {
+        title: 'Cross-browser compatibility',
+        description:
+          'Ensure your website looks and functions consistently across various web browsers, delivering a seamless experience to all users.',
+      },
+    ]}
+    image={{
+      src: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
+      alt: 'Colorful Image',
+    }}
+  >
+    <Fragment slot="content">
+      <h3 class="text-2xl font-bold tracking-tight dark:text-white sm:text-3xl mb-2">Building on modern foundations</h3>
+      Gain a competitive advantage by incorporating industry leading practices
+    </Fragment>
+
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </Content>
+
+  <!-- Content Widget **************** -->
+
+  <Content
+    isAfterContent
+    items={[
+      {
+        title: 'High level of customization',
+        description: `Tailor the template effortlessly to match your brand's identity and requirements, making your website distinct and saving you time.`,
+      },
+      {
+        title: 'Multiple layout possibilities',
+        description:
+          'Explore various layout options to find the structure that best presents your content, enhancing user engagement and navigation.',
+      },
+      {
+        title: 'Fully responsive design',
+        description:
+          "Ensure your website's optimal performance on various devices and screen sizes, providing a consistent and enjoyable user experience.",
+      },
+      {
+        title: 'Integration of media',
+        description:
+          'Seamlessly incorporate images, videos, and multimedia elements that enhance your content and engage visitors effectively.',
+      },
+    ]}
+    image={{
+      src: 'https://images.unsplash.com/photo-1600132806370-bf17e65e942f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2194&q=80',
+      alt: 'Blueprint Image',
+    }}
+  >
+    <Fragment slot="content">Ensure your online presence truly represents you.</Fragment>
+
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </Content>
+
+  <!-- Content Widget **************** -->
+
+  <Content
+    isReversed
+    isAfterContent
+    items={[
+      {
+        title: 'Enhanced user engagement',
+        description:
+          'Captivate your audience with interactive elements, intuitive navigation, and visually appealing layouts, encouraging longer visits.',
+      },
+      {
+        title: 'Continuous improvement',
+        description:
+          'Ensure your website stays aligned with the latest trends and technologies through regular updates and enhancements.',
+      },
+      {
+        title: 'Time and resource efficiency',
+        description:
+          'Skip the time-consuming process of building a website from scratch and launch your online presence sooner with AstroWind.',
+      },
+      {
+        title: 'Community support',
+        description: `Join the growing AstroWind community for insights, resources, and assistance, ensuring you're never alone on your web development journey.`,
+      },
+    ]}
+    image={{
+      src: 'https://images.unsplash.com/photo-1611462985358-60d3498e0364?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
+      alt: 'Astronauts Image',
+    }}
+  >
+    <Fragment slot="content">Designed to foster growth and success.</Fragment>
+
+    <Fragment slot="bg">
+      <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+    </Fragment>
+  </Content>
+
+  <!-- Steps Widget ****************** -->
+
+  <Steps
+    title="Get your dream website up and running in no time with AstroWind."
+    items={[
+      {
+        title: 'Step 1: <span class="font-medium">Download</span>',
+        description:
+          "Kickstart with GitHub! Either fork the AstroWind template or simply click 'Use this template'. Your canvas awaits, ready for your digital masterpiece. In just a few clicks, you've already set the foundation.",
+        icon: 'tabler:package',
+      },
+      {
+        title: 'Step 2: <span class="font-medium">Add content</span>',
+        description:
+          "Pour your vision into it. Add images, text, and all that jazz to breathe life into your digital space. Remember, it's the content that tells your story, so make it captivating.",
+        icon: 'tabler:letter-case',
+      },
+      {
+        title: 'Step 3: <span class="font-medium">Customize styles</span>',
+        description:
+          'Give it your personal touch. Tailor colors, fonts, and layouts until it feels just right. Your unique flair, amplified by AstroWind! Precision in design ensures a seamless user experience.',
+        icon: 'tabler:paint',
+      },
+      {
+        title: 'Ready!',
+        icon: 'tabler:check',
+      },
+    ]}
+    image={{
+      src: 'https://images.unsplash.com/photo-1616198814651-e71f960c3180?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=987&q=80',
+      alt: 'Steps image',
+    }}
+  />
+
+  <!-- Features2 Widget ************** -->
+
+  <!-- Features2 Widget ************** -->
+
+  {services.length > 0 && (
+    <Features2
+      title="Our Services"
+      subtitle="The Best Services we provide"
+      tagline="Services"
+      items={services}
+    >
+      <Fragment slot="bg">
+        <div class="absolute inset-0 bg-blue-50 dark:bg-transparent"></div>
+      </Fragment>
+    </Features2>
+  )}
+
+  <!-- Projects Widget ******************* -->
+
+  {projects.length > 0 && (
+    <WidgetWrapper id="projects" isDark={false} containerClass="max-w-7xl mx-auto" bg={undefined}>
+      <Headline title="Our Projects" subtitle="Check out our latest work" tagline="Portfolio" />
+      <Grid posts={projects} />
+    </WidgetWrapper>
+  )}
+
+  {/* Team Widget */}
+  {team.length > 0 && (
+    <Testimonials
+      title="Our Team"
+      subtitle="Meet the experts"
+      tagline="Team"
+      testimonials={team}
+    />
+  )}
+
+  {/* Testimonials Widget */}
+  {testimonials.length > 0 && (
+    <Testimonials
+      title="Testimonials"
+      subtitle="What our clients say"
+      tagline="Feedback"
+      testimonials={testimonials}
+    />
+  )}
+
+  <!-- Stats Widget ****************** -->
+
+  {funfacts.length > 0 && (
+    <Stats
+      stats={funfacts}
+    />
+  )}
+
+  <!-- Brands Widget ****************** -->
+
+  {partners.length > 0 && (
+    <Brands
+      title="Our Partners"
+      icons={[]}
+      images={partners}
+    />
+  )}
+
+  <!-- CallToAction Widget *********** -->
+
+  <CallToAction
+    actions={[
+      {
+        variant: 'primary',
+        text: 'Get template',
+        href: 'https://github.com/arthelokyo/astrowind',
+        target: '_blank',
+        icon: 'tabler:download',
+      },
+    ]}
+  >
+    <Fragment slot="title">
+      Astro&nbsp;+&nbsp;<br class="block sm:hidden" /><span class="sm:whitespace-nowrap">Tailwind CSS</span>
+    </Fragment>
+
+    <Fragment slot="subtitle">
+      Be very surprised by these huge fake numbers you are seeing on this page. <br class="hidden md:inline" />Don't
+      waste more time! :P
+    </Fragment>
+  </CallToAction>
+</Layout>

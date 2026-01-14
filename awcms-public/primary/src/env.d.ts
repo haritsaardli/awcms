@@ -1,28 +1,17 @@
+// eslint-disable-next-line @typescript-eslint/triple-slash-reference
 /// <reference path="../.astro/types.d.ts" />
 /// <reference types="astro/client" />
+/// <reference types="vite/client" />
+/// <reference types="../vendor/integration/types.d.ts" />
 
 declare namespace App {
     interface Locals {
         tenant_id: string;
         tenant_slug: string;
-        tenant_source: 'host' | 'path';
         host: string;
-        runtime?: {
-            env: {
-                VITE_SUPABASE_URL?: string;
-                VITE_SUPABASE_ANON_KEY?: string;
-                [key: string]: any;
-            }
+        tenant_source: 'path' | 'host';
+        runtime: {
+            env: Record<string, string>;
         };
     }
-}
-
-interface ImportMetaEnv {
-    readonly VITE_SUPABASE_URL: string;
-    readonly VITE_SUPABASE_ANON_KEY: string;
-    readonly VITE_DEV_TENANT_HOST?: string;
-}
-
-interface ImportMeta {
-    readonly env: ImportMetaEnv;
 }

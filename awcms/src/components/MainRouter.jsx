@@ -43,6 +43,10 @@ const OrdersManager = lazy(() => import('@/components/dashboard/OrdersManager'))
 const ProductTypesManager = lazy(() => import('@/components/dashboard/ProductTypesManager'));
 const PromotionsManager = lazy(() => import('@/components/dashboard/PromotionsManager'));
 const PortfolioManager = lazy(() => import('@/components/dashboard/PortfolioManager'));
+const ServicesManager = lazy(() => import('@/components/dashboard/ServicesManager'));
+const TeamManager = lazy(() => import('@/components/dashboard/TeamManager'));
+const PartnersManager = lazy(() => import('@/components/dashboard/PartnersManager'));
+const FunFactsManager = lazy(() => import('@/components/dashboard/FunFactsManager'));
 const TestimonyManager = lazy(() => import('@/components/dashboard/TestimonyManager'));
 const PhotoGalleryManager = lazy(() => import('@/components/dashboard/PhotoGalleryManager'));
 const VideoGalleryManager = lazy(() => import('@/components/dashboard/VideoGalleryManager'));
@@ -181,6 +185,10 @@ const MainRouter = () => {
 
           <Route path="promotions" element={<PromotionsManager />} />
           <Route path="portfolio" element={<PortfolioManager />} />
+          <Route path="services" element={<ServicesManager />} />
+          <Route path="team" element={<TeamManager />} />
+          <Route path="partners" element={<PartnersManager />} />
+          <Route path="funfacts" element={<FunFactsManager />} />
           <Route path="testimonies" element={<TestimonyManager />} />
 
           <Route path="gallery/photos" element={<PhotoGalleryManager />} />
