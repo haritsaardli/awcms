@@ -1,6 +1,8 @@
 @import "tailwindcss";
 @plugin "tailwindcss-animate";
+@source "../node_modules/flowbite";
 @plugin "@tailwindcss/typography";
+@plugin "flowbite/plugin";
 
 @theme {
   --font-sans: 'Inter', system-ui, sans-serif;

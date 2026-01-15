@@ -15,49 +15,21 @@ Welcome to the AWCMS monorepo. AWCMS is a multi-tenant CMS platform with admin, 
 
 ## Quick Start
 
-### Admin Panel
+See the **[Developer Setup Guide](docs/dev/setup.md)** for detailed instructions.
 
-```bash
-cd awcms
-npm install
-cp .env.example .env.local
-npm run dev
-```
-
-### Public Portal
-
-```bash
-cd awcms-public/primary
-npm install
-# Create .env with Supabase variables
-npm run dev
-```
-
-### Mobile App
-
-```bash
-cd awcms-mobile/primary
-flutter pub get
-cp .env.example .env
-flutter run
-```
-
-### ESP32 Firmware
-
-```bash
-cd awcms-esp32/primary
-cp .env.example .env
-source .env && pio run -t uploadfs && pio run -t upload
-```
+- **Admin Panel**: [Guide](docs/dev/admin.md)
+- **Public Portal**: [Guide](docs/dev/public.md)
+- **Mobile App**: [Guide](docs/dev/mobile.md)
+- **IoT Firmware**: [Guide](docs/dev/esp32.md)
 
 ## Documentation
 
-- `DOCS_INDEX.md` (monorepo index)
-- `AGENTS.md` (AI agent rules)
+- **[DOCS_INDEX.md](DOCS_INDEX.md)**: The central navigation for all documentation.
+- **[AGENTS.md](AGENTS.md)**: Rules for AI agents.
 
 ## Contributing
 
-See `CONTRIBUTING.md`.
+See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 

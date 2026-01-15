@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import GenericContentManager from '@/components/dashboard/GenericContentManager';
-import { Briefcase, ChevronRight, Home, Wrench } from 'lucide-react';
+import { ChevronRight, Home, Wrench } from 'lucide-react';
 
 function ServicesManager() {
     const columns = [

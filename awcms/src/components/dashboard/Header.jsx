@@ -18,7 +18,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import LanguageSelector from '@/components/ui/LanguageSelector';
 import { NotificationDropdown } from '@/components/dashboard/notifications/NotificationDropdown';
-import { TenantBadge } from '@/templates/awadmintemplate01';
+import { TenantBadge } from '@/templates/flowbite-admin';
 import { DarkModeToggle } from '@/components/ui/DarkModeToggle';
 
 function Header({ toggleSidebar, onNavigate }) {

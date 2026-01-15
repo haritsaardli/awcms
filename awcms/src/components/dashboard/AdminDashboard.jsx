@@ -14,7 +14,7 @@ import { PluginAction } from '@/contexts/PluginContext';
 import { PlatformOverview } from './widgets/PlatformOverview';
 import { MyApprovals } from './widgets/MyApprovals';
 import { UsageWidget } from './widgets/UsageWidget';
-import { AdminPageLayout, PageHeader } from '@/templates/awadmintemplate01';
+import { AdminPageLayout, PageHeader } from '@/templates/flowbite-admin';
 
 function AdminDashboard() {
     console.log('AdminDashboard rendering...');

@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import GenericContentManager from '@/components/dashboard/GenericContentManager';
 import VisualPageBuilder from '@/components/visual-builder/VisualPageBuilder';
-import { AdminPageLayout, PageHeader, PageTabs, TabsContent } from '@/templates/awadmintemplate01';
+import { AdminPageLayout, PageHeader, PageTabs, TabsContent } from '@/templates/flowbite-admin';
 import { FileText, FolderOpen, Layers, Paintbrush } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 

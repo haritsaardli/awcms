@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import GenericContentManager from '@/components/dashboard/GenericContentManager';
 import ArticleEditor from '@/components/dashboard/ArticleEditor';
-import { AdminPageLayout, PageHeader, PageTabs, TabsContent } from '@/templates/awadmintemplate01';
+import { AdminPageLayout, PageHeader, PageTabs, TabsContent } from '@/templates/flowbite-admin';
 import { FileText, FolderOpen, Tag, Layout, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 

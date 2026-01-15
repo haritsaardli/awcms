@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AdminPageLayout, PageHeader, PageTabs, TabsContent } from '@/templates/awadmintemplate01';
+import { AdminPageLayout, PageHeader, PageTabs, TabsContent } from '@/templates/flowbite-admin';
 import TemplatesList from './templates/TemplatesList';
 import TemplatePartsList from './templates/TemplatePartsList';
 import TemplateAssignments from './templates/TemplateAssignments';

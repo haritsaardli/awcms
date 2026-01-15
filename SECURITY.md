@@ -1,18 +1,17 @@
 # Security Policy
 
-## Supported Versions
-
-| Version | Supported |
-| --- | --- |
-| latest | ✅ |
+Please refer to the complete **[Security Documentation](docs/security/overview.md)**.
 
 ## Reporting a Vulnerability
 
-If you discover a security vulnerability within AWCMS, please do the following:
+If you discover a security vulnerability, please email `security@awcms.com` (or your organization's security contact).
 
-1. **Do NOT** create a public GitHub issue.
-2. Send an email to: **<security@ahliweb.com>**
-3. Include the following information:
+**DO NOT** create a public GitHub issue for security vulnerabilities.
+
+## Supported Versions
+
+1. Send an email to: **<security@ahliweb.com>**
+2. Include the following information:
    - Description of the vulnerability
    - Steps to reproduce
    - Potential impact

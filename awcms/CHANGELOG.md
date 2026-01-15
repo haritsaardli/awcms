@@ -5,6 +5,15 @@ All notable changes to the **AWCMS** project will be documented in this file.
 
 ## [Unreleased]
 
+## [2.15.2] - 2026-01-15
+
+### Documentation
+
+- **Documentation Overhaul**: Restructured and unified documentation into a root `docs/` directory.
+- **New Structure**: Organized documentation into `architecture`, `tenancy`, `security`, `compliance`, `dev`, `deploy`, and `modules`.
+- **New Guides**: Added `docs/dev/setup.md` (Developer Setup Guide), `docs/security/threat-model.md`, `docs/compliance/indonesia.md` (UU PDP), and ISO 27001 mapping.
+- **Clean Up**: Removed `awcms/docs` directory and fixed all broken links.
+
 ## [2.15.1] - 2026-01-14
 
 ### Fixed
