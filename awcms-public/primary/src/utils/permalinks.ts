@@ -111,7 +111,7 @@ const definitivePermalink = (permalink: string): string => createPath(BASE_PATHN
 /** */
 export const applyGetPermalinks = (menu: any = {}): any => {
   if (Array.isArray(menu)) {
-    return menu.map((item: any) => applyGetPermalinks(item));
+    return menu.map((item: any): any => applyGetPermalinks(item));
   } else if (typeof menu === 'object' && menu !== null) {
     const obj: any = {};
     for (const key in menu) {
