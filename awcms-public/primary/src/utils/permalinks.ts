@@ -45,8 +45,13 @@ export const getPermalink = (slug = '', type = 'page'): string => {
 
   const lowerSlug = slug.toLowerCase().trim();
 
-  if (lowerSlug.startsWith('javascript:') || lowerSlug.startsWith('vbscript:') || lowerSlug.startsWith('data:')) {
-    return '#';
+  const ALLOWED_PROTOCOLS = ['http:', 'https:', 'mailto:', 'tel:', 'data:'];
+
+  if (lowerSlug.includes(':')) {
+    const scheme = lowerSlug.split(':')[0] + ':';
+    if (!ALLOWED_PROTOCOLS.includes(scheme) && !lowerSlug.startsWith('//') && !lowerSlug.startsWith('#')) {
+      return '#';
+    }
   }
 
   if (
@@ -55,7 +60,8 @@ export const getPermalink = (slug = '', type = 'page'): string => {
     lowerSlug.startsWith('://') ||
     lowerSlug.startsWith('#') ||
     lowerSlug.startsWith('mailto:') ||
-    lowerSlug.startsWith('tel:')
+    lowerSlug.startsWith('tel:') ||
+    lowerSlug.startsWith('data:')
   ) {
     return slug;
   }
