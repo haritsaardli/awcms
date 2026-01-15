@@ -1,8 +1,18 @@
-
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import GenericContentManager from '@/components/dashboard/GenericContentManager';
+import { supabase } from '@/lib/customSupabaseClient';
 
 function ContactsManager() {
+  const [provinces, setProvinces] = useState([]);
+
+  useEffect(() => {
+    const fetchProvinces = async () => {
+      const { data } = await supabase.from('provinces').select('id, name').order('name');
+      if (data) setProvinces(data);
+    };
+    fetchProvinces();
+  }, []);
+
   const columns = [
     { key: 'name', label: 'Location Name' },
     { key: 'city', label: 'City' },
@@ -14,7 +24,13 @@ function ContactsManager() {
     { key: 'name', label: 'Location Name', required: true, description: 'e.g. Head Office' },
     { key: 'address', label: 'Address', type: 'textarea', required: true },
     { key: 'city', label: 'City', required: true },
-    { key: 'province', label: 'Province/State' },
+    {
+      key: 'province',
+      label: 'Province',
+      type: 'select',
+      options: provinces.map(p => ({ value: p.name, label: p.name })), // storing name for now to maintain compat, ideally ID
+      required: true
+    },
     { key: 'postal_code', label: 'Postal Code' },
     { key: 'country', label: 'Country', defaultValue: 'Indonesia' },
     { key: 'phone', label: 'Phone Number' },

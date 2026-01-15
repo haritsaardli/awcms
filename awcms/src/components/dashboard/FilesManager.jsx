@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Helmet } from 'react-helmet';
+import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import { ChevronRight, UploadCloud, Trash2, RefreshCw, FolderClosed } from 'lucide-react';
 import { Button } from '@/components/ui/button';

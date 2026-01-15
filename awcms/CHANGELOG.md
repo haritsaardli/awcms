@@ -5,6 +5,20 @@ All notable changes to the **AWCMS** project will be documented in this file.
 
 ## [Unreleased]
 
+## [2.15.3] - 2026-01-16
+
+### Remediation & Enhancements
+
+- **Database Integrity (Region Module)**:
+  - Created `public.provinces` reference table with 38 Indonesian provinces.
+  - Updated `ContactsManager` to use a standardized dropdown for Province selection, ensuring consistent data.
+- **Resilience**:
+  - Implemented `GlobalErrorBoundary` to catch and gracefully handle root-level application crashes (White Screen of Death).
+- **Modernization**:
+  - Replaced deprecated `react-helmet` with `react-helmet-async` across the entire application for meaningful React 19 compatibility.
+- **Security & Verification**:
+  - Verified Mobile App offline-first architecture (`Drift` + `SyncService`) and IoT credential safety.
+
 ## [2.15.2] - 2026-01-15
 
 ### Documentation

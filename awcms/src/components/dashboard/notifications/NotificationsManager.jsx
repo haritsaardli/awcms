@@ -12,7 +12,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Send, Users, User, CheckCircle2, Search, Filter, CheckCheck } from 'lucide-react';
 import ContentTable from '@/components/dashboard/ContentTable';
 import { useToast } from '@/components/ui/use-toast';
-import { Helmet } from 'react-helmet';
+import { Helmet } from 'react-helmet-async';
 import { useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { usePermissions } from '@/contexts/PermissionContext';

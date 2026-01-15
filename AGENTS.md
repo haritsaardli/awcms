@@ -51,7 +51,7 @@ Agents must be aware of the exact versions in use:
 | TailwindCSS      | 4.1.18   | Admin uses CSS-based config    |
 | Supabase JS      | 2.87.1   | Admin client (respects RLS)    |
 | React Router DOM | 7.10.1   | Client-side routing            |
-| Puck             | 0.20.2   | Visual Editor (@puckeditor/puck) |
+| Puck             | 0.21.0   | Visual Editor (@puckeditor/puck) |
 | TipTap           | 3.13.0   | Rich text editor (XSS-safe)    |
 | Framer Motion    | 12.23.26 | Animations                     |
 | Radix UI         | Latest   | Accessible UI primitives       |

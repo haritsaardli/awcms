@@ -17,7 +17,7 @@ import RolesManager from '@/components/dashboard/RolesManager';
 import AuditLogsERP from '@/components/dashboard/AuditLogsERP';
 import PolicyManager from '@/components/dashboard/PolicyManager';
 import UserProfile from '@/components/dashboard/UserProfile';
-import { Helmet } from 'react-helmet';
+import { Helmet } from 'react-helmet-async';
 
 function Dashboard() {
   const [currentPage, setCurrentPage] = useState('home');

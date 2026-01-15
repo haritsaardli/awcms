@@ -7,7 +7,8 @@ import { DarkModeProvider } from '@/contexts/DarkModeContext';
 import { PluginProvider } from '@/contexts/PluginContext';
 import { Toaster } from '@/components/ui/toaster';
 import MainRouter from '@/components/MainRouter';
-import { Helmet } from 'react-helmet';
+import { Helmet, HelmetProvider } from 'react-helmet-async';
+import GlobalErrorBoundary from '@/components/ui/GlobalErrorBoundary';
 
 import { TenantProvider } from '@/contexts/TenantContext';
 
@@ -25,26 +26,30 @@ function App() {
 
 
   return (
-    <DarkModeProvider>
-      <TenantProvider>
-        <AuthProvider>
-          <PermissionProvider>
-            <ThemeProvider>
-              <PluginProvider>
-                <Helmet>
-                  <title>CMS & Public Portal</title>
-                  <meta name="description" content="Content Management System and Public Portal" />
-                </Helmet>
-                <ThemeWrapper>
-                  <MainRouter />
-                  <Toaster />
-                </ThemeWrapper>
-              </PluginProvider>
-            </ThemeProvider>
-          </PermissionProvider>
-        </AuthProvider>
-      </TenantProvider>
-    </DarkModeProvider>
+    <HelmetProvider>
+      <GlobalErrorBoundary>
+        <DarkModeProvider>
+          <TenantProvider>
+            <AuthProvider>
+              <PermissionProvider>
+                <ThemeProvider>
+                  <PluginProvider>
+                    <Helmet>
+                      <title>CMS & Public Portal</title>
+                      <meta name="description" content="Content Management System and Public Portal" />
+                    </Helmet>
+                    <ThemeWrapper>
+                      <MainRouter />
+                      <Toaster />
+                    </ThemeWrapper>
+                  </PluginProvider>
+                </ThemeProvider>
+              </PermissionProvider>
+            </AuthProvider>
+          </TenantProvider>
+        </DarkModeProvider>
+      </GlobalErrorBoundary>
+    </HelmetProvider>
   );
 }
 

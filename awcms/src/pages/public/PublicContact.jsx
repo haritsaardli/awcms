@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/lib/customSupabaseClient';
-import { Helmet } from 'react-helmet';
+import { Helmet } from 'react-helmet-async';
 
 function PublicContact() {
   const { t } = useTranslation();

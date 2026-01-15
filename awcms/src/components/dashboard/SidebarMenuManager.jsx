@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Reorder, AnimatePresence } from 'framer-motion';
-import { Helmet } from 'react-helmet';
+import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import {
     GripVertical, Eye, EyeOff, Edit2, Save, RefreshCw,
