@@ -206,9 +206,11 @@ function PageEditor({ page, onClose, onSuccess }) {
 
                 <div className="flex gap-2">
                     <Button variant="outline" size="sm" onClick={() => {
-                        const baseUrl = 'http://localhost:4321'; // TODO: Get from tenant config
-                        const previewSecret = 'SUPER_SECRET_PREVIEW_TOKEN_12345'; // TODO: Get from tenant env/config
-                        const url = `${baseUrl}/${formData.slug}?preview_secret=${previewSecret}`;
+                        const baseUrl = import.meta.env.VITE_PUBLIC_PORTAL_URL || 'http://localhost:4321';
+                        const previewSecret = import.meta.env.VITE_PREVIEW_SECRET || '';
+                        const url = previewSecret
+                            ? `${baseUrl}/${formData.slug}?preview_secret=${previewSecret}`
+                            : `${baseUrl}/${formData.slug}`;
                         window.open(url, '_blank');
                     }}>
                         <Globe className="w-4 h-4 mr-2" /> Preview
