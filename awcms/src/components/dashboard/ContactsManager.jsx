@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import GenericContentManager from '@/components/dashboard/GenericContentManager';
 import { supabase } from '@/lib/customSupabaseClient';
+import { MapPin } from 'lucide-react';
+import { AdminPageLayout, PageHeader } from '@/templates/flowbite-admin';
 
 function ContactsManager() {
   const [provinces, setProvinces] = useState([]);
@@ -28,7 +30,7 @@ function ContactsManager() {
       key: 'province',
       label: 'Province',
       type: 'select',
-      options: provinces.map(p => ({ value: p.name, label: p.name })), // storing name for now to maintain compat, ideally ID
+      options: provinces.map(p => ({ value: p.name, label: p.name })),
       required: true
     },
     { key: 'postal_code', label: 'Postal Code' },
@@ -43,13 +45,23 @@ function ContactsManager() {
   ];
 
   return (
-    <GenericContentManager
-      tableName="contacts"
-      resourceName="Location"
-      columns={columns}
-      formFields={formFields}
-      permissionPrefix="contacts"
-    />
+    <AdminPageLayout requiredPermission="contacts.read">
+      <PageHeader
+        title="Locations"
+        description="Manage office locations and contact information."
+        icon={MapPin}
+        breadcrumbs={[{ label: 'Locations', icon: MapPin }]}
+      />
+
+      <GenericContentManager
+        tableName="contacts"
+        resourceName="Location"
+        columns={columns}
+        formFields={formFields}
+        permissionPrefix="contacts"
+        showBreadcrumbs={false}
+      />
+    </AdminPageLayout>
   );
 }
 

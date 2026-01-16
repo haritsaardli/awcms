@@ -48,5 +48,5 @@ Provide common fixes for local development and deployment issues.
 
 ## References
 
-- `../00-core/MULTI_TENANCY.md`
-- `../00-core/SUPABASE_INTEGRATION.md`
+- `docs/tenancy/overview.md`
+- `docs/tenancy/supabase.md`

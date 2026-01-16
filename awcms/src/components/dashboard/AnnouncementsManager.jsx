@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
 import GenericContentManager from '@/components/dashboard/GenericContentManager';
-import { Megaphone, ChevronRight, Home } from 'lucide-react';
+import { Megaphone } from 'lucide-react';
+import { AdminPageLayout, PageHeader } from '@/templates/flowbite-admin';
 
 function AnnouncementsManager() {
     const columns = [
@@ -63,19 +63,13 @@ function AnnouncementsManager() {
     ];
 
     return (
-        <div className="space-y-6">
-            {/* Breadcrumb Navigation */}
-            <nav className="flex items-center text-sm text-muted-foreground">
-                <Link to="/cmspanel" className="hover:text-primary transition-colors flex items-center gap-1">
-                    <Home className="w-4 h-4" />
-                    Dashboard
-                </Link>
-                <ChevronRight className="w-4 h-4 mx-2 text-muted-foreground/50" />
-                <span className="flex items-center gap-1 text-foreground font-medium">
-                    <Megaphone className="w-4 h-4" />
-                    Announcements
-                </span>
-            </nav>
+        <AdminPageLayout requiredPermission="announcements.read">
+            <PageHeader
+                title="Announcements"
+                description="Create and manage system-wide announcements."
+                icon={Megaphone}
+                breadcrumbs={[{ label: 'Announcements', icon: Megaphone }]}
+            />
 
             <GenericContentManager
                 tableName="announcements"
@@ -85,7 +79,7 @@ function AnnouncementsManager() {
                 permissionPrefix="announcements"
                 showBreadcrumbs={false}
             />
-        </div>
+        </AdminPageLayout>
     );
 }
 

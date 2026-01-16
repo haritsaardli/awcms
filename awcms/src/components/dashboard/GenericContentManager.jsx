@@ -5,8 +5,9 @@ import { usePermissions } from '@/contexts/PermissionContext';
 import { useToast } from '@/components/ui/use-toast';
 import { udm } from '@/lib/data/UnifiedDataManager'; // Changed from supabase
 import { Button } from '@/components/ui/button';
-import { Plus, Trash2, Search, RefreshCw, RotateCcw, ShieldAlert, User, Home, ChevronRight } from 'lucide-react';
-import { Input } from '@/components/ui/input';
+import { Plus, Trash2, RefreshCw, RotateCcw, ShieldAlert, User, Home, ChevronRight } from 'lucide-react';
+import MinCharSearchInput from '@/components/common/MinCharSearchInput';
+import { useSearch } from '@/hooks/useSearch';
 import { useAuth } from '@/contexts/SupabaseAuthContext';
 import { Link } from 'react-router-dom';
 import { useTenant } from '@/contexts/TenantContext';
@@ -47,8 +48,22 @@ const GenericContentManager = ({
     const [loading, setLoading] = useState(false);
     const [showEditor, setShowEditor] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
-    const [query, setQuery] = useState('');
     const [showTrash, setShowTrash] = useState(false);
+
+    // Integrated useSearch hook
+    const {
+        query,
+        setQuery,
+        debouncedQuery,
+        isValid: isSearchValid,
+        message: searchMessage,
+        loading: searchLoading,
+        minLength,
+        clearSearch
+    } = useSearch({
+        minLength: 5, // Standardized 5 char limit
+        initialQuery: ''
+    });
 
     const [totalItems, setTotalItems] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
@@ -112,9 +127,9 @@ const GenericContentManager = ({
                 });
             }
 
-            if (query) {
+            if (debouncedQuery) {
                 const searchCol = columns.find(c => c.key === 'title' || c.key === 'name')?.key || 'id';
-                q = q.ilike(searchCol, `%${query}%`);
+                q = q.ilike(searchCol, `%${debouncedQuery}%`);
             }
 
             const from = (currentPage - 1) * itemsPerPage;
@@ -139,7 +154,7 @@ const GenericContentManager = ({
     useEffect(() => {
         fetchItems();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentPage, itemsPerPage, query, canView, showTrash, tableName, currentTenant?.id]);
+    }, [currentPage, itemsPerPage, debouncedQuery, canView, showTrash, tableName, currentTenant?.id]);
 
     const handleEdit = (item) => {
         if (!checkAccess('edit', permissionPrefix, item)) {
@@ -337,13 +352,16 @@ const GenericContentManager = ({
                     </div>
 
                     <div className="bg-card p-4 rounded-xl border border-border shadow-sm flex items-center gap-2">
-                        <div className="relative flex-1 max-w-sm">
-                            <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                            <Input
-                                placeholder={`Search ${resourceName}s...`}
+                        <div className="flex-1 max-w-sm">
+                            <MinCharSearchInput
                                 value={query}
                                 onChange={e => setQuery(e.target.value)}
-                                className="pl-9 bg-background"
+                                onClear={clearSearch}
+                                loading={loading || searchLoading}
+                                isValid={isSearchValid}
+                                message={searchMessage}
+                                minLength={minLength}
+                                placeholder={`Search ${resourceName}s... (5+ chars)`}
                             />
                         </div>
                         <div className="flex-1"></div>

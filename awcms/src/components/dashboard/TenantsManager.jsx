@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/button';
 import { Plus, Building, RefreshCw, DollarSign, Mail, FileText, Globe, ChevronLeft, ChevronRight, Radio } from 'lucide-react';
 import { format } from 'date-fns';
 import { Input } from '@/components/ui/input';
+import { useSearch } from '@/hooks/useSearch';
+import MinCharSearchInput from '@/components/common/MinCharSearchInput';
 import { Label } from '@/components/ui/label';
 import {
     Dialog,
@@ -34,6 +36,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { AdminPageLayout, PageHeader } from '@/templates/flowbite-admin';
 
 function TenantsManager() {
     const { toast } = useToast();
@@ -43,7 +46,19 @@ function TenantsManager() {
     const [loading, setLoading] = useState(true);
     const [showEditor, setShowEditor] = useState(false);
     const [editingTenant, setEditingTenant] = useState(null);
-    const [query, setQuery] = useState('');
+
+    // Search
+    const {
+        query,
+        setQuery,
+        debouncedQuery,
+        isValid: isSearchValid,
+        message: searchMessage,
+        loading: searchLoading,
+        minLength,
+        clearSearch
+    } = useSearch({ context: 'admin' });
+
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
 
@@ -270,10 +285,12 @@ function TenantsManager() {
         }
     };
 
-    const filteredTenants = tenants.filter(t =>
-        t.name.toLowerCase().includes(query.toLowerCase()) ||
-        t.slug.toLowerCase().includes(query.toLowerCase())
-    );
+    const filteredTenants = tenants.filter(t => {
+        if (!debouncedQuery) return true;
+        const lower = debouncedQuery.toLowerCase();
+        return t.name.toLowerCase().includes(lower) ||
+            t.slug.toLowerCase().includes(lower);
+    });
 
     // Pagination logic
     const totalPages = Math.ceil(filteredTenants.length / itemsPerPage);
@@ -284,7 +301,7 @@ function TenantsManager() {
     // Reset to page 1 when search changes
     useEffect(() => {
         setCurrentPage(1);
-    }, [query]);
+    }, [debouncedQuery]);
 
     const columns = [
         { key: 'name', label: 'Name', className: 'font-semibold' },
@@ -357,46 +374,38 @@ function TenantsManager() {
     );
 
     return (
-        <div className="space-y-6">
-            {/* Breadcrumb Navigation */}
-            <nav className="flex items-center text-sm text-muted-foreground">
-                <a href="/cmspanel" className="hover:text-foreground transition-colors flex items-center gap-1">
-                    <RefreshCw className="w-4 h-4" /> {/* Fallback icon */}
-                    Dashboard
-                </a>
-                <span className="w-4 h-4 mx-2 text-muted">/</span>
-                <span className="flex items-center gap-1 text-foreground font-medium">
-                    <Building className="w-4 h-4" />
-                    Tenants
-                </span>
-            </nav>
-
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-card p-6 rounded-xl border border-border shadow-sm">
-                <div>
-                    <h2 className="text-3xl font-bold text-foreground flex items-center gap-2">
-                        <Building className="w-8 h-8 text-primary" />
-                        Tenants
-                    </h2>
-                    <p className="text-muted-foreground mt-1">Manage platform tenants, subscriptions, and domains.</p>
-                </div>
-                <div className="flex gap-2">
-                    <Button variant="ghost" onClick={fetchTenants} title="Refresh" className="text-muted-foreground hover:text-foreground">
-                        <RefreshCw className="w-4 h-4" />
-                    </Button>
-                    <Button onClick={handleCreate} className="bg-primary text-primary-foreground hover:bg-primary/90">
-                        <Plus className="w-4 h-4 mr-2" /> New Tenant
-                    </Button>
-                </div>
-            </div>
+        <AdminPageLayout requiredPermission="platform.tenants.read">
+            <PageHeader
+                title="Tenants"
+                description="Manage platform tenants, subscriptions, and domains."
+                icon={Building}
+                breadcrumbs={[{ label: 'Tenants', icon: Building }]}
+                actions={(
+                    <div className="flex gap-2">
+                        <Button variant="ghost" onClick={fetchTenants} title="Refresh" className="text-muted-foreground hover:text-foreground">
+                            <RefreshCw className="w-4 h-4" />
+                        </Button>
+                        <Button onClick={handleCreate} className="bg-primary text-primary-foreground hover:bg-primary/90">
+                            <Plus className="w-4 h-4 mr-2" /> New Tenant
+                        </Button>
+                    </div>
+                )}
+            />
 
             <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
                 <div className="p-4 border-b border-border bg-muted/20 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-                    <Input
-                        placeholder="Search tenants..."
-                        value={query}
-                        onChange={e => setQuery(e.target.value)}
-                        className="max-w-sm bg-background border-input"
-                    />
+                    <div className="flex-1 max-w-sm">
+                        <MinCharSearchInput
+                            value={query}
+                            onChange={e => setQuery(e.target.value)}
+                            onClear={clearSearch}
+                            loading={loading || searchLoading}
+                            isValid={isSearchValid}
+                            message={searchMessage}
+                            minLength={minLength}
+                            placeholder="Search tenants"
+                        />
+                    </div>
                     <div className="flex items-center gap-2">
                         <span className="text-sm text-muted-foreground">Show:</span>
                         <Select value={String(itemsPerPage)} onValueChange={(v) => { setItemsPerPage(Number(v)); setCurrentPage(1); }}>
@@ -685,7 +694,7 @@ function TenantsManager() {
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
-        </div>
+        </AdminPageLayout>
     );
 }
 

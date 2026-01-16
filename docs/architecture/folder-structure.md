@@ -1,13 +1,16 @@
 # Folder Structure
 
 ## Purpose
+
 Describe the monorepo layout and the key directories for each package.
 
 ## Audience
+
 - Contributors navigating the codebase
 - Operators locating deployment artifacts
 
 ## Prerequisites
+
 - `docs/architecture/standards.md`
 
 ## Reference
@@ -90,5 +93,5 @@ awcms-esp32/primary/
 
 ## References
 
-- `../../../DOCS_INDEX.md`
-- `../00-core/ARCHITECTURE.md`
+- `../../DOCS_INDEX.md`
+- `docs/architecture/overview.md`

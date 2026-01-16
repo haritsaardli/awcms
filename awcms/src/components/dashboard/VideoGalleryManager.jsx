@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
 import GenericContentManager from '@/components/dashboard/GenericContentManager';
-import { Video, ChevronRight, Home } from 'lucide-react';
+import { Video } from 'lucide-react';
+import { AdminPageLayout, PageHeader } from '@/templates/flowbite-admin';
 
 function VideoGalleryManager() {
     const columns = [
@@ -44,19 +44,13 @@ function VideoGalleryManager() {
     ];
 
     return (
-        <div className="space-y-6">
-            {/* Breadcrumb Navigation */}
-            <nav className="flex items-center text-sm text-muted-foreground">
-                <Link to="/cmspanel" className="hover:text-primary transition-colors flex items-center gap-1">
-                    <Home className="w-4 h-4" />
-                    Dashboard
-                </Link>
-                <ChevronRight className="w-4 h-4 mx-2 text-muted-foreground/50" />
-                <span className="flex items-center gap-1 text-foreground font-medium">
-                    <Video className="w-4 h-4" />
-                    Video Gallery
-                </span>
-            </nav>
+        <AdminPageLayout requiredPermission="video_gallery.read">
+            <PageHeader
+                title="Video Gallery"
+                description="Manage video content and YouTube integrations."
+                icon={Video}
+                breadcrumbs={[{ label: 'Video Gallery', icon: Video }]}
+            />
 
             <GenericContentManager
                 tableName="video_gallery"
@@ -66,7 +60,7 @@ function VideoGalleryManager() {
                 permissionPrefix="video_gallery"
                 showBreadcrumbs={false}
             />
-        </div>
+        </AdminPageLayout>
     );
 }
 

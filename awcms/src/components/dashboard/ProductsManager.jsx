@@ -1,9 +1,9 @@
 
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import GenericContentManager from '@/components/dashboard/GenericContentManager';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Package, Layers, ChevronRight, Home, FolderOpen } from 'lucide-react';
+import { Package, Layers, FolderOpen } from 'lucide-react';
+import { AdminPageLayout, PageHeader } from '@/templates/flowbite-admin';
 
 function ProductsManager() {
   const [activeTab, setActiveTab] = useState('products');
@@ -154,26 +154,20 @@ function ProductsManager() {
     { key: 'type', label: 'Type', type: 'hidden', defaultValue: 'product' }
   ];
 
+  // Breadcrumbs for PageHeader
+  const breadcrumbs = [
+    { label: 'Products', icon: Package },
+    ...(activeTab !== 'products' ? [{ label: activeTab.replace('_', ' ').charAt(0).toUpperCase() + activeTab.replace('_', ' ').slice(1) }] : []),
+  ];
+
   return (
-    <div className="space-y-6">
-      {/* Breadcrumb Navigation */}
-      <nav className="flex items-center text-sm text-muted-foreground">
-        <Link to="/cmspanel" className="hover:text-primary transition-colors flex items-center gap-1">
-          <Home className="w-4 h-4" />
-          Dashboard
-        </Link>
-        <ChevronRight className="w-4 h-4 mx-2 text-muted-foreground/50" />
-        <span className="flex items-center gap-1 text-foreground font-medium">
-          <Package className="w-4 h-4" />
-          Products
-        </span>
-        {activeTab !== 'products' && (
-          <>
-            <ChevronRight className="w-4 h-4 mx-2 text-muted-foreground/50" />
-            <span className="text-primary font-medium capitalize">{activeTab.replace('_', ' ')}</span>
-          </>
-        )}
-      </nav>
+    <AdminPageLayout requiredPermission="products.read">
+      <PageHeader
+        title="Products"
+        description="Manage your product catalog, types, and categories."
+        icon={Package}
+        breadcrumbs={breadcrumbs}
+      />
 
       {/* Enhanced Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -240,7 +234,7 @@ function ProductsManager() {
           showBreadcrumbs={false}
         />
       )}
-    </div>
+    </AdminPageLayout>
   );
 }
 

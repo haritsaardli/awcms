@@ -39,5 +39,5 @@ import { initReactI18next } from 'react-i18next';
 
 ## References
 
-- `../03-features/TEMPLATE_SYSTEM.md`
+- `docs/modules/TEMPLATE_SYSTEM.md`
 - `../../src/lib/i18n.js`

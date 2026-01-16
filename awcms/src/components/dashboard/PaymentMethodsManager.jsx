@@ -4,6 +4,7 @@
 import React from 'react';
 import GenericContentManager from '@/components/dashboard/GenericContentManager';
 import { CreditCard } from 'lucide-react';
+import { AdminPageLayout, PageHeader } from '@/templates/flowbite-admin';
 
 function PaymentMethodsManager() {
     const columns = [
@@ -86,34 +87,44 @@ function PaymentMethodsManager() {
     ];
 
     return (
-        <div className="space-y-6">
-            <div className="bg-primary/5 border border-primary/20 rounded-xl p-4">
-                <div className="flex items-start gap-3">
-                    <div className="p-2 bg-primary/10 rounded-lg">
-                        <CreditCard className="w-5 h-5 text-primary" />
-                    </div>
-                    <div className="flex-1">
-                        <h3 className="font-semibold text-foreground mb-1">Xendit Configuration</h3>
-                        <p className="text-sm text-muted-foreground mb-2">
-                            To enable online payments via Xendit, you need to configure the API key in the Edge Function.
-                        </p>
-                        <ol className="text-sm text-muted-foreground space-y-1 list-decimal list-inside">
-                            <li>Get your API key from <a href="https://dashboard.xendit.co" target="_blank" rel="noopener noreferrer" className="underline font-medium text-primary hover:text-primary/80">Xendit Dashboard</a></li>
-                            <li>Add <code className="bg-muted px-1 rounded text-xs font-mono text-foreground">XENDIT_API_KEY</code> to Supabase Edge Function secrets</li>
-                            <li>Create a payment method with type "Xendit"</li>
-                        </ol>
+        <AdminPageLayout requiredPermission="payment_methods.read">
+            <PageHeader
+                title="Payment Methods"
+                description="Configure available payment options for checkout."
+                icon={CreditCard}
+                breadcrumbs={[{ label: 'Payment Methods', icon: CreditCard }]}
+            />
+
+            <div className="space-y-6">
+                <div className="bg-primary/5 border border-primary/20 rounded-xl p-4">
+                    <div className="flex items-start gap-3">
+                        <div className="p-2 bg-primary/10 rounded-lg">
+                            <CreditCard className="w-5 h-5 text-primary" />
+                        </div>
+                        <div className="flex-1">
+                            <h3 className="font-semibold text-foreground mb-1">Xendit Configuration</h3>
+                            <p className="text-sm text-muted-foreground mb-2">
+                                To enable online payments via Xendit, you need to configure the API key in the Edge Function.
+                            </p>
+                            <ol className="text-sm text-muted-foreground space-y-1 list-decimal list-inside">
+                                <li>Get your API key from <a href="https://dashboard.xendit.co" target="_blank" rel="noopener noreferrer" className="underline font-medium text-primary hover:text-primary/80">Xendit Dashboard</a></li>
+                                <li>Add <code className="bg-muted px-1 rounded text-xs font-mono text-foreground">XENDIT_API_KEY</code> to Supabase Edge Function secrets</li>
+                                <li>Create a payment method with type "Xendit"</li>
+                            </ol>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <GenericContentManager
-                tableName="payment_methods"
-                resourceName="Payment Method"
-                columns={columns}
-                formFields={formFields}
-                permissionPrefix="payment_methods"
-            />
-        </div>
+                <GenericContentManager
+                    tableName="payment_methods"
+                    resourceName="Payment Method"
+                    columns={columns}
+                    formFields={formFields}
+                    permissionPrefix="payment_methods"
+                    showBreadcrumbs={false}
+                />
+            </div>
+        </AdminPageLayout>
     );
 }
 

@@ -38,5 +38,5 @@ const ArticlesManager = lazy(() => import('@/components/dashboard/ArticlesManage
 
 ## References
 
-- `../00-core/ARCHITECTURE.md`
-- `../03-features/SCALABILITY_GUIDE.md`
+- `docs/architecture/overview.md`
+- `docs/modules/SCALABILITY_GUIDE.md`

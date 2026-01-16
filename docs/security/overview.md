@@ -119,5 +119,5 @@ Development headers are set in `awcms/vite.config.js`. Production headers must b
 ## References
 
 - `../02-reference/RLS_POLICIES.md`
-- `../03-features/ABAC_SYSTEM.md`
-- `../00-core/SOFT_DELETE.md`
+- `docs/security/abac.md`
+- `docs/architecture/database.md`

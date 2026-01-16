@@ -57,6 +57,6 @@ FOR INSERT WITH CHECK (
 
 ## References
 
-- `../00-core/MULTI_TENANCY.md`
-- `../00-core/SUPABASE_INTEGRATION.md`
-- `../00-core/SOFT_DELETE.md`
+- `docs/tenancy/overview.md`
+- `docs/tenancy/supabase.md`
+- `docs/architecture/database.md`

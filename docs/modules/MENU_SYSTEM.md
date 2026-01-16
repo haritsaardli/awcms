@@ -52,5 +52,5 @@ addFilter('admin_menu_items', 'my_plugin', items => [
 
 ## References
 
-- `../03-features/ABAC_SYSTEM.md`
+- `docs/security/abac.md`
 - `../../src/hooks/useAdminMenu.js`

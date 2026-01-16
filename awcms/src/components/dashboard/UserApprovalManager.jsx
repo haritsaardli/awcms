@@ -5,13 +5,14 @@ import { usePermissions } from '@/contexts/PermissionContext';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/use-toast';
 import { Loader2, CheckCircle, UserCheck, ShieldCheck, ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { AdminPageLayout, PageHeader } from '@/templates/flowbite-admin';
 
 const ITEMS_PER_PAGE_OPTIONS = [5, 10, 25, 50];
 
@@ -257,63 +258,69 @@ const UserApprovalManager = () => {
     );
 
     return (
-        <Card className="w-full">
-            <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle className="flex items-center gap-2">
-                    <UserCheck className="w-6 h-6" /> Account Approvals
-                </CardTitle>
-                <Button variant="ghost" size="icon" onClick={fetchRequests} title="Refresh">
-                    <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-                </Button>
-            </CardHeader>
-            <CardContent>
-                <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-                    <TabsList>
-                        <TabsTrigger value="pending">Pending</TabsTrigger>
-                        <TabsTrigger value="completed">Approved</TabsTrigger>
-                        <TabsTrigger value="rejected">Rejected</TabsTrigger>
-                    </TabsList>
+        <AdminPageLayout requiredPermission="platform.approvals.read">
+            <PageHeader
+                title="Account Approvals"
+                description="Manage user registration and approval requests."
+                icon={UserCheck}
+                breadcrumbs={[{ label: 'Approvals', icon: UserCheck }]}
+                actions={(
+                    <Button variant="ghost" size="icon" onClick={fetchRequests} title="Refresh">
+                        <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+                    </Button>
+                )}
+            />
 
-                    <TabsContent value="pending" className="space-y-4">
-                        {renderTable(true)}
-                    </TabsContent>
+            <Card className="w-full">
+                <CardContent className="pt-6">
+                    <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+                        <TabsList>
+                            <TabsTrigger value="pending">Pending</TabsTrigger>
+                            <TabsTrigger value="completed">Approved</TabsTrigger>
+                            <TabsTrigger value="rejected">Rejected</TabsTrigger>
+                        </TabsList>
 
-                    <TabsContent value="completed">
-                        {renderTable(false)}
-                    </TabsContent>
+                        <TabsContent value="pending" className="space-y-4">
+                            {renderTable(true)}
+                        </TabsContent>
 
-                    <TabsContent value="rejected">
-                        {renderTable(false)}
-                    </TabsContent>
-                </Tabs>
-            </CardContent>
+                        <TabsContent value="completed">
+                            {renderTable(false)}
+                        </TabsContent>
 
-            {/* Reject Dialog */}
-            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Reject Application</DialogTitle>
-                        <DialogDescription>
-                            Provide a reason for rejecting this application.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <div className="py-4">
-                        <Textarea
-                            placeholder="Reason for rejection..."
-                            value={rejectReason}
-                            onChange={(e) => setRejectReason(e.target.value)}
-                        />
-                    </div>
-                    <DialogFooter>
-                        <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
-                        <Button variant="destructive" onClick={handleReject} disabled={!rejectReason || processingId}>
-                            {processingId ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-                            Confirm Rejection
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
-        </Card>
+                        <TabsContent value="rejected">
+                            {renderTable(false)}
+                        </TabsContent>
+                    </Tabs>
+                </CardContent>
+
+                {/* Reject Dialog */}
+                <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Reject Application</DialogTitle>
+                            <DialogDescription>
+                                Provide a reason for rejecting this application.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="py-4">
+                            <Textarea
+                                placeholder="Reason for rejection..."
+                                value={rejectReason}
+                                onChange={(e) => setRejectReason(e.target.value)}
+                            />
+                        </div>
+                        <DialogFooter>
+                            <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
+                            <Button variant="destructive" onClick={handleReject} disabled={!rejectReason || processingId}>
+                                {processingId ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                                Confirm Rejection
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
+            </Card>
+        </AdminPageLayout>
     );
 };
 

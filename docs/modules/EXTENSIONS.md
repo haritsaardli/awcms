@@ -299,5 +299,5 @@ These APIs use the WordPress-style hooks system internally. Registered blocks wi
 
 ## References
 
-- `../03-features/PUBLIC_PORTAL_ARCHITECTURE.md`
-- `../00-core/CORE_STANDARDS.md`
+- `docs/modules/PUBLIC_PORTAL_ARCHITECTURE.md`
+- `docs/architecture/standards.md`

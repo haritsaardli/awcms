@@ -712,5 +712,5 @@ Any tables created by extensions must:
 
 ## References
 
-- `../03-features/ROLE_HIERARCHY.md`
-- `../00-core/SECURITY.md`
+- `docs/modules/ROLE_HIERARCHY.md`
+- `docs/security/overview.md`

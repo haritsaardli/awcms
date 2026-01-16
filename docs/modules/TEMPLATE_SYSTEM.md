@@ -71,5 +71,5 @@ registerTemplateBlock({
 
 ## References
 
-- `../03-features/VISUAL_BUILDER.md`
-- `../03-features/PUBLIC_PORTAL_ARCHITECTURE.md`
+- `docs/modules/VISUAL_BUILDER.md`
+- `docs/modules/PUBLIC_PORTAL_ARCHITECTURE.md`

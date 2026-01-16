@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { usePermissions } from '@/contexts/PermissionContext';
 import { shadcnHslToHex } from '@/lib/themeUtils';
+import { AdminPageLayout, PageHeader } from '@/templates/flowbite-admin';
 
 const MiniThemePreview = ({ config, isActive }) => {
     const primary = shadcnHslToHex(config?.colors?.primary) || '#3b82f6';
@@ -242,37 +243,35 @@ const ThemesManager = () => {
     );
 
     return (
-        <div className="p-6 max-w-7xl mx-auto space-y-8">
-            {/* Header */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div>
-                    <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
-                        <Palette className="w-8 h-8 text-primary" /> Theme Gallery
-                    </h1>
-                    <p className="text-muted-foreground mt-1">Manage, customize, and activate visual themes for your site.</p>
-                </div>
+        <AdminPageLayout requiredPermission="tenant.setting.read">
+            <PageHeader
+                title="Theme Gallery"
+                description="Manage, customize, and activate visual themes for your site."
+                icon={Palette}
+                breadcrumbs={[{ label: 'Themes', icon: Palette }]}
+                actions={
+                    <div className="flex gap-2 w-full sm:w-auto">
+                        <div className="relative">
+                            <input
+                                type="file"
+                                accept=".json"
+                                className="absolute inset-0 opacity-0 cursor-pointer w-full"
+                                onChange={handleImport}
+                                disabled={!hasPermission('tenant.setting.update')}
+                            />
+                            <Button variant="outline" className="w-full sm:w-auto">
+                                <Upload className="w-4 h-4 mr-2" /> Import
+                            </Button>
+                        </div>
 
-                <div className="flex gap-2 w-full sm:w-auto">
-                    <div className="relative">
-                        <input
-                            type="file"
-                            accept=".json"
-                            className="absolute inset-0 opacity-0 cursor-pointer w-full"
-                            onChange={handleImport}
-                            disabled={!hasPermission('tenant.setting.update')}
-                        />
-                        <Button variant="outline" className="w-full sm:w-auto">
-                            <Upload className="w-4 h-4 mr-2" /> Import
-                        </Button>
+                        {hasPermission('tenant.setting.update') && (
+                            <Button onClick={handleCreate} className="w-full sm:w-auto">
+                                <Plus className="w-4 h-4 mr-2" /> New Theme
+                            </Button>
+                        )}
                     </div>
-
-                    {hasPermission('tenant.setting.update') && (
-                        <Button onClick={handleCreate} className="w-full sm:w-auto">
-                            <Plus className="w-4 h-4 mr-2" /> New Theme
-                        </Button>
-                    )}
-                </div>
-            </div>
+                }
+            />
 
             {/* Search Bar */}
             <div className="relative max-w-md">
@@ -387,7 +386,7 @@ const ThemesManager = () => {
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
-        </div>
+        </AdminPageLayout>
     );
 };
 

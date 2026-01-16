@@ -45,5 +45,5 @@ WHERE tenant_id IS NULL;
 
 ## References
 
-- `../03-features/TEMPLATE_SYSTEM.md`
-- `../00-core/SUPABASE_INTEGRATION.md`
+- `docs/modules/TEMPLATE_SYSTEM.md`
+- `docs/tenancy/supabase.md`

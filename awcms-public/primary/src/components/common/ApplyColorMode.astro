@@ -20,12 +20,30 @@ import { UI } from 'astrowind:config';
     }
   }
 
-  if ((defaultTheme && defaultTheme.endsWith(':only')) || (!localStorage.theme && defaultTheme !== 'system')) {
-    applyTheme(defaultTheme.replace(':only', ''));
-  } else if (
-    localStorage.theme === 'dark' ||
-    (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
-  ) {
+  const STORAGE_KEY = 'awcms_theme';
+  const OLD_KEY = 'theme';
+
+  let currentTheme = localStorage.getItem(STORAGE_KEY);
+  
+  // Migration
+  if (!currentTheme && localStorage.getItem(OLD_KEY)) {
+    currentTheme = localStorage.getItem(OLD_KEY);
+    localStorage.setItem(STORAGE_KEY, currentTheme);
+    localStorage.removeItem(OLD_KEY);
+  }
+
+  // Fallback to config default if nothing stored
+  if (!currentTheme) {
+      // If config forces a theme (ends with :only), respect it
+      if ((defaultTheme && defaultTheme.endsWith(':only')) || defaultTheme !== 'system') {
+        currentTheme = defaultTheme.replace(':only', '');
+      } else {
+        currentTheme = 'system';
+      }
+  }
+
+  // Resolve 'system' to actual preference
+  if (currentTheme === 'dark' || (currentTheme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
     applyTheme('dark');
   } else {
     applyTheme('light');

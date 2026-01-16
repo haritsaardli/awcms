@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
 import GenericContentManager from '@/components/dashboard/GenericContentManager';
-import { Star, MessageSquareQuote, ChevronRight, Home } from 'lucide-react';
+import { Star, MessageSquareQuote } from 'lucide-react';
+import { AdminPageLayout, PageHeader } from '@/templates/flowbite-admin';
 
 function TestimonyManager() {
     const columns = [
@@ -59,19 +59,13 @@ function TestimonyManager() {
     ];
 
     return (
-        <div className="space-y-6">
-            {/* Breadcrumb Navigation */}
-            <nav className="flex items-center text-sm text-muted-foreground">
-                <Link to="/cmspanel" className="hover:text-primary transition-colors flex items-center gap-1">
-                    <Home className="w-4 h-4" />
-                    Dashboard
-                </Link>
-                <ChevronRight className="w-4 h-4 mx-2 text-muted-foreground/50" />
-                <span className="flex items-center gap-1 text-foreground font-medium">
-                    <MessageSquareQuote className="w-4 h-4" />
-                    Testimonies
-                </span>
-            </nav>
+        <AdminPageLayout requiredPermission="testimonies.read">
+            <PageHeader
+                title="Testimonies"
+                description="Manage customer reviews and testimonials."
+                icon={MessageSquareQuote}
+                breadcrumbs={[{ label: 'Testimonies', icon: MessageSquareQuote }]}
+            />
 
             <GenericContentManager
                 tableName="testimonies"
@@ -81,7 +75,7 @@ function TestimonyManager() {
                 permissionPrefix="testimonies"
                 showBreadcrumbs={false}
             />
-        </div>
+        </AdminPageLayout>
     );
 }
 

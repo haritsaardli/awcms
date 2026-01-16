@@ -1,12 +1,13 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Shield, Search, Plus, X, Loader2 } from 'lucide-react';
+import { Shield, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/lib/customSupabaseClient';
 import { usePermissions } from '@/contexts/PermissionContext';
 import { useSearch } from '@/hooks/useSearch';
+import MinCharSearchInput from '@/components/common/MinCharSearchInput';
 import ContentTable from '@/components/dashboard/ContentTable';
 import {
   Dialog,
@@ -16,6 +17,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Label } from '@/components/ui/label';
+import { AdminPageLayout, PageHeader } from '@/templates/flowbite-admin';
 
 function PermissionsManager() {
   const { toast } = useToast();
@@ -38,6 +40,10 @@ function PermissionsManager() {
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [editingPermission, setEditingPermission] = useState(null);
   const [formData, setFormData] = useState({ name: '', description: '', resource: '', action: '' });
+
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   const isSuperAdmin = ['super_admin', 'owner'].includes(userRole);
 
@@ -86,6 +92,19 @@ function PermissionsManager() {
       ));
     }
   }, [debouncedQuery, permissions]);
+
+  // Reset to page 1 on search
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedQuery]);
+
+  // Pagination Logic
+  const totalItems = filteredPermissions.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const paginatedPermissions = filteredPermissions.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   const handleSave = async (e) => {
     e.preventDefault();
@@ -154,51 +173,38 @@ function PermissionsManager() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-3xl font-bold text-foreground">Permissions</h2>
-          <p className="text-muted-foreground">Manage system permissions</p>
-        </div>
-        <Button onClick={() => {
-          setEditingPermission(null);
-          setFormData({ name: '', description: '', resource: '', action: '' });
-          setIsEditorOpen(true);
-        }} className="bg-primary text-primary-foreground hover:bg-primary/90">
-          <Plus className="w-4 h-4 mr-2" /> New Permission
-        </Button>
-      </div>
+    <AdminPageLayout requiredPermission="platform.permissions.read">
+      <PageHeader
+        title="Permissions"
+        description="Manage system permissions"
+        icon={Shield}
+        breadcrumbs={[{ label: 'Permissions', icon: Shield }]}
+        actions={(
+          <Button onClick={() => {
+            setEditingPermission(null);
+            setFormData({ name: '', description: '', resource: '', action: '' });
+            setIsEditorOpen(true);
+          }} className="bg-primary text-primary-foreground hover:bg-primary/90">
+            <Plus className="w-4 h-4 mr-2" /> New Permission
+          </Button>
+        )}
+      />
 
       <div className="bg-card p-4 rounded-xl border border-border shadow-sm">
-        <div className="relative">
-          <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder={`Search permissions... (${minLength}+ chars)`}
-            value={query}
-            onChange={e => setQuery(e.target.value)}
-            className={`pl-9 pr-24 ${!isSearchValid ? 'border-destructive focus:ring-destructive/30' : 'bg-background'}`}
-          />
-          <div className="absolute right-3 top-2.5 flex items-center gap-2">
-            {(loading || searchLoading) && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
-            {query && (
-              <button onClick={clearSearch} className="text-muted-foreground hover:text-foreground">
-                <X className="h-4 w-4" />
-              </button>
-            )}
-            <span className={`text-xs font-mono ${query.length > 0 && query.length < minLength ? 'text-destructive font-bold' : 'text-muted-foreground'}`}>
-              {query.length}/{minLength}
-            </span>
-          </div>
-          {!isSearchValid && (
-            <div className="absolute top-full left-0 mt-1 text-xs text-destructive font-medium animate-in slide-in-from-top-1 px-1">
-              {searchMessage}
-            </div>
-          )}
-        </div>
+        <MinCharSearchInput
+          value={query}
+          onChange={e => setQuery(e.target.value)}
+          onClear={clearSearch}
+          loading={loading || searchLoading}
+          isValid={isSearchValid}
+          message={searchMessage}
+          minLength={minLength}
+          placeholder="Search permissions"
+        />
       </div>
 
       <ContentTable
-        data={filteredPermissions}
+        data={paginatedPermissions}
         columns={columns}
         loading={loading}
         onEdit={(perm) => {
@@ -207,6 +213,17 @@ function PermissionsManager() {
           setIsEditorOpen(true);
         }}
         onDelete={handleDelete}
+        pagination={{
+          currentPage,
+          totalPages,
+          totalItems,
+          itemsPerPage,
+          onPageChange: setCurrentPage,
+          onLimitChange: (limit) => {
+            setItemsPerPage(limit);
+            setCurrentPage(1);
+          }
+        }}
       />
 
       <Dialog open={isEditorOpen} onOpenChange={setIsEditorOpen}>
@@ -239,7 +256,7 @@ function PermissionsManager() {
           </form>
         </DialogContent>
       </Dialog>
-    </div>
+    </AdminPageLayout>
   );
 }
 

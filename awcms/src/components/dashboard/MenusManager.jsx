@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Reorder } from 'framer-motion';
-import { GripVertical, Plus, Save, Trash2, Lock, Edit, ChevronRight, ChevronDown, RefreshCw } from 'lucide-react';
+import { GripVertical, Plus, Save, Trash2, Lock, Edit, ChevronRight, ChevronDown, RefreshCw, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -18,6 +18,7 @@ import {
   DialogFooter,
   DialogDescription,
 } from "@/components/ui/dialog";
+import { AdminPageLayout, PageHeader } from '@/templates/flowbite-admin';
 
 function MenusManager() {
   const { toast } = useToast();
@@ -373,200 +374,205 @@ function MenusManager() {
   if (!canView) return <div className="p-8 text-center text-slate-500">Access Denied</div>;
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h2 className="text-3xl font-bold text-slate-800">Menu Management</h2>
-          <p className="text-slate-600">Drag and drop to reorder navigation items</p>
-        </div>
-        <div className="flex gap-3 w-full sm:w-auto flex-wrap">
-          {canCreate && (
-            <Button onClick={syncFromModules} variant="outline" disabled={syncing} className="border-emerald-300 text-emerald-700 hover:bg-emerald-50 flex-1 sm:flex-none">
-              <RefreshCw className={`w-4 h-4 mr-2 ${syncing ? 'animate-spin' : ''}`} /> Sync Modules
+    <AdminPageLayout requiredPermission="tenant.menu.read">
+      <PageHeader
+        title="Menu Management"
+        description="Drag and drop to reorder navigation items"
+        icon={Menu}
+        breadcrumbs={[{ label: 'Menus', icon: Menu }]}
+        actions={(
+          <div className="flex gap-3 flex-wrap">
+            {canCreate && (
+              <Button onClick={syncFromModules} variant="outline" disabled={syncing} className="border-emerald-300 text-emerald-700 hover:bg-emerald-50">
+                <RefreshCw className={`w-4 h-4 mr-2 ${syncing ? 'animate-spin' : ''}`} /> Sync Modules
+              </Button>
+            )}
+            <Button onClick={saveOrder} variant="outline" className="border-slate-300">
+              <Save className="w-4 h-4 mr-2" /> Save Order
             </Button>
-          )}
-          <Button onClick={saveOrder} variant="outline" className="border-slate-300 flex-1 sm:flex-none">
-            <Save className="w-4 h-4 mr-2" /> Save Order
-          </Button>
-          {canCreate && (
-            <Button onClick={() => handleEdit(null)} className="bg-blue-600 hover:bg-blue-700 flex-1 sm:flex-none">
-              <Plus className="w-4 h-4 mr-2" /> Add Item
-            </Button>
-          )}
-        </div>
-      </div>
-
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 min-h-[300px]">
-        {loading ? (
-          <div className="flex items-center justify-center h-40 text-slate-400">Loading menus...</div>
-        ) : menus.length === 0 ? (
-          <div className="text-center py-12 text-slate-500">No menu items found. Create one to get started.</div>
-        ) : (
-          <Reorder.Group axis="y" values={menus} onReorder={handleReorder} className="space-y-3">
-            {menus.map((menu) => (
-              <MenuReorderItem
-                key={menu.id}
-                menu={menu}
-                canEdit={canEdit}
-                canDelete={canDelete}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
-                onPerms={openPermissions}
-                onChildReorder={(newChildren) => handleChildReorder(menu.id, newChildren)}
-                isPlatformAdmin={isPlatformAdmin}
-              />
-            ))}
-          </Reorder.Group>
+            {canCreate && (
+              <Button onClick={() => handleEdit(null)} className="bg-blue-600 hover:bg-blue-700">
+                <Plus className="w-4 h-4 mr-2" /> Add Item
+              </Button>
+            )}
+          </div>
         )}
-      </div>
+      />
 
-      {/* Edit Menu Dialog */}
-      <Dialog open={isEditing} onOpenChange={setIsEditing}>
-        <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle>{editingMenu ? 'Edit Menu Item' : 'Create Menu Item'}</DialogTitle>
-            <DialogDescription>
-              Configure the details for this navigation link.
-            </DialogDescription>
-          </DialogHeader>
-          <form onSubmit={handleSaveMenu} className="space-y-4 py-4">
-            {/* Module Picker - only show for new items */}
-            {!editingMenu && (
+      <div className="max-w-5xl mx-auto">
+
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 min-h-[300px]">
+          {loading ? (
+            <div className="flex items-center justify-center h-40 text-slate-400">Loading menus...</div>
+          ) : menus.length === 0 ? (
+            <div className="text-center py-12 text-slate-500">No menu items found. Create one to get started.</div>
+          ) : (
+            <Reorder.Group axis="y" values={menus} onReorder={handleReorder} className="space-y-3">
+              {menus.map((menu) => (
+                <MenuReorderItem
+                  key={menu.id}
+                  menu={menu}
+                  canEdit={canEdit}
+                  canDelete={canDelete}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
+                  onPerms={openPermissions}
+                  onChildReorder={(newChildren) => handleChildReorder(menu.id, newChildren)}
+                  isPlatformAdmin={isPlatformAdmin}
+                />
+              ))}
+            </Reorder.Group>
+          )}
+        </div>
+
+        {/* Edit Menu Dialog */}
+        <Dialog open={isEditing} onOpenChange={setIsEditing}>
+          <DialogContent className="sm:max-w-[500px]">
+            <DialogHeader>
+              <DialogTitle>{editingMenu ? 'Edit Menu Item' : 'Create Menu Item'}</DialogTitle>
+              <DialogDescription>
+                Configure the details for this navigation link.
+              </DialogDescription>
+            </DialogHeader>
+            <form onSubmit={handleSaveMenu} className="space-y-4 py-4">
+              {/* Module Picker - only show for new items */}
+              {!editingMenu && (
+                <div className="space-y-2">
+                  <Label>Quick Select (Optional)</Label>
+                  <select
+                    className="flex h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                    value={selectedModule}
+                    onChange={e => handleModuleSelect(e.target.value)}
+                  >
+                    <option value="">-- Select a module or enter custom --</option>
+                    {Object.entries(getModulesByGroup()).map(([group, modules]) => (
+                      <optgroup key={group} label={group}>
+                        {modules.map(mod => (
+                          <option key={mod.key} value={mod.key}>{mod.label} ({mod.url})</option>
+                        ))}
+                      </optgroup>
+                    ))}
+                  </select>
+                </div>
+              )}
+
               <div className="space-y-2">
-                <Label>Quick Select (Optional)</Label>
+                <Label>Link to Page (Optional)</Label>
                 <select
                   className="flex h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-                  value={selectedModule}
-                  onChange={e => handleModuleSelect(e.target.value)}
+                  value={menuFormData.page_id || ''}
+                  onChange={e => handlePageSelect(e.target.value)}
                 >
-                  <option value="">-- Select a module or enter custom --</option>
-                  {Object.entries(getModulesByGroup()).map(([group, modules]) => (
-                    <optgroup key={group} label={group}>
-                      {modules.map(mod => (
-                        <option key={mod.key} value={mod.key}>{mod.label} ({mod.url})</option>
-                      ))}
-                    </optgroup>
+                  <option value="">-- No Page Linked --</option>
+                  {pages.map(p => (
+                    <option key={p.id} value={p.id}>{p.title} ({p.slug})</option>
                   ))}
                 </select>
               </div>
-            )}
-
-            <div className="space-y-2">
-              <Label>Link to Page (Optional)</Label>
-              <select
-                className="flex h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-                value={menuFormData.page_id || ''}
-                onChange={e => handlePageSelect(e.target.value)}
-              >
-                <option value="">-- No Page Linked --</option>
-                {pages.map(p => (
-                  <option key={p.id} value={p.id}>{p.title} ({p.slug})</option>
-                ))}
-              </select>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Label</Label>
+                  <Input
+                    value={menuFormData.label}
+                    onChange={e => setMenuFormData({ ...menuFormData, label: e.target.value })}
+                    placeholder="e.g. About Us"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Internal Name</Label>
+                  <Input
+                    value={menuFormData.name}
+                    onChange={e => setMenuFormData({ ...menuFormData, name: e.target.value })}
+                    placeholder="about_us"
+                  />
+                </div>
+              </div>
               <div className="space-y-2">
-                <Label>Label</Label>
+                <Label>URL Path</Label>
                 <Input
-                  value={menuFormData.label}
-                  onChange={e => setMenuFormData({ ...menuFormData, label: e.target.value })}
-                  placeholder="e.g. About Us"
+                  value={menuFormData.url}
+                  onChange={e => setMenuFormData({ ...menuFormData, url: e.target.value })}
+                  placeholder="e.g. /about or https://google.com"
                   required
                 />
               </div>
               <div className="space-y-2">
-                <Label>Internal Name</Label>
-                <Input
-                  value={menuFormData.name}
-                  onChange={e => setMenuFormData({ ...menuFormData, name: e.target.value })}
-                  placeholder="about_us"
-                />
+                <Label>Parent Menu</Label>
+                <select
+                  className="flex h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                  value={menuFormData.parent_id || ''}
+                  onChange={e => setMenuFormData({ ...menuFormData, parent_id: e.target.value || null })}
+                >
+                  <option value="">No Parent (Top Level)</option>
+                  {flatMenus.filter(m => m.id !== editingMenu?.id && !m.parent_id).map(m => (
+                    <option key={m.id} value={m.id}>{m.label}</option>
+                  ))}
+                </select>
               </div>
-            </div>
-            <div className="space-y-2">
-              <Label>URL Path</Label>
-              <Input
-                value={menuFormData.url}
-                onChange={e => setMenuFormData({ ...menuFormData, url: e.target.value })}
-                placeholder="e.g. /about or https://google.com"
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Parent Menu</Label>
-              <select
-                className="flex h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-                value={menuFormData.parent_id || ''}
-                onChange={e => setMenuFormData({ ...menuFormData, parent_id: e.target.value || null })}
-              >
-                <option value="">No Parent (Top Level)</option>
-                {flatMenus.filter(m => m.id !== editingMenu?.id && !m.parent_id).map(m => (
-                  <option key={m.id} value={m.id}>{m.label}</option>
-                ))}
-              </select>
-            </div>
-            <div className="flex gap-6 pt-2">
-              <label className="flex items-center gap-2 text-sm font-medium cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={menuFormData.is_active === true}
-                  onChange={e => setMenuFormData({ ...menuFormData, is_active: e.target.checked })}
-                  className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-                />
-                Active
-              </label>
-              <label className="flex items-center gap-2 text-sm font-medium cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={menuFormData.is_public === true}
-                  onChange={e => setMenuFormData({ ...menuFormData, is_public: e.target.checked })}
-                  className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-                />
-                Public Default
-              </label>
-            </div>
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setIsEditing(false)}>Cancel</Button>
-              <Button type="submit">Save Changes</Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
-
-      {/* Permissions Dialog */}
-      <Dialog open={isPermEditorOpen} onOpenChange={setIsPermEditorOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Manage Access: {selectedMenuPerms?.label}</DialogTitle>
-            <DialogDescription>
-              Toggle which roles can view this menu item in the public interface.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="py-4 space-y-3 max-h-[300px] overflow-y-auto">
-            {roles.map(role => (
-              <div key={role.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-100">
-                <span className="font-medium text-slate-700">{role.name}</span>
-                <label className="flex items-center gap-2 cursor-pointer">
+              <div className="flex gap-6 pt-2">
+                <label className="flex items-center gap-2 text-sm font-medium cursor-pointer">
                   <input
                     type="checkbox"
-                    checked={menuPermissions[role.id] || false}
-                    onChange={e => setMenuPermissions({
-                      ...menuPermissions,
-                      [role.id]: e.target.checked
-                    })}
-                    className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                    checked={menuFormData.is_active === true}
+                    onChange={e => setMenuFormData({ ...menuFormData, is_active: e.target.checked })}
+                    className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
                   />
-                  <span className="text-xs font-semibold text-slate-500 uppercase">Allow</span>
+                  Active
+                </label>
+                <label className="flex items-center gap-2 text-sm font-medium cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={menuFormData.is_public === true}
+                    onChange={e => setMenuFormData({ ...menuFormData, is_public: e.target.checked })}
+                    className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  Public Default
                 </label>
               </div>
-            ))}
-          </div>
-          <DialogFooter>
-            <Button onClick={savePermissions}>Save Permissions</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </div>
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => setIsEditing(false)}>Cancel</Button>
+                <Button type="submit">Save Changes</Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+
+        {/* Permissions Dialog */}
+        <Dialog open={isPermEditorOpen} onOpenChange={setIsPermEditorOpen}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Manage Access: {selectedMenuPerms?.label}</DialogTitle>
+              <DialogDescription>
+                Toggle which roles can view this menu item in the public interface.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="py-4 space-y-3 max-h-[300px] overflow-y-auto">
+              {roles.map(role => (
+                <div key={role.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-100">
+                  <span className="font-medium text-slate-700">{role.name}</span>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={menuPermissions[role.id] || false}
+                      onChange={e => setMenuPermissions({
+                        ...menuPermissions,
+                        [role.id]: e.target.checked
+                      })}
+                      className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <span className="text-xs font-semibold text-slate-500 uppercase">Allow</span>
+                  </label>
+                </div>
+              ))}
+            </div>
+            <DialogFooter>
+              <Button onClick={savePermissions}>Save Permissions</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
+    </AdminPageLayout>
   );
 }
 

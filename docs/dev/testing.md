@@ -58,5 +58,5 @@ npm run docs:check
 
 ## References
 
-- `../01-guides/CI_CD.md`
-- `../00-core/SOFT_DELETE.md`
+- `docs/dev/ci-cd.md`
+- `docs/architecture/database.md`

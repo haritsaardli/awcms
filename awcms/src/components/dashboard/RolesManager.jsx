@@ -8,7 +8,9 @@ import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/lib/customSupabaseClient';
 import { Button } from '@/components/ui/button';
 import { Plus, Shield, RefreshCw, Trash2, Crown } from 'lucide-react';
-import { Input } from '@/components/ui/input';
+import { AdminPageLayout, PageHeader } from '@/templates/flowbite-admin';
+import { useSearch } from '@/hooks/useSearch';
+import MinCharSearchInput from '@/components/common/MinCharSearchInput';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -30,7 +32,19 @@ function RolesManager() {
   // State declarations
   const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [query, setQuery] = useState('');
+
+  // Search
+  const {
+    query,
+    setQuery,
+    debouncedQuery,
+    isValid: isSearchValid,
+    message: searchMessage,
+    loading: searchLoading,
+    minLength,
+    clearSearch
+  } = useSearch({ context: 'admin' });
+
   const [showEditor, setShowEditor] = useState(false);
   const [selectedRole, setSelectedRole] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -121,10 +135,12 @@ function RolesManager() {
     }
   };
 
-  const filteredRoles = roles.filter(role =>
-    role.name.toLowerCase().includes(query.toLowerCase()) ||
-    role.description?.toLowerCase().includes(query.toLowerCase())
-  );
+  const filteredRoles = roles.filter(role => {
+    if (!debouncedQuery) return true;
+    const lower = debouncedQuery.toLowerCase();
+    return role.name.toLowerCase().includes(lower) ||
+      role.description?.toLowerCase().includes(lower);
+  });
 
   const columns = [
     {
@@ -171,10 +187,27 @@ function RolesManager() {
     });
   }
 
+  // Header actions for PageHeader
+  const headerActions = (
+    <div className="flex gap-2">
+      <Button variant="ghost" onClick={fetchRoles} title="Refresh" className="text-muted-foreground hover:text-foreground">
+        <RefreshCw className="w-4 h-4" />
+      </Button>
+      {canCreate && (
+        <Button onClick={() => { setSelectedRole(null); setShowEditor(true); }} className="bg-primary text-primary-foreground hover:bg-primary/90">
+          <Plus className="w-4 h-4 mr-2" /> New Role
+        </Button>
+      )}
+    </div>
+  );
+
+  // Breadcrumbs for PageHeader
+  const breadcrumbs = [{ label: 'Roles & Permissions', icon: Shield }];
+
   if (!canView) return <div className="p-8 text-center text-slate-500">Access Denied</div>;
 
   return (
-    <div className="space-y-6">
+    <AdminPageLayout requiredPermission="tenant.role.read">
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
@@ -219,46 +252,28 @@ function RolesManager() {
         />
       ) : (
         <>
-          {/* Breadcrumb Navigation */}
-          <nav className="flex items-center text-sm text-muted-foreground">
-            <a href="/cmspanel" className="hover:text-foreground transition-colors flex items-center gap-1">
-              <RefreshCw className="w-4 h-4" /> {/* Fallback icon, really should be Home but sticking to imports */}
-              Dashboard
-            </a>
-            <span className="w-4 h-4 mx-2 text-muted" >/</span>
-            <span className="flex items-center gap-1 text-foreground font-medium">
-              <Shield className="w-4 h-4" />
-              Roles & Permissions
-            </span>
-          </nav>
-
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-card p-6 rounded-xl border border-border shadow-sm">
-            <div>
-              <h2 className="text-3xl font-bold text-foreground flex items-center gap-2">
-                Roles & Permissions
-              </h2>
-              <p className="text-muted-foreground mt-1">Manage access levels and configure granular permissions.</p>
-            </div>
-            <div className="flex gap-2">
-              <Button variant="ghost" onClick={fetchRoles} title="Refresh" className="text-muted-foreground hover:text-foreground">
-                <RefreshCw className="w-4 h-4" />
-              </Button>
-              {canCreate && (
-                <Button onClick={() => { setSelectedRole(null); setShowEditor(true); }} className="bg-primary text-primary-foreground hover:bg-primary/90">
-                  <Plus className="w-4 h-4 mr-2" /> New Role
-                </Button>
-              )}
-            </div>
-          </div>
+          <PageHeader
+            title="Roles & Permissions"
+            description="Manage access levels and configure granular permissions."
+            icon={Shield}
+            breadcrumbs={breadcrumbs}
+            actions={headerActions}
+          />
 
           <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
             <div className="p-4 border-b border-border bg-muted/20">
-              <Input
-                placeholder="Search roles..."
-                value={query}
-                onChange={e => setQuery(e.target.value)}
-                className="max-w-sm bg-background border-input"
-              />
+              <div className="max-w-sm">
+                <MinCharSearchInput
+                  value={query}
+                  onChange={e => setQuery(e.target.value)}
+                  onClear={clearSearch}
+                  loading={loading || searchLoading}
+                  isValid={isSearchValid}
+                  message={searchMessage}
+                  minLength={minLength}
+                  placeholder="Search roles"
+                />
+              </div>
             </div>
 
             <ContentTable
@@ -271,7 +286,7 @@ function RolesManager() {
           </div>
         </>
       )}
-    </div>
+    </AdminPageLayout>
   );
 }
 

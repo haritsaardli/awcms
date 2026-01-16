@@ -65,6 +65,6 @@ Describe how the public portal renders tenant content and enforces security cons
 
 ## References
 
-- `../01-guides/MIGRATION.md`
-- `../00-core/MULTI_TENANCY.md`
+- `docs/modules/TEMPLATE_MIGRATION.md`
+- `docs/tenancy/overview.md`
 - `../../awcms-public/primary/README.md`

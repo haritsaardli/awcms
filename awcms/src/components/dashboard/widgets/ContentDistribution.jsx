@@ -12,13 +12,13 @@ export function ContentDistribution({ data }) {
   ].filter(item => item.value > 0);
 
   return (
-    <Card className="col-span-1 border-slate-200 shadow-sm h-full">
+    <Card className="col-span-1 min-w-0 bg-white/60 backdrop-blur-xl border-white/40 shadow-sm hover:shadow-md transition-shadow">
       <CardHeader>
         <CardTitle>Content Overview</CardTitle>
       </CardHeader>
-      <CardContent className="h-[300px] min-h-[300px] p-6">
+      <CardContent className="p-6">
         {chartData.length > 0 ? (
-          <div className="w-full h-[250px]">
+          <div className="w-full h-[300px] relative">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie

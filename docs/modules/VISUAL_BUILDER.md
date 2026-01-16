@@ -66,5 +66,5 @@ Refer to `ABAC_SYSTEM.md` for key conventions.
 
 ## References
 
-- `../03-features/TEMPLATE_SYSTEM.md`
-- `../03-features/PUBLIC_PORTAL_ARCHITECTURE.md`
+- `docs/modules/TEMPLATE_SYSTEM.md`
+- `docs/modules/PUBLIC_PORTAL_ARCHITECTURE.md`

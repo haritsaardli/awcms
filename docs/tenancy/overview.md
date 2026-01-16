@@ -83,6 +83,6 @@ const { data } = await supabase
 
 ## References
 
-- `../00-core/SUPABASE_INTEGRATION.md`
+- `docs/tenancy/supabase.md`
 - `../02-reference/RLS_POLICIES.md`
-- `../03-features/ABAC_SYSTEM.md`
+- `docs/security/abac.md`

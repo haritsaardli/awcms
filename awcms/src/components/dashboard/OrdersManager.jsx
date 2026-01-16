@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
 import GenericContentManager from '@/components/dashboard/GenericContentManager';
-import { User, ShoppingCart, ChevronRight, Home } from 'lucide-react';
+import { User, ShoppingCart } from 'lucide-react';
+import { AdminPageLayout, PageHeader } from '@/templates/flowbite-admin';
 
 function OrdersManager() {
     const columns = [
@@ -134,19 +134,13 @@ function OrdersManager() {
     ];
 
     return (
-        <div className="space-y-6">
-            {/* Breadcrumb Navigation */}
-            <nav className="flex items-center text-sm text-muted-foreground">
-                <Link to="/cmspanel" className="hover:text-primary transition-colors flex items-center gap-1">
-                    <Home className="w-4 h-4" />
-                    Dashboard
-                </Link>
-                <ChevronRight className="w-4 h-4 mx-2 text-muted-foreground/50" />
-                <span className="flex items-center gap-1 text-foreground font-medium">
-                    <ShoppingCart className="w-4 h-4" />
-                    Orders
-                </span>
-            </nav>
+        <AdminPageLayout requiredPermission="orders.read">
+            <PageHeader
+                title="Orders"
+                description="Manage customer orders and transactions."
+                icon={ShoppingCart}
+                breadcrumbs={[{ label: 'Orders', icon: ShoppingCart }]}
+            />
 
             <GenericContentManager
                 tableName="orders"
@@ -158,7 +152,7 @@ function OrdersManager() {
                 customSelect="*, user:users(id, email, full_name), owner:users!created_by(email, full_name), tenant:tenants(name)"
                 showBreadcrumbs={false}
             />
-        </div>
+        </AdminPageLayout>
     );
 }
 

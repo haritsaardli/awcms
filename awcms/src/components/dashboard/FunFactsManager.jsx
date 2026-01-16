@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
 import GenericContentManager from '@/components/dashboard/GenericContentManager';
-import { Trophy, ChevronRight, Home } from 'lucide-react';
+import { Trophy } from 'lucide-react';
+import { AdminPageLayout, PageHeader } from '@/templates/flowbite-admin';
 
 function FunFactsManager() {
     const columns = [
@@ -46,18 +46,13 @@ function FunFactsManager() {
     ];
 
     return (
-        <div className="space-y-6">
-            <nav className="flex items-center text-sm text-muted-foreground">
-                <Link to="/cmspanel" className="hover:text-primary transition-colors flex items-center gap-1">
-                    <Home className="w-4 h-4" />
-                    Dashboard
-                </Link>
-                <ChevronRight className="w-4 h-4 mx-2 text-muted-foreground/50" />
-                <span className="flex items-center gap-1 text-foreground font-medium">
-                    <Trophy className="w-4 h-4" />
-                    Fun Facts
-                </span>
-            </nav>
+        <AdminPageLayout requiredPermission="funfacts.read">
+            <PageHeader
+                title="Fun Facts"
+                description="Manage statistics and key numbers displayed on your site."
+                icon={Trophy}
+                breadcrumbs={[{ label: 'Fun Facts', icon: Trophy }]}
+            />
 
             <GenericContentManager
                 tableName="funfacts"
@@ -68,7 +63,7 @@ function FunFactsManager() {
                 showBreadcrumbs={false}
                 defaultSortColumn="order"
             />
-        </div>
+        </AdminPageLayout>
     );
 }
 

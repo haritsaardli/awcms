@@ -9,8 +9,9 @@ import { useToast } from '@/components/ui/use-toast';
 import { udm } from '@/lib/data/UnifiedDataManager';
 import { supabase } from '@/lib/customSupabaseClient';
 import { Button } from '@/components/ui/button';
-import { Plus, Search, RefreshCw, User, ShieldAlert, Trash2, Crown } from 'lucide-react';
-import { Input } from '@/components/ui/input';
+import { Plus, RefreshCw, User, ShieldAlert, Trash2, Crown } from 'lucide-react';
+import { useSearch } from '@/hooks/useSearch';
+import MinCharSearchInput from '@/components/common/MinCharSearchInput';
 import { useTenant } from '@/contexts/TenantContext';
 import {
   AlertDialog,
@@ -35,7 +36,19 @@ function UsersManager() {
   // State declarations
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [query, setQuery] = useState('');
+
+  // Search
+  const {
+    query,
+    setQuery,
+    debouncedQuery,
+    isValid: isSearchValid,
+    message: searchMessage,
+    loading: searchLoading,
+    minLength,
+    clearSearch
+  } = useSearch({ context: 'admin' });
+
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [totalItems, setTotalItems] = useState(0);
@@ -86,8 +99,8 @@ function UsersManager() {
         q = q.eq('tenant_id', currentTenant.id);
       }
 
-      if (query) {
-        q = q.ilike('email', `%${query}%`);
+      if (debouncedQuery) {
+        q = q.ilike('email', `%${debouncedQuery}%`);
       }
 
       const from = (currentPage - 1) * itemsPerPage;
@@ -106,7 +119,7 @@ function UsersManager() {
     } finally {
       setLoading(false);
     }
-  }, [canView, isPlatformAdmin, currentTenant, query, currentPage, itemsPerPage, toast]);
+  }, [canView, isPlatformAdmin, currentTenant, debouncedQuery, currentPage, itemsPerPage, toast]);
 
   useEffect(() => {
     if (activeTab === 'users') {
@@ -259,13 +272,16 @@ function UsersManager() {
         <TabsContent value="users" className="space-y-6 mt-0">
           {/* Search Bar */}
           <div className="bg-card p-4 rounded-xl border border-border shadow-sm flex items-center gap-2">
-            <div className="relative flex-1 max-w-sm">
-              <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search users..."
+            <div className="flex-1 max-w-sm">
+              <MinCharSearchInput
                 value={query}
                 onChange={e => setQuery(e.target.value)}
-                className="pl-9 bg-background"
+                onClear={clearSearch}
+                loading={loading || searchLoading}
+                isValid={isSearchValid}
+                message={searchMessage}
+                minLength={minLength}
+                placeholder="Search users by email"
               />
             </div>
             <div className="flex-1"></div>

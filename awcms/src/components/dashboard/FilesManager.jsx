@@ -1,8 +1,7 @@
 
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Link } from 'react-router-dom';
-import { ChevronRight, UploadCloud, Trash2, RefreshCw, FolderClosed } from 'lucide-react';
+import { UploadCloud, Trash2, RefreshCw, FolderClosed, Image } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import MediaLibrary from './media/MediaLibrary';
@@ -10,6 +9,7 @@ import { FileUploader } from './media/FileUploader';
 import { FileStats } from './media/FileStats';
 import { useToast } from '@/components/ui/use-toast';
 import { useMedia } from '@/hooks/useMedia';
+import { AdminPageLayout, PageHeader } from '@/templates/flowbite-admin';
 
 function FilesManager() {
   const [isUploadOpen, setIsUploadOpen] = useState(false);
@@ -42,119 +42,99 @@ function FilesManager() {
     if (success) setRefreshTrigger(prev => prev + 1);
   };
 
+  const breadcrumbs = [
+    { label: 'Media Library', icon: Image, href: showTrash ? '/cmspanel/files' : undefined },
+    ...(showTrash ? [{ label: 'Trash Bin', icon: Trash2 }] : [])
+  ];
+
+  const headerActions = (
+    <div className="flex items-center gap-3">
+      {!showTrash && (
+        <Button
+          variant="outline"
+          onClick={handleSync}
+          disabled={syncing}
+          title="Sync files from Storage Bucket if missing in DB"
+        >
+          <RefreshCw className={`w-4 h-4 mr-2 ${syncing ? 'animate-spin' : ''}`} />
+          {syncing ? 'Syncing...' : 'Sync Storage'}
+        </Button>
+      )}
+
+      <Button
+        variant={showTrash ? "outline" : "outline"}
+        onClick={() => setShowTrash(!showTrash)}
+        className={`transition-colors border-border ${showTrash ? 'bg-muted text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+      >
+        {showTrash ? (
+          <>
+            <FolderClosed className="w-4 h-4 mr-2" />
+            Back to Library
+          </>
+        ) : (
+          <>
+            <Trash2 className="w-4 h-4 mr-2 text-destructive" />
+            Trash Bin
+          </>
+        )}
+      </Button>
+
+      {!showTrash && (
+        <Dialog open={isUploadOpen} onOpenChange={setIsUploadOpen}>
+          <DialogTrigger asChild>
+            <Button className="shadow-sm">
+              <UploadCloud className="w-4 h-4 mr-2" />
+              Upload Files
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-xl">
+            <DialogHeader>
+              <DialogTitle>Upload Files</DialogTitle>
+              <DialogDescription>
+                Drag and drop files here to upload directly to your media library. Supported formats: JPG, PNG, WEBP, PDF.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="mt-4">
+              <FileUploader onUpload={handleUpload} uploading={uploading} />
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+    </div>
+  );
+
   return (
-    <div className="flex flex-col space-y-6 pb-8">
+    <AdminPageLayout>
       <Helmet>
         <title>{showTrash ? 'Trash - Media Library' : 'Media Library - CMS'}</title>
       </Helmet>
 
-      {/* Header Section */}
-      <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0 flex-shrink-0">
-        <div className="flex flex-col space-y-1">
-          <nav className="flex items-center text-sm mb-3">
-            <Link to="/cmspanel" className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors font-medium">
-              <FolderClosed className="w-4 h-4" />
-              Dashboard
-            </Link>
-            <ChevronRight className="w-4 h-4 mx-2 text-muted" />
-            <span
-              className={`flex items-center gap-1.5 font-semibold ${showTrash ? 'text-muted-foreground hover:text-foreground cursor-pointer transition-colors' : 'text-primary'}`}
-              onClick={() => setShowTrash(false)}
-            >
-              <UploadCloud className="w-4 h-4" />
-              Media Library
-            </span>
-            {showTrash && (
-              <>
-                <ChevronRight className="w-4 h-4 mx-2 text-muted" />
-                <span className="flex items-center gap-1.5 font-semibold text-destructive">
-                  <Trash2 className="w-4 h-4" />
-                  Trash
-                </span>
-              </>
-            )}
-          </nav>
+      <PageHeader
+        title={showTrash ? 'Trash Bin' : 'Media Library'}
+        description={showTrash
+          ? 'Manage deleted files. You can restore them when needed.'
+          : 'Manage and organize all your digital assets, images, and documents.'}
+        breadcrumbs={breadcrumbs}
+        actions={headerActions}
+      />
 
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">
-            {showTrash ? 'Trash Bin' : 'Media Library'}
-          </h1>
-          <p className="text-muted-foreground">
-            {showTrash
-              ? 'Manage deleted files. You can restore them when needed.'
-              : 'Manage and organize all your digital assets, images, and documents.'}
-          </p>
-        </div>
+      <div className="flex flex-col space-y-6">
+        {/* Stats Cards (Only show in main view) */}
+        {!showTrash && (
+          <div className="flex-shrink-0">
+            <FileStats stats={stats} loading={statsLoading} />
+          </div>
+        )}
 
-        <div className="flex items-center gap-3">
-          {!showTrash && (
-            <Button
-              variant="outline"
-              onClick={handleSync}
-              disabled={syncing}
-              title="Sync files from Storage Bucket if missing in DB"
-            >
-              <RefreshCw className={`w-4 h-4 mr-2 ${syncing ? 'animate-spin' : ''}`} />
-              {syncing ? 'Syncing...' : 'Sync Storage'}
-            </Button>
-          )}
-
-          <Button
-            variant={showTrash ? "outline" : "outline"}
-            onClick={() => setShowTrash(!showTrash)}
-            className={`transition-colors border-border ${showTrash ? 'bg-muted text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
-          >
-            {showTrash ? (
-              <>
-                <FolderClosed className="w-4 h-4 mr-2" />
-                Back to Library
-              </>
-            ) : (
-              <>
-                <Trash2 className="w-4 h-4 mr-2 text-destructive" />
-                Trash Bin
-              </>
-            )}
-          </Button>
-
-          {!showTrash && (
-            <Dialog open={isUploadOpen} onOpenChange={setIsUploadOpen}>
-              <DialogTrigger asChild>
-                <Button className="shadow-sm">
-                  <UploadCloud className="w-4 h-4 mr-2" />
-                  Upload Files
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-xl">
-                <DialogHeader>
-                  <DialogTitle>Upload Files</DialogTitle>
-                  <DialogDescription>
-                    Drag and drop files here to upload directly to your media library. Supported formats: JPG, PNG, WEBP, PDF.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="mt-4">
-                  <FileUploader onUpload={handleUpload} uploading={uploading} />
-                </div>
-              </DialogContent>
-            </Dialog>
-          )}
+        {/* Main Content Area */}
+        <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
+          <MediaLibrary
+            refreshTrigger={refreshTrigger}
+            isTrashView={showTrash}
+          />
         </div>
       </div>
-
-      {/* Stats Cards (Only show in main view) */}
-      {!showTrash && (
-        <div className="flex-shrink-0">
-          <FileStats stats={stats} loading={statsLoading} />
-        </div>
-      )}
-
-      {/* Main Content Area */}
-      <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
-        <MediaLibrary
-          refreshTrigger={refreshTrigger}
-          isTrashView={showTrash}
-        />
-      </div>
-    </div>
+    </AdminPageLayout>
   );
 }
 

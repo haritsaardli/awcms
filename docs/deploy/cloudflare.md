@@ -59,5 +59,5 @@ Environment variables:
 
 ## References
 
-- `../01-guides/DEPLOYMENT.md`
-- `../00-core/MULTI_TENANCY.md`
+- `docs/deploy/overview.md`
+- `docs/tenancy/overview.md`

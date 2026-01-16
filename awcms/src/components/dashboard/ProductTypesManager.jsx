@@ -2,6 +2,7 @@
 import React from 'react';
 import GenericContentManager from '@/components/dashboard/GenericContentManager';
 import { Layers } from 'lucide-react';
+import { AdminPageLayout, PageHeader } from '@/templates/flowbite-admin';
 
 function ProductTypesManager() {
   const columns = [
@@ -64,13 +65,23 @@ function ProductTypesManager() {
   ];
 
   return (
-    <GenericContentManager
-      tableName="product_types"
-      resourceName="Product Type"
-      columns={columns}
-      formFields={formFields}
-      permissionPrefix="product_types"
-    />
+    <AdminPageLayout requiredPermission="product_types.read">
+      <PageHeader
+        title="Product Types"
+        description="Define product categories and classification types."
+        icon={Layers}
+        breadcrumbs={[{ label: 'Product Types', icon: Layers }]}
+      />
+
+      <GenericContentManager
+        tableName="product_types"
+        resourceName="Product Type"
+        columns={columns}
+        formFields={formFields}
+        permissionPrefix="product_types"
+        showBreadcrumbs={false}
+      />
+    </AdminPageLayout>
   );
 }
 

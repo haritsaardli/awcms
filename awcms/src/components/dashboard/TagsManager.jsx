@@ -1,15 +1,17 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Tag, Trash2, Search, Filter, RefreshCw, Edit, Plus, RotateCcw, CheckCircle, AlertCircle, SortAsc, SortDesc, X, Loader2 } from 'lucide-react';
+import { Tag, Trash2, Filter, RefreshCw, Edit, Plus, RotateCcw, CheckCircle, AlertCircle, SortAsc, SortDesc } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import MinCharSearchInput from '@/components/common/MinCharSearchInput';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/lib/customSupabaseClient';
 import { usePermissions } from '@/contexts/PermissionContext';
 import { useTenant } from '@/contexts/TenantContext';
 import { useSearch } from '@/hooks/useSearch';
 import { Pagination } from '@/components/ui/pagination';
+import { AdminPageLayout, PageHeader } from '@/templates/flowbite-admin';
 import {
     Dialog,
     DialogContent,
@@ -389,60 +391,56 @@ function TagsManager() {
         currentPage * itemsPerPage
     );
 
-    return (
-        <div className="space-y-6">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-card p-6 rounded-xl border border-border shadow-sm">
-                <div>
-                    <h2 className="text-3xl font-bold text-foreground flex items-center gap-2">
-                        Tags Manager {showTrash && <span className="text-destructive text-lg font-normal bg-destructive/10 px-2 rounded">(Trash)</span>}
-                    </h2>
-                    <p className="text-muted-foreground mt-1">Manage content tags, colors, and view usage statistics across the system.</p>
-                </div>
-                <div className="flex flex-wrap gap-3">
-                    {(canSoftDelete || showTrash) && (
-                        <Button
-                            variant={showTrash ? "destructive" : "outline"}
-                            onClick={() => { setShowTrash(!showTrash); setCurrentPage(1); }}
-                            className={showTrash ? "bg-destructive hover:bg-destructive/90 text-destructive-foreground" : "text-muted-foreground hover:text-foreground"}
-                        >
-                            {showTrash ? "View Active Tags" : "Trash / Deleted"}
-                            <Trash2 className="w-4 h-4 ml-2" />
-                        </Button>
-                    )}
+    // Breadcrumbs for PageHeader
+    const breadcrumbs = [
+        { label: 'Tags', icon: Tag },
+        ...(showTrash ? [{ label: 'Trash', icon: Trash2 }] : []),
+    ];
 
-                    {!showTrash && canCreate && (
-                        <Button onClick={() => openModal(null)} className="bg-primary text-primary-foreground hover:bg-primary/90">
-                            <Plus className="w-4 h-4 mr-2" /> Create Tag
-                        </Button>
-                    )}
-                </div>
-            </div>
+    // Header actions for PageHeader
+    const headerActions = (
+        <div className="flex flex-wrap gap-3">
+            {(canSoftDelete || showTrash) && (
+                <Button
+                    variant={showTrash ? "destructive" : "outline"}
+                    onClick={() => { setShowTrash(!showTrash); setCurrentPage(1); }}
+                    className={showTrash ? "bg-destructive hover:bg-destructive/90 text-destructive-foreground" : "text-muted-foreground hover:text-foreground"}
+                >
+                    {showTrash ? "View Active Tags" : "Trash / Deleted"}
+                    <Trash2 className="w-4 h-4 ml-2" />
+                </Button>
+            )}
+
+            {!showTrash && canCreate && (
+                <Button onClick={() => openModal(null)} className="bg-primary text-primary-foreground hover:bg-primary/90">
+                    <Plus className="w-4 h-4 mr-2" /> Create Tag
+                </Button>
+            )}
+        </div>
+    );
+
+    return (
+        <AdminPageLayout requiredPermission="tenant.tag.read">
+            <PageHeader
+                title={showTrash ? 'Tags - Trash' : 'Tags Manager'}
+                description="Manage content tags, colors, and view usage statistics across the system."
+                icon={Tag}
+                breadcrumbs={breadcrumbs}
+                actions={headerActions}
+            />
 
             <div className="flex flex-col lg:flex-row gap-4 bg-card p-4 rounded-xl border border-border shadow-sm">
-                <div className="relative flex-1">
-                    <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input
-                        placeholder={`Search tags... (${minLength}+ chars)`}
+                <div className="flex-1 max-w-sm">
+                    <MinCharSearchInput
                         value={query}
                         onChange={e => { setQuery(e.target.value); setCurrentPage(1); }}
-                        className={`pl-9 pr-24 bg-background ${!isSearchValid ? 'border-destructive focus:ring-destructive' : ''}`}
+                        onClear={() => { clearSearch(); setCurrentPage(1); }}
+                        loading={loading || searchLoading}
+                        isValid={isSearchValid}
+                        message={searchMessage}
+                        minLength={minLength}
+                        placeholder="Search tags... (5+ chars)"
                     />
-                    <div className="absolute right-3 top-2.5 flex items-center gap-2">
-                        {(loading || searchLoading) && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
-                        {query && (
-                            <button onClick={() => { clearSearch(); setCurrentPage(1); }} className="text-muted-foreground hover:text-foreground">
-                                <X className="h-4 w-4" />
-                            </button>
-                        )}
-                        <span className={`text-xs font-mono ${query.length > 0 && query.length < minLength ? 'text-destructive font-bold' : 'text-muted-foreground'}`}>
-                            {query.length}/{minLength}
-                        </span>
-                    </div>
-                    {!isSearchValid && (
-                        <div className="absolute top-full left-0 mt-1 text-xs text-destructive font-medium animate-in slide-in-from-top-1 px-1">
-                            {searchMessage}
-                        </div>
-                    )}
                 </div>
 
                 {!showTrash && (
@@ -728,7 +726,7 @@ function TagsManager() {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
-        </div>
+        </AdminPageLayout>
     );
 }
 

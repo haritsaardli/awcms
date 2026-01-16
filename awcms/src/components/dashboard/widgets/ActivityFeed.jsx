@@ -6,7 +6,7 @@ import { formatDistanceToNow } from 'date-fns';
 
 export function ActivityFeed({ activities }) {
   return (
-    <Card className="h-full border-slate-200 shadow-sm">
+    <Card className="bg-white/60 backdrop-blur-xl border-white/40 shadow-sm hover:shadow-md transition-shadow">
       <CardHeader>
         <CardTitle>Recent Activity</CardTitle>
       </CardHeader>

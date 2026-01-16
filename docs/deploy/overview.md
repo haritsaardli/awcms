@@ -78,5 +78,5 @@ source .env && pio run -t uploadfs && pio run -t upload
 
 ## References
 
-- `../01-guides/CLOUDFLARE_DEPLOYMENT.md`
-- `../00-core/SUPABASE_INTEGRATION.md`
+- `docs/deploy/cloudflare.md`
+- `docs/tenancy/supabase.md`

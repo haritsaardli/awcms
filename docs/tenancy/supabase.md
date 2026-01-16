@@ -110,4 +110,4 @@ This repository currently contains both `supabase/` (root) and `awcms/supabase/`
 
 - `../02-reference/API_DOCUMENTATION.md`
 - `../02-reference/RLS_POLICIES.md`
-- `../00-core/MULTI_TENANCY.md`
+- `docs/tenancy/overview.md`

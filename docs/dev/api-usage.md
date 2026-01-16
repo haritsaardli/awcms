@@ -81,6 +81,6 @@ const { data, error } = await supabase.functions.invoke('manage-users', {
 
 ## References
 
-- `../00-core/SUPABASE_INTEGRATION.md`
+- `docs/tenancy/supabase.md`
 - `../02-reference/RLS_POLICIES.md`
-- `../00-core/SOFT_DELETE.md`
+- `docs/architecture/database.md`

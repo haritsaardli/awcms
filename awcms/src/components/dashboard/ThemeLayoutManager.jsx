@@ -5,6 +5,7 @@ import { Layout, Globe, FileType, AlertTriangle, PanelTop, PanelBottom, Pencil }
 import GenericContentManager from './GenericContentManager';
 import VisualPageBuilder from '@/components/visual-builder/VisualPageBuilder';
 import { Button } from '@/components/ui/button';
+import { AdminPageLayout, PageHeader } from '@/templates/flowbite-admin';
 
 /**
  * ThemeLayoutManager
@@ -121,36 +122,45 @@ const ThemeLayoutManager = () => {
     }
 
     return (
-        <Tabs defaultValue="homepage" className="w-full">
-            <TabsList className="grid grid-cols-3 lg:grid-cols-6 mb-6 h-auto">
-                <TabsTrigger value="homepage" className="flex flex-col gap-1 py-3"><Globe className="w-4 h-4" /> Homepage</TabsTrigger>
-                <TabsTrigger value="header" className="flex flex-col gap-1 py-3"><PanelTop className="w-4 h-4" /> Header</TabsTrigger>
-                <TabsTrigger value="footer" className="flex flex-col gap-1 py-3"><PanelBottom className="w-4 h-4" /> Footer</TabsTrigger>
-                <TabsTrigger value="single" className="flex flex-col gap-1 py-3"><FileType className="w-4 h-4" /> Singles</TabsTrigger>
-                <TabsTrigger value="404" className="flex flex-col gap-1 py-3"><AlertTriangle className="w-4 h-4" /> 404 Ops</TabsTrigger>
-                <TabsTrigger value="archive" className="flex flex-col gap-1 py-3"><Layout className="w-4 h-4" /> Archive</TabsTrigger>
-            </TabsList>
+        <AdminPageLayout requiredPermission="visual_pages.read">
+            <PageHeader
+                title="Theme Layouts"
+                description="Manage system templates for homepage, header, footer, and more."
+                icon={Layout}
+                breadcrumbs={[{ label: 'Theme Layouts', icon: Layout }]}
+            />
 
-            <TabsContent value="homepage">{renderManager('homepage', <Globe className="w-5 h-5" />, 'Homepage')}</TabsContent>
-            <TabsContent value="header">{renderManager('header', <PanelTop className="w-5 h-5" />, 'Global Header')}</TabsContent>
-            <TabsContent value="footer">{renderManager('footer', <PanelBottom className="w-5 h-5" />, 'Global Footer')}</TabsContent>
+            <Tabs defaultValue="homepage" className="w-full">
+                <TabsList className="grid grid-cols-3 lg:grid-cols-6 mb-6 h-auto">
+                    <TabsTrigger value="homepage" className="flex flex-col gap-1 py-3"><Globe className="w-4 h-4" /> Homepage</TabsTrigger>
+                    <TabsTrigger value="header" className="flex flex-col gap-1 py-3"><PanelTop className="w-4 h-4" /> Header</TabsTrigger>
+                    <TabsTrigger value="footer" className="flex flex-col gap-1 py-3"><PanelBottom className="w-4 h-4" /> Footer</TabsTrigger>
+                    <TabsTrigger value="single" className="flex flex-col gap-1 py-3"><FileType className="w-4 h-4" /> Singles</TabsTrigger>
+                    <TabsTrigger value="404" className="flex flex-col gap-1 py-3"><AlertTriangle className="w-4 h-4" /> 404 Ops</TabsTrigger>
+                    <TabsTrigger value="archive" className="flex flex-col gap-1 py-3"><Layout className="w-4 h-4" /> Archive</TabsTrigger>
+                </TabsList>
 
-            <TabsContent value="single">
-                <div className="grid gap-8">
-                    <div>
-                        <h3 className="text-lg font-semibold mb-3 flex items-center gap-2"><FileType className="w-5 h-5" /> Single Page Template</h3>
-                        {renderManager('single_page', null, 'Single Page Template')}
+                <TabsContent value="homepage">{renderManager('homepage', <Globe className="w-5 h-5" />, 'Homepage')}</TabsContent>
+                <TabsContent value="header">{renderManager('header', <PanelTop className="w-5 h-5" />, 'Global Header')}</TabsContent>
+                <TabsContent value="footer">{renderManager('footer', <PanelBottom className="w-5 h-5" />, 'Global Footer')}</TabsContent>
+
+                <TabsContent value="single">
+                    <div className="grid gap-8">
+                        <div>
+                            <h3 className="text-lg font-semibold mb-3 flex items-center gap-2"><FileType className="w-5 h-5" /> Single Page Template</h3>
+                            {renderManager('single_page', null, 'Single Page Template')}
+                        </div>
+                        <div className="border-t pt-6">
+                            <h3 className="text-lg font-semibold mb-3 flex items-center gap-2"><FileType className="w-5 h-5" /> Single Post Template</h3>
+                            {renderManager('single_post', null, 'Single Post Template')}
+                        </div>
                     </div>
-                    <div className="border-t pt-6">
-                        <h3 className="text-lg font-semibold mb-3 flex items-center gap-2"><FileType className="w-5 h-5" /> Single Post Template</h3>
-                        {renderManager('single_post', null, 'Single Post Template')}
-                    </div>
-                </div>
-            </TabsContent>
+                </TabsContent>
 
-            <TabsContent value="404">{renderManager('404', <AlertTriangle className="w-5 h-5" />, '404 Page')}</TabsContent>
-            <TabsContent value="archive">{renderManager('archive', <Layout className="w-5 h-5" />, 'Archive Template')}</TabsContent>
-        </Tabs>
+                <TabsContent value="404">{renderManager('404', <AlertTriangle className="w-5 h-5" />, '404 Page')}</TabsContent>
+                <TabsContent value="archive">{renderManager('archive', <Layout className="w-5 h-5" />, 'Archive Template')}</TabsContent>
+            </Tabs>
+        </AdminPageLayout>
     );
 };
 

@@ -2,10 +2,9 @@
 import React, { useState, useEffect } from 'react';
 import { Reorder, AnimatePresence } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
-import { Link } from 'react-router-dom';
 import {
     GripVertical, Eye, EyeOff, Edit2, Save, RefreshCw,
-    ChevronRight, Search, Settings2, ShieldAlert, X, Loader2, FolderOpen, Puzzle, Plus
+    Settings2, ShieldAlert, FolderOpen, Puzzle, Plus
 } from 'lucide-react';
 import { useAdminMenu } from '@/hooks/useAdminMenu';
 import { supabase } from '@/lib/customSupabaseClient';
@@ -14,6 +13,7 @@ import { useSearch } from '@/hooks/useSearch';
 import { getIconComponent } from '@/lib/adminIcons';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import MinCharSearchInput from '@/components/common/MinCharSearchInput';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/components/ui/use-toast';
@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { AdminPageLayout, PageHeader } from '@/templates/flowbite-admin';
 
 function SidebarMenuManager() {
     const { menuItems, loading, updateMenuOrder, toggleVisibility, updateMenuItem, updateGroup, fetchMenu } = useAdminMenu();
@@ -291,411 +292,397 @@ function SidebarMenuManager() {
     }
 
     return (
-        <div className="flex flex-col space-y-6 max-w-5xl mx-auto pb-10">
+        <AdminPageLayout requiredPermission="platform.sidebar.read">
             <Helmet>
                 <title>Sidebar Manager - CMS</title>
             </Helmet>
 
-            {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <nav className="flex items-center text-sm text-muted-foreground mb-2">
-                        <Link to="/cmspanel" className="hover:text-primary transition-colors">Dashboard</Link>
-                        <ChevronRight className="w-4 h-4 mx-2 text-muted-foreground/50" />
-                        <span className="font-medium text-foreground">Sidebar Manager</span>
-                    </nav>
-                    <h1 className="text-2xl font-bold text-foreground">Sidebar Navigation</h1>
-                    <p className="text-muted-foreground">Customize the admin sidebar menu order, grouping, and visibility.</p>
-                </div>
-
-                <div className="flex items-center gap-3">
-                    <Button variant="outline" onClick={() => fetchMenu()} disabled={loading}>
-                        <RefreshCw className={`w - 4 h - 4 mr - 2 ${loading ? 'animate-spin' : ''} `} />
-                        Refresh
-                    </Button>
-                    {hasChanges && (
-                        <Button onClick={handleSaveOrder} disabled={isSaving}>
-                            <Save className="w-4 h-4 mr-2" />
-                            {isSaving ? 'Saving...' : 'Save Order'}
+            <PageHeader
+                title="Sidebar Navigation"
+                description="Customize the admin sidebar menu order, grouping, and visibility."
+                icon={Settings2}
+                breadcrumbs={[{ label: 'Sidebar Manager', icon: Settings2 }]}
+                actions={(
+                    <div className="flex items-center gap-3">
+                        <Button variant="outline" onClick={() => fetchMenu()} disabled={loading}>
+                            <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+                            Refresh
                         </Button>
-                    )}
-                </div>
-            </div>
+                        {hasChanges && (
+                            <Button onClick={handleSaveOrder} disabled={isSaving}>
+                                <Save className="w-4 h-4 mr-2" />
+                                {isSaving ? 'Saving...' : 'Save Order'}
+                            </Button>
+                        )}
+                    </div>
+                )}
+            />
 
-            {/* Main Content */}
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                <div className="flex justify-between items-center mb-4">
-                    <TabsList>
-                        <TabsTrigger value="items">Menu Items</TabsTrigger>
-                        <TabsTrigger value="groups">Groups</TabsTrigger>
-                    </TabsList>
-                </div>
+            <div className="max-w-5xl mx-auto">
 
-                <TabsContent value="items" className="space-y-4">
-                    <div className="bg-card rounded-xl border border-border shadow-sm flex flex-col min-h-[500px]">
-                        <div className="p-4 border-b border-border flex items-center justify-between bg-muted/30">
-                            <div className="relative w-full max-w-sm">
-                                <Search className="absolute left-3 top-2.5 w-4 h-4 text-muted-foreground" />
-                                <Input
-                                    placeholder={`Search menu or group... (${minLength} + chars)`}
-                                    value={query}
-                                    onChange={e => setQuery(e.target.value)}
-                                    className={`pl - 9 pr - 24 bg - background ${!isSearchValid ? 'border-destructive focus:ring-destructive/30' : ''} `}
-                                />
-                                <div className="absolute right-3 top-2.5 flex items-center gap-2">
-                                    {(loading || searchLoading) && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
-                                    {query && (
-                                        <button onClick={clearSearch} className="text-muted-foreground hover:text-foreground">
-                                            <X className="h-4 w-4" />
-                                        </button>
-                                    )}
-                                    <span className={`text - xs font - mono ${query.length > 0 && query.length < minLength ? 'text-destructive font-bold' : 'text-muted-foreground'} `}>
-                                        {query.length}/{minLength}
-                                    </span>
+                {/* Main Content */}
+                <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                    <div className="flex justify-between items-center mb-4">
+                        <TabsList>
+                            <TabsTrigger value="items">Menu Items</TabsTrigger>
+                            <TabsTrigger value="groups">Groups</TabsTrigger>
+                        </TabsList>
+                    </div>
+
+                    <TabsContent value="items" className="space-y-4">
+                        <div className="bg-card rounded-xl border border-border shadow-sm flex flex-col min-h-[500px]">
+                            <div className="p-4 border-b border-border flex items-center justify-between bg-muted/30">
+                                <div className="w-full max-w-sm">
+                                    <MinCharSearchInput
+                                        value={query}
+                                        onChange={e => setQuery(e.target.value)}
+                                        onClear={clearSearch}
+                                        loading={loading || searchLoading}
+                                        isValid={isSearchValid}
+                                        message={searchMessage}
+                                        minLength={minLength}
+                                        placeholder="Search menu or group... (5+ chars)"
+                                    />
                                 </div>
-                                {!isSearchValid && (
-                                    <div className="absolute top-full left-0 mt-1 text-xs text-destructive font-medium animate-in slide-in-from-top-1 px-1">
-                                        {searchMessage}
+                                <div className="text-sm text-muted-foreground">
+                                    {filteredItems.length} items found
+                                </div>
+                            </div>
+
+                            <div className="flex-1 p-6">
+                                {loading && items.length === 0 ? (
+                                    <div className="flex flex-col items-center justify-center h-64 text-muted-foreground">
+                                        <RefreshCw className="w-8 h-8 animate-spin mb-2" />
+                                        <p>Loading configuration...</p>
                                     </div>
-                                )}
-                            </div>
-                            <div className="text-sm text-muted-foreground">
-                                {filteredItems.length} items found
-                            </div>
-                        </div>
-
-                        <div className="flex-1 p-6">
-                            {loading && items.length === 0 ? (
-                                <div className="flex flex-col items-center justify-center h-64 text-muted-foreground">
-                                    <RefreshCw className="w-8 h-8 animate-spin mb-2" />
-                                    <p>Loading configuration...</p>
-                                </div>
-                            ) : (
-                                <Reorder.Group axis="y" values={items} onReorder={handleReorder} className="space-y-2">
-                                    <AnimatePresence>
-                                        {filteredItems.map(item => {
-                                            const Icon = getIconComponent(item.icon);
-                                            return (
-                                                <Reorder.Item
-                                                    key={item.id}
-                                                    value={item}
-                                                    dragListener={canEdit || isSuperAdmin}
-                                                    className={`
+                                ) : (
+                                    <Reorder.Group axis="y" values={items} onReorder={handleReorder} className="space-y-2">
+                                        <AnimatePresence>
+                                            {filteredItems.map(item => {
+                                                const Icon = getIconComponent(item.icon);
+                                                return (
+                                                    <Reorder.Item
+                                                        key={item.id}
+                                                        value={item}
+                                                        dragListener={canEdit || isSuperAdmin}
+                                                        className={`
                                                 flex items - center gap - 4 p - 3 rounded - lg border
 bg - card shadow - sm transition - all
                                                 ${item.is_visible ? 'border-border' : 'border-border bg-muted/30 opacity-75'}
                                                 ${(canEdit || isSuperAdmin) ? 'hover:shadow-md cursor-grab active:cursor-grabbing hover:border-primary/50' : 'cursor-default'}
 `}
-                                                >
-                                                    {(canEdit || isSuperAdmin) ? (
-                                                        <div className="text-muted-foreground hover:text-foreground p-1">
-                                                            <GripVertical className="w-5 h-5" />
-                                                        </div>
-                                                    ) : (
-                                                        <div className="w-5 h-5" />
-                                                    )}
-
-                                                    <div className={`p - 2 rounded - md ${item.is_visible ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'} `}>
-                                                        <Icon className="w-5 h-5" />
-                                                    </div>
-
-                                                    <div className="flex-1 min-w-0">
-                                                        <div className="flex items-center gap-2 mb-1">
-                                                            <span className={`font - medium ${item.is_visible ? 'text-foreground' : 'text-muted-foreground line-through'} truncate`}>
-                                                                {item.label}
-                                                            </span>
-                                                            <Badge variant="outline" className="text-[10px] font-mono text-muted-foreground">
-                                                                {item.key}
-                                                            </Badge>
-                                                        </div>
-                                                        <div className="flex items-center gap-2 text-xs">
-                                                            <div className="flex items-center gap-1 text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
-                                                                <FolderOpen className="w-3 h-3" />
-                                                                <span className="truncate max-w-[100px]">{item.group_label || 'General'}</span>
+                                                    >
+                                                        {(canEdit || isSuperAdmin) ? (
+                                                            <div className="text-muted-foreground hover:text-foreground p-1">
+                                                                <GripVertical className="w-5 h-5" />
                                                             </div>
-                                                            {item.permission && (
-                                                                <span className="flex items-center text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-100 dark:bg-amber-900/10 dark:text-amber-500 dark:border-amber-900/20">
-                                                                    <Settings2 className="w-3 h-3 mr-1" />
-                                                                    {item.permission}
-                                                                </span>
-                                                            )}
-                                                            {item.source === 'extension' && (
-                                                                <span className="flex items-center text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-100 dark:bg-indigo-900/10 dark:text-indigo-400 dark:border-indigo-900/20">
-                                                                    <Puzzle className="w-3 h-3 mr-1" />
-                                                                    Ext
-                                                                </span>
-                                                            )}
-                                                            {(item.plugin_type === 'core' || item.is_core) && (
-                                                                <span className="flex items-center text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-100 dark:bg-emerald-900/10 dark:text-emerald-400 dark:border-emerald-900/20">
-                                                                    <Puzzle className="w-3 h-3 mr-1" />
-                                                                    Core
-                                                                </span>
-                                                            )}
-                                                        </div>
-                                                    </div>
-
-                                                    <div className="flex items-center gap-2">
-                                                        {(canEdit || isSuperAdmin) && (
-                                                            <Button
-                                                                variant="ghost"
-                                                                size="sm"
-                                                                onClick={() => handleEdit(item)}
-                                                                disabled={item.source === 'extension'}
-                                                                className={`text - muted - foreground ${item.source === 'extension' ? 'opacity-50 cursor-not-allowed' : 'hover:text-primary'} `}
-                                                                title={item.source === 'extension' ? "Managed by Extension" : "Edit Item"}
-                                                            >
-                                                                <Edit2 className="w-4 h-4" />
-                                                            </Button>
+                                                        ) : (
+                                                            <div className="w-5 h-5" />
                                                         )}
 
-                                                        <div className="flex items-center gap-2 border-l border-border pl-2">
-                                                            <Label htmlFor={`visible - ${item.id} `} className="sr-only">Visibility</Label>
-                                                            <Switch
-                                                                id={`visible - ${item.id} `}
-                                                                checked={item.is_visible}
-                                                                disabled={!canEdit && !isSuperAdmin}
-                                                                onCheckedChange={(checked) => handleToggleVisibility({ stopPropagation: () => { } }, item)}
-                                                            />
-                                                            {item.is_visible ? (
-                                                                <Eye className="w-4 h-4 text-muted-foreground" />
-                                                            ) : (
-                                                                <EyeOff className="w-4 h-4 text-muted-foreground/50" />
-                                                            )}
+                                                        <div className={`p - 2 rounded - md ${item.is_visible ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'} `}>
+                                                            <Icon className="w-5 h-5" />
                                                         </div>
+
+                                                        <div className="flex-1 min-w-0">
+                                                            <div className="flex items-center gap-2 mb-1">
+                                                                <span className={`font - medium ${item.is_visible ? 'text-foreground' : 'text-muted-foreground line-through'} truncate`}>
+                                                                    {item.label}
+                                                                </span>
+                                                                <Badge variant="outline" className="text-[10px] font-mono text-muted-foreground">
+                                                                    {item.key}
+                                                                </Badge>
+                                                            </div>
+                                                            <div className="flex items-center gap-2 text-xs">
+                                                                <div className="flex items-center gap-1 text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
+                                                                    <FolderOpen className="w-3 h-3" />
+                                                                    <span className="truncate max-w-[100px]">{item.group_label || 'General'}</span>
+                                                                </div>
+                                                                {item.permission && (
+                                                                    <span className="flex items-center text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-100 dark:bg-amber-900/10 dark:text-amber-500 dark:border-amber-900/20">
+                                                                        <Settings2 className="w-3 h-3 mr-1" />
+                                                                        {item.permission}
+                                                                    </span>
+                                                                )}
+                                                                {item.source === 'extension' && (
+                                                                    <span className="flex items-center text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-100 dark:bg-indigo-900/10 dark:text-indigo-400 dark:border-indigo-900/20">
+                                                                        <Puzzle className="w-3 h-3 mr-1" />
+                                                                        Ext
+                                                                    </span>
+                                                                )}
+                                                                {(item.plugin_type === 'core' || item.is_core) && (
+                                                                    <span className="flex items-center text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-100 dark:bg-emerald-900/10 dark:text-emerald-400 dark:border-emerald-900/20">
+                                                                        <Puzzle className="w-3 h-3 mr-1" />
+                                                                        Core
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="flex items-center gap-2">
+                                                            {(canEdit || isSuperAdmin) && (
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="sm"
+                                                                    onClick={() => handleEdit(item)}
+                                                                    disabled={item.source === 'extension'}
+                                                                    className={`text - muted - foreground ${item.source === 'extension' ? 'opacity-50 cursor-not-allowed' : 'hover:text-primary'} `}
+                                                                    title={item.source === 'extension' ? "Managed by Extension" : "Edit Item"}
+                                                                >
+                                                                    <Edit2 className="w-4 h-4" />
+                                                                </Button>
+                                                            )}
+
+                                                            <div className="flex items-center gap-2 border-l border-border pl-2">
+                                                                <Label htmlFor={`visible - ${item.id} `} className="sr-only">Visibility</Label>
+                                                                <Switch
+                                                                    id={`visible - ${item.id} `}
+                                                                    checked={item.is_visible}
+                                                                    disabled={!canEdit && !isSuperAdmin}
+                                                                    onCheckedChange={(checked) => handleToggleVisibility({ stopPropagation: () => { } }, item)}
+                                                                />
+                                                                {item.is_visible ? (
+                                                                    <Eye className="w-4 h-4 text-muted-foreground" />
+                                                                ) : (
+                                                                    <EyeOff className="w-4 h-4 text-muted-foreground/50" />
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    </Reorder.Item>
+                                                );
+                                            })}
+                                        </AnimatePresence>
+                                    </Reorder.Group>
+                                )}
+                            </div>
+                        </div>
+                    </TabsContent>
+
+                    <TabsContent value="groups" className="space-y-4">
+                        <div className="bg-card rounded-xl border border-border shadow-sm flex flex-col min-h-[500px]">
+                            <div className="p-4 border-b border-border flex items-center justify-between bg-muted/30">
+                                <div>
+                                    <h3 className="text-sm font-medium text-foreground">Manage Groups</h3>
+                                    <p className="text-xs text-muted-foreground">Drag to reorder groups. This updates the order for all items within.</p>
+                                </div>
+                                {/* Show Save Button specific to Groups tab if changes exist */}
+                                {hasChanges && activeTab === 'groups' && (
+                                    <Button onClick={handleSaveGroupOrder} disabled={isSaving} size="sm">
+                                        <Save className="w-4 h-4 mr-2" />
+                                        {isSaving ? 'Saving...' : 'Save Group Order'}
+                                    </Button>
+                                )}
+                                {(canEdit || isSuperAdmin) && (
+                                    <Button
+                                        onClick={() => {
+                                            setNewGroupForm({ label: '', order: (groups.length + 1) * 10 });
+                                            setShowNewGroupDialog(true);
+                                        }}
+                                        size="sm"
+                                        variant="outline"
+                                        className="border-green-600/30 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/10"
+                                    >
+                                        <Plus className="w-4 h-4 mr-2" />
+                                        Add Group
+                                    </Button>
+                                )}
+                            </div>
+                            <div className="flex-1 p-6">
+                                <Reorder.Group axis="y" values={groups} onReorder={handleGroupReorder} className="space-y-2">
+                                    <AnimatePresence>
+                                        {groups.map(group => (
+                                            <Reorder.Item
+                                                key={group.id}
+                                                value={group}
+                                                drag={!group.isExtension && (canEdit || isSuperAdmin) ? "y" : false}
+                                                className={`flex items-center gap-3 p-3 bg-card border rounded-lg shadow-sm ${group.isExtension ? 'bg-muted/30 border-dashed border-indigo-200 dark:border-indigo-900/30' : 'border-border'} ${(!group.isExtension && (canEdit || isSuperAdmin)) ? 'cursor-grab active:cursor-grabbing hover:border-primary/50' : ''
+                                                    }`}
+                                            >
+                                                {(!group.isExtension && (canEdit || isSuperAdmin)) ? (
+                                                    <div className="text-muted-foreground hover:text-foreground p-1">
+                                                        <GripVertical className="w-5 h-5" />
                                                     </div>
-                                                </Reorder.Item>
-                                            );
-                                        })}
+                                                ) : (
+                                                    <div className="p-1 w-7 flex justify-center">
+                                                        {group.isExtension && <Puzzle className="w-4 h-4 text-indigo-400" />}
+                                                    </div>
+                                                )}
+
+                                                <div className={`p-2 rounded-md ${group.isExtension ? 'bg-indigo-100/50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-400' : 'bg-muted text-muted-foreground'}`}>
+                                                    <FolderOpen className="w-5 h-5" />
+                                                </div>
+                                                <div className="flex-1">
+                                                    <div className="flex items-center gap-2">
+                                                        <h4 className={`font-medium ${group.isExtension ? 'text-indigo-700 dark:text-indigo-300' : 'text-foreground'}`}>{group.label}</h4>
+                                                        {group.isExtension && <span className="text-[10px] bg-indigo-100 text-indigo-700 px-1.5 rounded-full border border-indigo-200 dark:bg-indigo-900/20 dark:text-indigo-300 dark:border-indigo-800">Module</span>}
+                                                        {group.isPlugin && <span className="text-[10px] bg-emerald-100 text-emerald-700 px-1.5 rounded-full border border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-300 dark:border-emerald-800">Core</span>}
+                                                    </div>
+                                                    <p className="text-xs text-muted-foreground">Order: {group.order}</p>
+                                                </div>
+                                                {(canEdit || isSuperAdmin) && (
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        disabled={group.isExtension}
+                                                        onClick={() => handleEditGroup(group)}
+                                                        className="text-muted-foreground hover:text-primary disabled:opacity-30 disabled:hover:text-muted-foreground"
+                                                        title={group.isExtension ? "Managed by Extension" : "Edit Group"}
+                                                    >
+                                                        <Edit2 className="w-4 h-4" />
+                                                    </Button>
+                                                )}
+                                            </Reorder.Item>
+                                        ))}
                                     </AnimatePresence>
                                 </Reorder.Group>
-                            )}
-                        </div>
-                    </div>
-                </TabsContent>
-
-                <TabsContent value="groups" className="space-y-4">
-                    <div className="bg-card rounded-xl border border-border shadow-sm flex flex-col min-h-[500px]">
-                        <div className="p-4 border-b border-border flex items-center justify-between bg-muted/30">
-                            <div>
-                                <h3 className="text-sm font-medium text-foreground">Manage Groups</h3>
-                                <p className="text-xs text-muted-foreground">Drag to reorder groups. This updates the order for all items within.</p>
                             </div>
-                            {/* Show Save Button specific to Groups tab if changes exist */}
-                            {hasChanges && activeTab === 'groups' && (
-                                <Button onClick={handleSaveGroupOrder} disabled={isSaving} size="sm">
-                                    <Save className="w-4 h-4 mr-2" />
-                                    {isSaving ? 'Saving...' : 'Save Group Order'}
-                                </Button>
-                            )}
-                            {(canEdit || isSuperAdmin) && (
-                                <Button
-                                    onClick={() => {
-                                        setNewGroupForm({ label: '', order: (groups.length + 1) * 10 });
-                                        setShowNewGroupDialog(true);
-                                    }}
-                                    size="sm"
-                                    variant="outline"
-                                    className="border-green-600/30 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/10"
-                                >
-                                    <Plus className="w-4 h-4 mr-2" />
-                                    Add Group
-                                </Button>
-                            )}
                         </div>
-                        <div className="flex-1 p-6">
-                            <Reorder.Group axis="y" values={groups} onReorder={handleGroupReorder} className="space-y-2">
-                                <AnimatePresence>
-                                    {groups.map(group => (
-                                        <Reorder.Item
-                                            key={group.id}
-                                            value={group}
-                                            drag={!group.isExtension && (canEdit || isSuperAdmin) ? "y" : false}
-                                            className={`flex items-center gap-3 p-3 bg-card border rounded-lg shadow-sm ${group.isExtension ? 'bg-muted/30 border-dashed border-indigo-200 dark:border-indigo-900/30' : 'border-border'} ${(!group.isExtension && (canEdit || isSuperAdmin)) ? 'cursor-grab active:cursor-grabbing hover:border-primary/50' : ''
-                                                }`}
-                                        >
-                                            {(!group.isExtension && (canEdit || isSuperAdmin)) ? (
-                                                <div className="text-muted-foreground hover:text-foreground p-1">
-                                                    <GripVertical className="w-5 h-5" />
-                                                </div>
-                                            ) : (
-                                                <div className="p-1 w-7 flex justify-center">
-                                                    {group.isExtension && <Puzzle className="w-4 h-4 text-indigo-400" />}
-                                                </div>
-                                            )}
-
-                                            <div className={`p-2 rounded-md ${group.isExtension ? 'bg-indigo-100/50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-400' : 'bg-muted text-muted-foreground'}`}>
-                                                <FolderOpen className="w-5 h-5" />
-                                            </div>
-                                            <div className="flex-1">
-                                                <div className="flex items-center gap-2">
-                                                    <h4 className={`font-medium ${group.isExtension ? 'text-indigo-700 dark:text-indigo-300' : 'text-foreground'}`}>{group.label}</h4>
-                                                    {group.isExtension && <span className="text-[10px] bg-indigo-100 text-indigo-700 px-1.5 rounded-full border border-indigo-200 dark:bg-indigo-900/20 dark:text-indigo-300 dark:border-indigo-800">Module</span>}
-                                                    {group.isPlugin && <span className="text-[10px] bg-emerald-100 text-emerald-700 px-1.5 rounded-full border border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-300 dark:border-emerald-800">Core</span>}
-                                                </div>
-                                                <p className="text-xs text-muted-foreground">Order: {group.order}</p>
-                                            </div>
-                                            {(canEdit || isSuperAdmin) && (
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    disabled={group.isExtension}
-                                                    onClick={() => handleEditGroup(group)}
-                                                    className="text-muted-foreground hover:text-primary disabled:opacity-30 disabled:hover:text-muted-foreground"
-                                                    title={group.isExtension ? "Managed by Extension" : "Edit Group"}
-                                                >
-                                                    <Edit2 className="w-4 h-4" />
-                                                </Button>
-                                            )}
-                                        </Reorder.Item>
-                                    ))}
-                                </AnimatePresence>
-                            </Reorder.Group>
-                        </div>
-                    </div>
-                </TabsContent>
-            </Tabs>
+                    </TabsContent>
+                </Tabs >
 
 
-            {/* Edit Dialog */}
-            <Dialog open={!!editingItem} onOpenChange={(open) => !open && setEditingItem(null)}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Edit Menu Item</DialogTitle>
-                        <DialogDescription>
-                            Customize the label and grouping for this sidebar item.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <div className="py-4 space-y-4">
-                        <div className="space-y-2">
-                            <Label>Label</Label>
-                            <Input
-                                value={editForm.label}
-                                onChange={e => setEditForm({ ...editForm, label: e.target.value })}
-                                placeholder="Menu Label"
-                            />
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4">
+                {/* Edit Dialog */}
+                < Dialog open={!!editingItem
+                } onOpenChange={(open) => !open && setEditingItem(null)}>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Edit Menu Item</DialogTitle>
+                            <DialogDescription>
+                                Customize the label and grouping for this sidebar item.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="py-4 space-y-4">
                             <div className="space-y-2">
-                                <Label>Group Label</Label>
-                                <div className="relative">
+                                <Label>Label</Label>
+                                <Input
+                                    value={editForm.label}
+                                    onChange={e => setEditForm({ ...editForm, label: e.target.value })}
+                                    placeholder="Menu Label"
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label>Group Label</Label>
+                                    <div className="relative">
+                                        <Input
+                                            list="groups-list"
+                                            value={editForm.group_label}
+                                            onChange={e => setEditForm({ ...editForm, group_label: e.target.value })}
+                                            placeholder="General"
+                                        />
+                                        <datalist id="groups-list">
+                                            {existingGroups.map(g => (
+                                                <option key={g} value={g} />
+                                            ))}
+                                        </datalist>
+                                    </div>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Group Order</Label>
                                     <Input
-                                        list="groups-list"
-                                        value={editForm.group_label}
-                                        onChange={e => setEditForm({ ...editForm, group_label: e.target.value })}
-                                        placeholder="General"
+                                        type="number"
+                                        value={editForm.group_order}
+                                        onChange={e => setEditForm({ ...editForm, group_order: e.target.value })}
+                                        placeholder="0"
+                                        min="0"
                                     />
-                                    <datalist id="groups-list">
-                                        {existingGroups.map(g => (
-                                            <option key={g} value={g} />
-                                        ))}
-                                    </datalist>
+                                    <p className="text-[10px] text-slate-500">Lower numbers appear higher.</p>
                                 </div>
                             </div>
+
                             <div className="space-y-2">
-                                <Label>Group Order</Label>
-                                <Input
-                                    type="number"
-                                    value={editForm.group_order}
-                                    onChange={e => setEditForm({ ...editForm, group_order: e.target.value })}
-                                    placeholder="0"
-                                    min="0"
-                                />
-                                <p className="text-[10px] text-slate-500">Lower numbers appear higher.</p>
+                                <Label>Key (Read Only)</Label>
+                                <Input value={editingItem?.key || ''} disabled className="bg-muted" />
                             </div>
                         </div>
+                        <DialogFooter>
+                            <Button variant="outline" onClick={() => setEditingItem(null)}>Cancel</Button>
+                            <Button onClick={saveEdit}>Save Changes</Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog >
 
-                        <div className="space-y-2">
-                            <Label>Key (Read Only)</Label>
-                            <Input value={editingItem?.key || ''} disabled className="bg-muted" />
+                {/* Group Edit Dialog */}
+                < Dialog open={!!editingGroup} onOpenChange={(open) => !open && setEditingGroup(null)}>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Edit Group</DialogTitle>
+                            <DialogDescription>
+                                Rename or reorder this group.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="py-4 space-y-4">
+                            <div className="space-y-2">
+                                <Label>Group Label</Label>
+                                <Input
+                                    value={groupEditForm.label}
+                                    onChange={e => setGroupEditForm({ ...groupEditForm, label: e.target.value })}
+                                    placeholder="Group Name"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label>Order</Label>
+                                <Input
+                                    type="number"
+                                    value={groupEditForm.order}
+                                    onChange={e => setGroupEditForm({ ...groupEditForm, order: e.target.value })}
+                                    placeholder="0"
+                                />
+                            </div>
                         </div>
-                    </div>
-                    <DialogFooter>
-                        <Button variant="outline" onClick={() => setEditingItem(null)}>Cancel</Button>
-                        <Button onClick={saveEdit}>Save Changes</Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+                        <DialogFooter>
+                            <Button variant="outline" onClick={() => setEditingGroup(null)}>Cancel</Button>
+                            <Button onClick={saveGroupEdit}>Save Group</Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog >
 
-            {/* Group Edit Dialog */}
-            <Dialog open={!!editingGroup} onOpenChange={(open) => !open && setEditingGroup(null)}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Edit Group</DialogTitle>
-                        <DialogDescription>
-                            Rename or reorder this group.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <div className="py-4 space-y-4">
-                        <div className="space-y-2">
-                            <Label>Group Label</Label>
-                            <Input
-                                value={groupEditForm.label}
-                                onChange={e => setGroupEditForm({ ...groupEditForm, label: e.target.value })}
-                                placeholder="Group Name"
-                            />
+                {/* New Group Dialog */}
+                < Dialog open={showNewGroupDialog} onOpenChange={(open) => !open && setShowNewGroupDialog(false)}>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Create New Group</DialogTitle>
+                            <DialogDescription>
+                                Add a new menu group. Groups help organize sidebar items.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="py-4 space-y-4">
+                            <div className="space-y-2">
+                                <Label>Group Name</Label>
+                                <Input
+                                    value={newGroupForm.label}
+                                    onChange={e => setNewGroupForm({ ...newGroupForm, label: e.target.value })}
+                                    placeholder="e.g., MARKETING"
+                                />
+                                <p className="text-[10px] text-slate-500">Use UPPERCASE for consistency with existing groups.</p>
+                            </div>
+                            <div className="space-y-2">
+                                <Label>Order</Label>
+                                <Input
+                                    type="number"
+                                    value={newGroupForm.order}
+                                    onChange={e => setNewGroupForm({ ...newGroupForm, order: e.target.value })}
+                                    placeholder="10"
+                                    min="1"
+                                />
+                                <p className="text-[10px] text-muted-foreground">Lower numbers appear higher in the sidebar.</p>
+                            </div>
                         </div>
-                        <div className="space-y-2">
-                            <Label>Order</Label>
-                            <Input
-                                type="number"
-                                value={groupEditForm.order}
-                                onChange={e => setGroupEditForm({ ...groupEditForm, order: e.target.value })}
-                                placeholder="0"
-                            />
-                        </div>
-                    </div>
-                    <DialogFooter>
-                        <Button variant="outline" onClick={() => setEditingGroup(null)}>Cancel</Button>
-                        <Button onClick={saveGroupEdit}>Save Group</Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
-
-            {/* New Group Dialog */}
-            <Dialog open={showNewGroupDialog} onOpenChange={(open) => !open && setShowNewGroupDialog(false)}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Create New Group</DialogTitle>
-                        <DialogDescription>
-                            Add a new menu group. Groups help organize sidebar items.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <div className="py-4 space-y-4">
-                        <div className="space-y-2">
-                            <Label>Group Name</Label>
-                            <Input
-                                value={newGroupForm.label}
-                                onChange={e => setNewGroupForm({ ...newGroupForm, label: e.target.value })}
-                                placeholder="e.g., MARKETING"
-                            />
-                            <p className="text-[10px] text-slate-500">Use UPPERCASE for consistency with existing groups.</p>
-                        </div>
-                        <div className="space-y-2">
-                            <Label>Order</Label>
-                            <Input
-                                type="number"
-                                value={newGroupForm.order}
-                                onChange={e => setNewGroupForm({ ...newGroupForm, order: e.target.value })}
-                                placeholder="10"
-                                min="1"
-                            />
-                            <p className="text-[10px] text-muted-foreground">Lower numbers appear higher in the sidebar.</p>
-                        </div>
-                    </div>
-                    <DialogFooter>
-                        <Button variant="outline" onClick={() => setShowNewGroupDialog(false)}>Cancel</Button>
-                        <Button
-                            onClick={handleCreateGroup}
-                            disabled={!newGroupForm.label.trim()}
-                            className="bg-green-600 hover:bg-green-700"
-                        >
-                            Create Group
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
-        </div >
+                        <DialogFooter>
+                            <Button variant="outline" onClick={() => setShowNewGroupDialog(false)}>Cancel</Button>
+                            <Button
+                                onClick={handleCreateGroup}
+                                disabled={!newGroupForm.label.trim()}
+                                className="bg-green-600 hover:bg-green-700"
+                            >
+                                Create Group
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog >
+            </div >
+        </AdminPageLayout >
     );
 }
 

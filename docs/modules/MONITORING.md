@@ -31,5 +31,5 @@ Describe the monitoring tools and logging practices for AWCMS.
 
 ## References
 
-- `../03-features/AUDIT_TRAIL.md`
-- `../00-core/SECURITY.md`
+- `docs/modules/AUDIT_TRAIL.md`
+- `docs/security/overview.md`

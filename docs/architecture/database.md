@@ -636,5 +636,5 @@ WHERE deleted_at IS NULL;
 ## References
 
 - `../02-reference/RLS_POLICIES.md`
-- `../00-core/SOFT_DELETE.md`
+- `docs/architecture/database.md`
 - `../../../schema_dump.sql`

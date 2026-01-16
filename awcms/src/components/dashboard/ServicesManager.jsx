@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
 import GenericContentManager from '@/components/dashboard/GenericContentManager';
-import { ChevronRight, Home, Wrench } from 'lucide-react';
+import { Wrench } from 'lucide-react';
+import { AdminPageLayout, PageHeader } from '@/templates/flowbite-admin';
 
 function ServicesManager() {
     const columns = [
@@ -47,29 +47,24 @@ function ServicesManager() {
     ];
 
     return (
-        <div className="space-y-6">
-            <nav className="flex items-center text-sm text-muted-foreground">
-                <Link to="/cmspanel" className="hover:text-primary transition-colors flex items-center gap-1">
-                    <Home className="w-4 h-4" />
-                    Dashboard
-                </Link>
-                <ChevronRight className="w-4 h-4 mx-2 text-muted-foreground/50" />
-                <span className="flex items-center gap-1 text-foreground font-medium">
-                    <Wrench className="w-4 h-4" />
-                    Services
-                </span>
-            </nav>
+        <AdminPageLayout requiredPermission="services.read">
+            <PageHeader
+                title="Services"
+                description="Manage your company's services showcase."
+                icon={Wrench}
+                breadcrumbs={[{ label: 'Services', icon: Wrench }]}
+            />
 
             <GenericContentManager
                 tableName="services"
                 resourceName="Service"
                 columns={columns}
                 formFields={formFields}
-                permissionPrefix="services" // Ensure this maps to valid permissions or use generic ones
+                permissionPrefix="services"
                 showBreadcrumbs={false}
                 defaultSortColumn="order"
             />
-        </div>
+        </AdminPageLayout>
     );
 }
 

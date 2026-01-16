@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
 import GenericContentManager from '@/components/dashboard/GenericContentManager';
-import { Mail, ChevronRight, Home } from 'lucide-react';
+import { Mail } from 'lucide-react';
+import { AdminPageLayout, PageHeader } from '@/templates/flowbite-admin';
 
 function ContactMessagesManager() {
     const columns = [
@@ -28,19 +28,13 @@ function ContactMessagesManager() {
     ];
 
     return (
-        <div className="space-y-6">
-            {/* Breadcrumb Navigation */}
-            <nav className="flex items-center text-sm text-muted-foreground">
-                <Link to="/cmspanel" className="hover:text-primary transition-colors flex items-center gap-1">
-                    <Home className="w-4 h-4" />
-                    Dashboard
-                </Link>
-                <ChevronRight className="w-4 h-4 mx-2 text-muted-foreground/50" />
-                <span className="flex items-center gap-1 text-foreground font-medium">
-                    <Mail className="w-4 h-4" />
-                    Contact Messages
-                </span>
-            </nav>
+        <AdminPageLayout requiredPermission="contact_messages.read">
+            <PageHeader
+                title="Contact Messages"
+                description="View and manage incoming contact form submissions."
+                icon={Mail}
+                breadcrumbs={[{ label: 'Messages', icon: Mail }]}
+            />
 
             <GenericContentManager
                 tableName="contact_messages"
@@ -50,7 +44,7 @@ function ContactMessagesManager() {
                 permissionPrefix="contact_messages"
                 showBreadcrumbs={false}
             />
-        </div>
+        </AdminPageLayout>
     );
 }
 

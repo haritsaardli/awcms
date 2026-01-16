@@ -20,6 +20,7 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs";
 import { activateExtensionRegistry, deactivateExtensionRegistry, syncExtensionToRegistry } from '@/utils/extensionLifecycle';
+import { AdminPageLayout, PageHeader } from '@/templates/flowbite-admin';
 
 // Extension Modules
 import ExtensionEditor from './ExtensionEditor';
@@ -148,42 +149,33 @@ function ExtensionsManager() {
   if (showGuide) return <ExtensionGuide onBack={() => setShowGuide(false)} />;
   if (editingExtension) return <ExtensionEditor extension={editingExtension} onClose={() => setEditingExtension(null)} onSave={() => { setEditingExtension(null); fetchExtensions(); }} />;
 
-  return (
-    <div className="space-y-6">
-      {/* Breadcrumb Navigation */}
-      <nav className="flex items-center text-sm text-muted-foreground">
-        <a href="/cmspanel" className="hover:text-foreground transition-colors flex items-center gap-1">
-          <Puzzle className="w-4 h-4" /> {/* Fallback icon */}
-          Dashboard
-        </a>
-        <span className="w-4 h-4 mx-2 text-muted">/</span>
-        <span className="flex items-center gap-1 text-foreground font-medium">
-          <Puzzle className="w-4 h-4" />
-          Extensions
-        </span>
-      </nav>
+  const breadcrumbs = [
+    { label: t('extensions.title'), icon: Puzzle }
+  ];
 
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-card p-6 rounded-xl border border-border shadow-sm">
-        <div>
-          <h2 className="text-3xl font-bold text-foreground flex items-center gap-2">
-            <Puzzle className="w-8 h-8 text-primary" />
-            {t('extensions.title')}
-          </h2>
-          <p className="text-muted-foreground">{t('extensions.subtitle')}</p>
-        </div>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={() => setShowGuide(true)}>
-            <BookOpen className="w-4 h-4 mr-2" />
-            {t('extensions.guide')}
-          </Button>
-          {canCreate && (
-            <Button onClick={() => setActiveTab('install')}>
-              <Upload className="w-4 h-4 mr-2" />
-              {t('extensions.install')}
-            </Button>
-          )}
-        </div>
-      </div>
+  const headerActions = (
+    <div className="flex gap-2">
+      <Button variant="outline" onClick={() => setShowGuide(true)}>
+        <BookOpen className="w-4 h-4 mr-2" />
+        {t('extensions.guide')}
+      </Button>
+      {canCreate && (
+        <Button onClick={() => setActiveTab('install')}>
+          <Upload className="w-4 h-4 mr-2" />
+          {t('extensions.install')}
+        </Button>
+      )}
+    </div>
+  );
+
+  return (
+    <AdminPageLayout>
+      <PageHeader
+        title={t('extensions.title')}
+        description={t('extensions.subtitle')}
+        breadcrumbs={breadcrumbs}
+        actions={headerActions}
+      />
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="bg-muted p-1 rounded-lg overflow-x-auto flex-wrap h-auto w-full justify-start">
@@ -287,7 +279,7 @@ function ExtensionsManager() {
           </>
         )}
       </Tabs>
-    </div>
+    </AdminPageLayout>
   );
 }
 

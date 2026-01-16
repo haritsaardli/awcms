@@ -10,6 +10,7 @@ import { useTenant } from '@/contexts/TenantContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { usePermissions } from '@/contexts/PermissionContext';
 import { ShieldAlert } from 'lucide-react';
+import { AdminPageLayout, PageHeader } from '@/templates/flowbite-admin';
 
 function SeoManager() {
     const { toast } = useToast();
@@ -130,118 +131,123 @@ function SeoManager() {
     }
 
     return (
-        <div className="max-w-4xl mx-auto space-y-6">
-            <div>
-                <h2 className="text-3xl font-bold text-foreground">SEO Management</h2>
-                <p className="text-muted-foreground">Configure global metadata and search engine settings</p>
+        <AdminPageLayout requiredPermission="tenant.setting.read">
+            <PageHeader
+                title="SEO Management"
+                description="Configure global metadata and search engine settings."
+                icon={Globe}
+                breadcrumbs={[{ label: 'SEO', icon: Globe }]}
+            />
+
+            <div className="max-w-4xl space-y-6">
+
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Meta Tags Configuration</CardTitle>
+                        <CardDescription>These settings apply as defaults for all pages</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <form onSubmit={handleSave} className="space-y-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                    <Label htmlFor="site_title">Default Site Title</Label>
+                                    <Input
+                                        id="site_title"
+                                        value={globalSeo.site_title}
+                                        onChange={(e) => setGlobalSeo({ ...globalSeo, site_title: e.target.value })}
+                                        placeholder="My Website"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="twitter_handle">Twitter Handle</Label>
+                                    <Input
+                                        id="twitter_handle"
+                                        value={globalSeo.twitter_handle}
+                                        onChange={(e) => setGlobalSeo({ ...globalSeo, twitter_handle: e.target.value })}
+                                        placeholder="@username"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="site_description">Default Meta Description</Label>
+                                <Textarea
+                                    id="site_description"
+                                    value={globalSeo.site_description}
+                                    onChange={(e) => setGlobalSeo({ ...globalSeo, site_description: e.target.value })}
+                                    rows={3}
+                                    placeholder="A brief description of your website..."
+                                />
+                                <p className="text-xs text-muted-foreground">
+                                    Recommended: 150-160 characters for optimal display in search results
+                                </p>
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="default_keywords">Default Keywords (Comma separated)</Label>
+                                <Input
+                                    id="default_keywords"
+                                    value={globalSeo.default_keywords}
+                                    onChange={(e) => setGlobalSeo({ ...globalSeo, default_keywords: e.target.value })}
+                                    placeholder="keyword1, keyword2, keyword3"
+                                />
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="og_image">Default OG Image URL</Label>
+                                <div className="flex gap-2">
+                                    <Input
+                                        id="og_image"
+                                        value={globalSeo.og_image}
+                                        onChange={(e) => setGlobalSeo({ ...globalSeo, og_image: e.target.value })}
+                                        placeholder="https://example.com/og-image.jpg"
+                                    />
+                                    <Button type="button" variant="outline">Browse</Button>
+                                </div>
+                                <p className="text-xs text-muted-foreground">
+                                    Recommended size: 1200x630 pixels for optimal display on social media
+                                </p>
+                            </div>
+
+                            <div className="pt-4 border-t border-border flex justify-end">
+                                <Button type="submit" disabled={saving}>
+                                    {saving ? (
+                                        <>
+                                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                            Saving...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Save className="w-4 h-4 mr-2" />
+                                            Save Configuration
+                                        </>
+                                    )}
+                                </Button>
+                            </div>
+                        </form>
+                    </CardContent>
+                </Card>
+
+                <Card className="bg-primary/5 border-primary/20">
+                    <CardContent className="pt-6">
+                        <div className="flex items-start gap-4">
+                            <div className="p-3 bg-primary/10 rounded-lg text-primary">
+                                <Globe className="w-6 h-6" />
+                            </div>
+                            <div>
+                                <h3 className="font-bold text-foreground mb-1">Robots.txt & Sitemap</h3>
+                                <p className="text-sm text-muted-foreground mb-4">
+                                    Your sitemap is automatically generated at <code className="bg-muted px-1 py-0.5 rounded text-foreground font-mono">/sitemap.xml</code> based on public content visibility.
+                                </p>
+                                <Button variant="outline" size="sm" className="bg-background hover:bg-muted text-foreground border-border">
+                                    View Sitemap
+                                </Button>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
             </div>
-
-            <Card>
-                <CardHeader>
-                    <CardTitle>Meta Tags Configuration</CardTitle>
-                    <CardDescription>These settings apply as defaults for all pages</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <form onSubmit={handleSave} className="space-y-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="space-y-2">
-                                <Label htmlFor="site_title">Default Site Title</Label>
-                                <Input
-                                    id="site_title"
-                                    value={globalSeo.site_title}
-                                    onChange={(e) => setGlobalSeo({ ...globalSeo, site_title: e.target.value })}
-                                    placeholder="My Website"
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="twitter_handle">Twitter Handle</Label>
-                                <Input
-                                    id="twitter_handle"
-                                    value={globalSeo.twitter_handle}
-                                    onChange={(e) => setGlobalSeo({ ...globalSeo, twitter_handle: e.target.value })}
-                                    placeholder="@username"
-                                />
-                            </div>
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label htmlFor="site_description">Default Meta Description</Label>
-                            <Textarea
-                                id="site_description"
-                                value={globalSeo.site_description}
-                                onChange={(e) => setGlobalSeo({ ...globalSeo, site_description: e.target.value })}
-                                rows={3}
-                                placeholder="A brief description of your website..."
-                            />
-                            <p className="text-xs text-muted-foreground">
-                                Recommended: 150-160 characters for optimal display in search results
-                            </p>
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label htmlFor="default_keywords">Default Keywords (Comma separated)</Label>
-                            <Input
-                                id="default_keywords"
-                                value={globalSeo.default_keywords}
-                                onChange={(e) => setGlobalSeo({ ...globalSeo, default_keywords: e.target.value })}
-                                placeholder="keyword1, keyword2, keyword3"
-                            />
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label htmlFor="og_image">Default OG Image URL</Label>
-                            <div className="flex gap-2">
-                                <Input
-                                    id="og_image"
-                                    value={globalSeo.og_image}
-                                    onChange={(e) => setGlobalSeo({ ...globalSeo, og_image: e.target.value })}
-                                    placeholder="https://example.com/og-image.jpg"
-                                />
-                                <Button type="button" variant="outline">Browse</Button>
-                            </div>
-                            <p className="text-xs text-muted-foreground">
-                                Recommended size: 1200x630 pixels for optimal display on social media
-                            </p>
-                        </div>
-
-                        <div className="pt-4 border-t border-border flex justify-end">
-                            <Button type="submit" disabled={saving}>
-                                {saving ? (
-                                    <>
-                                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                        Saving...
-                                    </>
-                                ) : (
-                                    <>
-                                        <Save className="w-4 h-4 mr-2" />
-                                        Save Configuration
-                                    </>
-                                )}
-                            </Button>
-                        </div>
-                    </form>
-                </CardContent>
-            </Card>
-
-            <Card className="bg-primary/5 border-primary/20">
-                <CardContent className="pt-6">
-                    <div className="flex items-start gap-4">
-                        <div className="p-3 bg-primary/10 rounded-lg text-primary">
-                            <Globe className="w-6 h-6" />
-                        </div>
-                        <div>
-                            <h3 className="font-bold text-foreground mb-1">Robots.txt & Sitemap</h3>
-                            <p className="text-sm text-muted-foreground mb-4">
-                                Your sitemap is automatically generated at <code className="bg-muted px-1 py-0.5 rounded text-foreground font-mono">/sitemap.xml</code> based on public content visibility.
-                            </p>
-                            <Button variant="outline" size="sm" className="bg-background hover:bg-muted text-foreground border-border">
-                                View Sitemap
-                            </Button>
-                        </div>
-                    </div>
-                </CardContent>
-            </Card>
-        </div>
+        </AdminPageLayout>
     );
 }
 

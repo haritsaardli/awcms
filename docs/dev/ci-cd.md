@@ -58,5 +58,5 @@ npm run build
 
 ## References
 
-- `../01-guides/TESTING.md`
-- `../01-guides/DEPLOYMENT.md`
+- `docs/dev/testing.md`
+- `docs/deploy/overview.md`

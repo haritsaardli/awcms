@@ -55,5 +55,5 @@ Describe how tenant branding is stored and applied across the admin UI.
 
 ## References
 
-- `../03-features/COMPONENT_GUIDE.md`
+- `docs/modules/COMPONENT_GUIDE.md`
 - `../../src/hooks/useTenantTheme.js`

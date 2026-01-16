@@ -1,11 +1,12 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
-const STORAGE_KEY = 'awcms-dark-mode';
+const STORAGE_KEY = 'awcms_theme';
+const OLD_STORAGE_KEY = 'awcms-dark-mode';
 
 /**
  * Dark Mode Context
  * Manages light/dark/system theme preference
- * Separate from ThemeContext which handles tenant branding
+ * Supports migration from legacy keys
  */
 const DarkModeContext = createContext({
     mode: 'system', // 'light' | 'dark' | 'system'
@@ -23,8 +24,10 @@ export const DarkModeProvider = ({ children }) => {
     const applyDarkClass = (dark) => {
         if (dark) {
             document.documentElement.classList.add('dark');
+            document.documentElement.style.colorScheme = 'dark';
         } else {
             document.documentElement.classList.remove('dark');
+            document.documentElement.style.colorScheme = 'light';
         }
         setIsDark(dark);
     };
@@ -35,13 +38,13 @@ export const DarkModeProvider = ({ children }) => {
     };
 
     // Update theme based on mode
-    const updateTheme = (currentMode) => {
+    const updateTheme = React.useCallback((currentMode) => {
         if (currentMode === 'system') {
             applyDarkClass(getSystemPreference());
         } else {
             applyDarkClass(currentMode === 'dark');
         }
-    };
+    }, []);
 
     // Set mode and persist
     const setMode = (newMode) => {
@@ -52,29 +55,47 @@ export const DarkModeProvider = ({ children }) => {
 
     // Initialize on mount
     useEffect(() => {
+        let initialMode = 'system';
+
+        // 1. Try new key
         const stored = localStorage.getItem(STORAGE_KEY);
-        const initialMode = stored || 'system';
+        if (stored && ['light', 'dark', 'system'].includes(stored)) {
+            initialMode = stored;
+        } else {
+            // 2. Try migration from old key
+            const oldStored = localStorage.getItem(OLD_STORAGE_KEY);
+            if (oldStored && ['light', 'dark', 'system'].includes(oldStored)) {
+                initialMode = oldStored;
+                // Migrate to new key
+                localStorage.setItem(STORAGE_KEY, oldStored);
+                localStorage.removeItem(OLD_STORAGE_KEY);
+            }
+        }
+
         setModeState(initialMode);
         updateTheme(initialMode);
 
-        // Listen for system preference changes
-        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-        const handleChange = () => {
-            if (mode === 'system') {
-                applyDarkClass(getSystemPreference());
-            }
-        };
-
-        mediaQuery.addEventListener('change', handleChange);
-        return () => mediaQuery.removeEventListener('change', handleChange);
+        // System preference change handling is done in the separate useEffect below
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    // Update when mode changes
+    // Handle system changes and mode updates
     useEffect(() => {
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+        const handleSystemChange = (e) => {
+            if (mode === 'system') {
+                applyDarkClass(e.matches);
+            }
+        };
+
+        // Update immediately on mode change
         updateTheme(mode);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [mode]);
+
+        // Subscribe to system changes
+        mediaQuery.addEventListener('change', handleSystemChange);
+        return () => mediaQuery.removeEventListener('change', handleSystemChange);
+    }, [mode, updateTheme]);
 
     return (
         <DarkModeContext.Provider value={{ mode, isDark, setMode }}>

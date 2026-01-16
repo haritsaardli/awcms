@@ -1,6 +1,8 @@
 
 import React from 'react';
 import GenericContentManager from '@/components/dashboard/GenericContentManager';
+import { FolderTree } from 'lucide-react';
+import { AdminPageLayout, PageHeader } from '@/templates/flowbite-admin';
 
 function CategoriesManager() {
   const columns = [
@@ -30,14 +32,23 @@ function CategoriesManager() {
   ];
 
   return (
-    <GenericContentManager
-      tableName="categories"
-      resourceName="Category"
-      columns={columns}
-      formFields={formFields}
-      permissionPrefix="categories"
+    <AdminPageLayout requiredPermission="categories.read">
+      <PageHeader
+        title="Categories"
+        description="Organize content with categories and taxonomies."
+        icon={FolderTree}
+        breadcrumbs={[{ label: 'Categories', icon: FolderTree }]}
+      />
 
-    />
+      <GenericContentManager
+        tableName="categories"
+        resourceName="Category"
+        columns={columns}
+        formFields={formFields}
+        permissionPrefix="categories"
+        showBreadcrumbs={false}
+      />
+    </AdminPageLayout>
   );
 }
 

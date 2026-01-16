@@ -1,7 +1,7 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import GenericContentManager from '@/components/dashboard/GenericContentManager';
-import { Settings, ChevronRight, Home } from 'lucide-react';
+import { Settings } from 'lucide-react';
+import { AdminPageLayout, PageHeader } from '@/templates/flowbite-admin';
 
 function SettingsManager() {
     const columns = [
@@ -28,19 +28,13 @@ function SettingsManager() {
     ];
 
     return (
-        <div className="space-y-6">
-            {/* Breadcrumb Navigation */}
-            <nav className="flex items-center text-sm text-muted-foreground">
-                <Link to="/cmspanel" className="hover:text-foreground transition-colors flex items-center gap-1">
-                    <Home className="w-4 h-4" />
-                    Dashboard
-                </Link>
-                <ChevronRight className="w-4 h-4 mx-2 text-muted" />
-                <span className="flex items-center gap-1 text-foreground font-medium">
-                    <Settings className="w-4 h-4" />
-                    Settings
-                </span>
-            </nav>
+        <AdminPageLayout requiredPermission="tenant.setting.read">
+            <PageHeader
+                title="Settings"
+                description="Manage system configuration and preferences."
+                icon={Settings}
+                breadcrumbs={[{ label: 'Settings', icon: Settings }]}
+            />
 
             <GenericContentManager
                 tableName="settings"
@@ -55,7 +49,7 @@ function SettingsManager() {
                 defaultSortColumn="key"
                 showBreadcrumbs={false}
             />
-        </div>
+        </AdminPageLayout>
     );
 }
 

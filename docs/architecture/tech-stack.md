@@ -69,5 +69,5 @@ Public styling uses TailwindCSS 4 via the Vite plugin and `tailwind.config.mjs`.
 
 ## References
 
-- `../00-core/CORE_STANDARDS.md`
-- `../03-features/VERSIONING.md`
+- `docs/architecture/standards.md`
+- `docs/modules/VERSIONING.md`

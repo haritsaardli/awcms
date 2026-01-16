@@ -32,5 +32,5 @@ Outline scalability considerations for AWCMS deployments.
 
 ## References
 
-- `../03-features/PERFORMANCE.md`
-- `../00-core/ARCHITECTURE.md`
+- `docs/modules/PERFORMANCE.md`
+- `docs/architecture/overview.md`

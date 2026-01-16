@@ -2,11 +2,12 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { usePermissions } from '@/contexts/PermissionContext';
 import { supabase } from '@/lib/customSupabaseClient';
 import { useToast } from '@/components/ui/use-toast';
-import { Plus, Trash2, Edit2 } from 'lucide-react';
+import { Plus, Trash2, Edit2, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { AdminPageLayout, PageHeader } from '@/templates/flowbite-admin';
 
 export default function PolicyManager() {
     const { tenantId, hasPermission, isPlatformAdmin } = usePermissions();
@@ -146,18 +147,18 @@ export default function PolicyManager() {
     };
 
     return (
-        <div className="space-y-4">
-            <div className="flex justify-between items-center">
-                <div>
-                    <h2 className="text-2xl font-bold tracking-tight">Policy Manager</h2>
-                    <p className="text-slate-500 text-sm">Define ABAC rules for fine-grained access control.</p>
-                </div>
-                {canManage && (
+        <AdminPageLayout requiredPermission="tenant.policy.read">
+            <PageHeader
+                title="Policy Manager"
+                description="Define ABAC rules for fine-grained access control."
+                icon={Shield}
+                breadcrumbs={[{ label: 'Policies', icon: Shield }]}
+                actions={canManage && (
                     <Button onClick={() => handleOpenDialog()}>
                         <Plus className="w-4 h-4 mr-2" /> New Policy
                     </Button>
                 )}
-            </div>
+            />
 
             <div className="bg-white rounded-md border shadow-sm">
                 <div className="overflow-x-auto">
@@ -278,6 +279,6 @@ export default function PolicyManager() {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
-        </div>
+        </AdminPageLayout>
     );
 }

@@ -56,5 +56,5 @@ await sendEmail({
 
 ## References
 
-- `../00-core/SUPABASE_INTEGRATION.md`
+- `docs/tenancy/supabase.md`
 - `../../src/lib/email/mailketingService.js`

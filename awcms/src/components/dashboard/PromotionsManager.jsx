@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
 import GenericContentManager from '@/components/dashboard/GenericContentManager';
-import { Tag, ChevronRight, Home } from 'lucide-react';
+import { Tag } from 'lucide-react';
+import { AdminPageLayout, PageHeader } from '@/templates/flowbite-admin';
 
 function PromotionsManager() {
     const columns = [
@@ -57,19 +57,13 @@ function PromotionsManager() {
     ];
 
     return (
-        <div className="space-y-6">
-            {/* Breadcrumb Navigation */}
-            <nav className="flex items-center text-sm text-muted-foreground">
-                <Link to="/cmspanel" className="hover:text-primary transition-colors flex items-center gap-1">
-                    <Home className="w-4 h-4" />
-                    Dashboard
-                </Link>
-                <ChevronRight className="w-4 h-4 mx-2 text-muted-foreground/50" />
-                <span className="flex items-center gap-1 text-foreground font-medium">
-                    <Tag className="w-4 h-4" />
-                    Promotions
-                </span>
-            </nav>
+        <AdminPageLayout requiredPermission="promotions.read">
+            <PageHeader
+                title="Promotions"
+                description="Manage promotional campaigns and discount codes."
+                icon={Tag}
+                breadcrumbs={[{ label: 'Promotions', icon: Tag }]}
+            />
 
             <GenericContentManager
                 tableName="promotions"
@@ -79,7 +73,7 @@ function PromotionsManager() {
                 permissionPrefix="promotions"
                 showBreadcrumbs={false}
             />
-        </div>
+        </AdminPageLayout>
     );
 }
 

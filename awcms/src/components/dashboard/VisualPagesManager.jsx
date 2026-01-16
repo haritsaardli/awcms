@@ -4,6 +4,7 @@ import ThemeLayoutManager from './ThemeLayoutManager';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Layers, Palette, ShieldAlert } from 'lucide-react';
 import { usePermissions } from '@/contexts/PermissionContext';
+import { AdminPageLayout, PageHeader } from '@/templates/flowbite-admin';
 
 /**
  * VisualPagesManager
@@ -25,11 +26,13 @@ const VisualPagesManager = () => {
     }
 
     return (
-        <div className="space-y-6">
-            <div className="flex flex-col gap-2">
-                <h1 className="text-2xl font-bold tracking-tight">Visual Builder</h1>
-                <p className="text-muted-foreground">Manage your visual pages and system theme templates.</p>
-            </div>
+        <AdminPageLayout requiredPermission="tenant.page.read">
+            <PageHeader
+                title="Visual Builder"
+                description="Manage your visual pages and system theme templates."
+                icon={Layers}
+                breadcrumbs={[{ label: 'Visual Pages', icon: Layers }]}
+            />
 
             <Tabs defaultValue="pages" className="w-full">
                 <div className="bg-slate-100 p-1 rounded-lg inline-flex mb-6">
@@ -52,7 +55,7 @@ const VisualPagesManager = () => {
                     <ThemeLayoutManager />
                 </TabsContent>
             </Tabs>
-        </div>
+        </AdminPageLayout>
     );
 };
 

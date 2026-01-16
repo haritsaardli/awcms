@@ -60,5 +60,5 @@ The `TipTapRenderer` converts the JSON document into accessible React components
 
 ## References
 
-- `../03-features/ABAC_SYSTEM.md`
-- `../00-core/SOFT_DELETE.md`
+- `docs/security/abac.md`
+- `docs/architecture/database.md`

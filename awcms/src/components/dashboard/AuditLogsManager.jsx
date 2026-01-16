@@ -9,6 +9,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Helmet } from 'react-helmet-async';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { AdminPageLayout, PageHeader } from '@/templates/flowbite-admin';
+import { ClipboardList } from 'lucide-react';
 
 function AuditLogsManager() {
     const { tenantId, userRole, hasPermission } = usePermissions();
@@ -98,21 +100,23 @@ function AuditLogsManager() {
     }
 
     return (
-        <div className="space-y-6">
+        <AdminPageLayout requiredPermission="tenant.audit.read">
             <Helmet>
                 <title>Audit Logs - CMS</title>
             </Helmet>
 
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <div>
-                    <h1 className="text-2xl font-bold tracking-tight text-foreground">Audit Trail</h1>
-                    <p className="text-muted-foreground">Enterprise-grade activity logging and compliance trail.</p>
-                </div>
-                <Button variant="outline" onClick={fetchLogs} disabled={loading}>
-                    <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-                    Refresh
-                </Button>
-            </div>
+            <PageHeader
+                title="Audit Trail"
+                description="Enterprise-grade activity logging and compliance trail."
+                icon={ClipboardList}
+                breadcrumbs={[{ label: 'Audit Logs', icon: ClipboardList }]}
+                actions={
+                    <Button variant="outline" onClick={fetchLogs} disabled={loading}>
+                        <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+                        Refresh
+                    </Button>
+                }
+            />
 
             <div className="bg-card rounded-lg border border-border shadow-sm p-4 flex items-center gap-4">
                 <div className="relative flex-1 max-w-md">
@@ -301,7 +305,7 @@ function AuditLogsManager() {
                     </div>
                 </DialogContent>
             </Dialog>
-        </div>
+        </AdminPageLayout>
     );
 }
 

@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
 import GenericContentManager from '@/components/dashboard/GenericContentManager';
-import { Briefcase, ChevronRight, Home } from 'lucide-react';
+import { Briefcase } from 'lucide-react';
+import { AdminPageLayout, PageHeader } from '@/templates/flowbite-admin';
 
 function PortfolioManager() {
     const columns = [
@@ -52,19 +52,13 @@ function PortfolioManager() {
     ];
 
     return (
-        <div className="space-y-6">
-            {/* Breadcrumb Navigation */}
-            <nav className="flex items-center text-sm text-muted-foreground">
-                <Link to="/cmspanel" className="hover:text-primary transition-colors flex items-center gap-1">
-                    <Home className="w-4 h-4" />
-                    Dashboard
-                </Link>
-                <ChevronRight className="w-4 h-4 mx-2 text-muted-foreground/50" />
-                <span className="flex items-center gap-1 text-foreground font-medium">
-                    <Briefcase className="w-4 h-4" />
-                    Portfolio
-                </span>
-            </nav>
+        <AdminPageLayout requiredPermission="portfolio.read">
+            <PageHeader
+                title="Portfolio"
+                description="Manage your portfolio and project showcase."
+                icon={Briefcase}
+                breadcrumbs={[{ label: 'Portfolio', icon: Briefcase }]}
+            />
 
             <GenericContentManager
                 tableName="portfolio"
@@ -74,7 +68,7 @@ function PortfolioManager() {
                 permissionPrefix="portfolio"
                 showBreadcrumbs={false}
             />
-        </div>
+        </AdminPageLayout>
     );
 }
 

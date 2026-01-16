@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
+import { AdminPageLayout, PageHeader } from '@/templates/flowbite-admin';
 
 function SSOManager() {
   const { toast } = useToast();
@@ -125,30 +126,19 @@ function SSOManager() {
   );
 
   return (
-    <div className="space-y-6">
-      {/* Breadcrumb Navigation */}
-      <nav className="flex items-center text-sm text-muted-foreground">
-        <a href="/cmspanel" className="hover:text-primary transition-colors flex items-center gap-1">
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
-          Dashboard
-        </a>
-        <svg className="w-4 h-4 mx-2 text-muted-foreground/50" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
-        <span className="flex items-center gap-1 text-foreground font-medium">
-          <Shield className="w-4 h-4" />
-          SSO & Security
-        </span>
-      </nav>
-
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-3xl font-bold text-foreground">{t('sso.title')}</h2>
-          <p className="text-muted-foreground">{t('sso.subtitle')}</p>
-        </div>
-        <Button onClick={() => { setCurrentPage(0); fetchSecurityData(0); }} variant="outline" className="gap-2" disabled={loading}>
-          <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-          {t('common.refresh')}
-        </Button>
-      </div>
+    <AdminPageLayout requiredPermission="platform.sso.read">
+      <PageHeader
+        title={t('sso.title')}
+        description={t('sso.subtitle')}
+        icon={Shield}
+        breadcrumbs={[{ label: 'SSO & Security', icon: Shield }]}
+        actions={(
+          <Button onClick={() => { setCurrentPage(0); fetchSecurityData(0); }} variant="outline" className="gap-2" disabled={loading}>
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+            {t('common.refresh')}
+          </Button>
+        )}
+      />
 
       <Tabs defaultValue="overview" className="w-full">
         <TabsList className="grid w-full grid-cols-3 mb-6">
@@ -385,7 +375,7 @@ function SSOManager() {
           </Card>
         </TabsContent>
       </Tabs>
-    </div>
+    </AdminPageLayout>
   );
 }
 

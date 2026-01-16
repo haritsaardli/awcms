@@ -193,7 +193,7 @@ WHERE created_at < NOW() - INTERVAL '365 days';
 
 ## Related Documentation
 
-- [Security](../00-core/SECURITY.md)
+- [Security](docs/security/overview.md)
 - [ABAC System](ABAC_SYSTEM.md)
 - [Monitoring](MONITORING.md)
 
@@ -207,4 +207,4 @@ WHERE created_at < NOW() - INTERVAL '365 days';
 ## References
 
 - `../02-reference/DATABASE_SCHEMA.md`
-- `../00-core/SECURITY.md`
+- `docs/security/overview.md`

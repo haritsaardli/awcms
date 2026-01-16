@@ -14,7 +14,7 @@ Define the non-negotiable architecture and implementation standards for AWCMS ac
 ## Prerequisites
 
 - `../../../AGENTS.md` must be followed over all other instructions
-- `../00-core/DOCS_STRUCTURE.md` for documentation structure
+- `DOCS_INDEX.md` for documentation structure
 
 ## Core Concepts
 
@@ -27,7 +27,7 @@ Define the non-negotiable architecture and implementation standards for AWCMS ac
 - **ABAC System**:
   - Context: `awcms/src/contexts/PermissionContext.jsx`
   - Hook: `usePermissions()` (role and permission checks)
-  - Definition: `../03-features/ROLE_HIERARCHY.md`
+  - Definition: `docs/modules/ROLE_HIERARCHY.md`
 - **Administrative Regions**: Indonesian administrative regions (Propinsi to Desa/Kelurahan) sourced from [cahyadsn/wilayah](https://github.com/cahyadsn/wilayah/blob/master/db/wilayah.sql) (Last Updated: 2026-01-13). Managed via `regions` table with standard hierarchy.
 - **Tenants**: Multi-tenancy support with `tenants` table and RLS policies.
   - Context: `awcms/src/contexts/TenantContext.jsx`
@@ -42,15 +42,15 @@ Define the non-negotiable architecture and implementation standards for AWCMS ac
   - Rules: `../02-reference/RLS_POLICIES.md`
 - **Audit and Lifecycle**:
   - Logging: `useAuditLog()`, `useExtensionAudit()`
-  - Soft delete only: `../00-core/SOFT_DELETE.md`
+  - Soft delete only: `docs/architecture/database.md`
 
 #### 1.2 Security Documentation
 
-- `../03-features/ABAC_SYSTEM.md`
-- `../00-core/MULTI_TENANCY.md`
-- `../00-core/SECURITY.md`
-- `../03-features/USER_MANAGEMENT.md`
-- `../03-features/PERFORMANCE.md`
+- `docs/security/abac.md`
+- `docs/tenancy/overview.md`
+- `docs/security/overview.md`
+- `docs/modules/USER_MANAGEMENT.md`
+- `docs/modules/PERFORMANCE.md`
 
 ### 2. Core UI and UX
 
@@ -78,11 +78,11 @@ Define the non-negotiable architecture and implementation standards for AWCMS ac
 
 #### 2.2 UI and UX Documentation
 
-- `../03-features/TEMPLATE_SYSTEM.md`
-- `../03-features/THEMING.md`
-- `../03-features/VISUAL_BUILDER.md`
-- `../03-features/MENU_SYSTEM.md`
-- `../03-features/INTERNATIONALIZATION.md`
+- `docs/modules/TEMPLATE_SYSTEM.md`
+- `docs/modules/THEMING.md`
+- `docs/modules/VISUAL_BUILDER.md`
+- `docs/modules/MENU_SYSTEM.md`
+- `docs/modules/INTERNATIONALIZATION.md`
 
 ### 3. Core Extension System
 
@@ -139,8 +139,8 @@ Define the non-negotiable architecture and implementation standards for AWCMS ac
 
 #### 3.4 Extension Documentation
 
-- `../03-features/EXTENSIONS.md`
-- `../03-features/MODULES_GUIDE.md`
+- `docs/modules/EXTENSIONS.md`
+- `docs/modules/MODULES_GUIDE.md`
 
 ### 4. Core Documentation
 
@@ -173,10 +173,10 @@ Define the non-negotiable architecture and implementation standards for AWCMS ac
 
 #### 5.2 Additional Standards Documentation
 
-- `../01-guides/MOBILE_DEVELOPMENT.md`
-- `../01-guides/CLOUDFLARE_DEPLOYMENT.md`
-- `../01-guides/TESTING.md`
-- `../01-guides/CONTRIBUTING.md`
+- `docs/dev/mobile.md`
+- `docs/deploy/cloudflare.md`
+- `docs/dev/testing.md`
+- `CONTRIBUTING.md`
 - `../ARCHITECTURAL_RECOMMENDATIONS.md`
 
 ## Security and Compliance Notes
@@ -189,11 +189,11 @@ Define the non-negotiable architecture and implementation standards for AWCMS ac
 ## Operational Concerns
 
 - Update `awcms/CHANGELOG.md` and `docs/changelog.md` for releases and doc updates.
-- Versioning rules live in `../03-features/VERSIONING.md`.
+- Versioning rules live in `docs/modules/VERSIONING.md`.
 
 ## Troubleshooting
 
-- See `../01-guides/TROUBLESHOOTING.md`.
+- See `docs/dev/troubleshooting.md`.
 
 ## References
 

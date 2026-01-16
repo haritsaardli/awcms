@@ -176,7 +176,7 @@ function MyComponent() {
 ## Related Documentation
 
 - [ABAC System](ABAC_SYSTEM.md)
-- [Security](../00-core/SECURITY.md)
+- [Security](docs/security/overview.md)
 - [User Management](USER_MANAGEMENT.md)
 
 ---
@@ -191,5 +191,5 @@ function MyComponent() {
 
 ## References
 
-- `../03-features/ABAC_SYSTEM.md`
-- `../00-core/SECURITY.md`
+- `docs/security/abac.md`
+- `docs/security/overview.md`

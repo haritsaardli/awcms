@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
 import GenericContentManager from '@/components/dashboard/GenericContentManager';
-import { Handshake, ChevronRight, Home } from 'lucide-react';
+import { Handshake } from 'lucide-react';
+import { AdminPageLayout, PageHeader } from '@/templates/flowbite-admin';
 
 function PartnersManager() {
     const columns = [
@@ -46,18 +46,13 @@ function PartnersManager() {
     ];
 
     return (
-        <div className="space-y-6">
-            <nav className="flex items-center text-sm text-muted-foreground">
-                <Link to="/cmspanel" className="hover:text-primary transition-colors flex items-center gap-1">
-                    <Home className="w-4 h-4" />
-                    Dashboard
-                </Link>
-                <ChevronRight className="w-4 h-4 mx-2 text-muted-foreground/50" />
-                <span className="flex items-center gap-1 text-foreground font-medium">
-                    <Handshake className="w-4 h-4" />
-                    Partners
-                </span>
-            </nav>
+        <AdminPageLayout requiredPermission="partners.read">
+            <PageHeader
+                title="Partners"
+                description="Manage partner logos and sponsorships."
+                icon={Handshake}
+                breadcrumbs={[{ label: 'Partners', icon: Handshake }]}
+            />
 
             <GenericContentManager
                 tableName="partners"
@@ -68,7 +63,7 @@ function PartnersManager() {
                 showBreadcrumbs={false}
                 defaultSortColumn="order"
             />
-        </div>
+        </AdminPageLayout>
     );
 }
 
