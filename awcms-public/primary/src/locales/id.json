@@ -1,0 +1,88 @@
+{
+    "common": {
+        "loading": "Memuat...",
+        "back": "Kembali",
+        "read_more": "Baca Selengkapnya",
+        "view_all": "Lihat Semua",
+        "search": "Cari...",
+        "no_results": "Tidak ada hasil ditemukan.",
+        "share": "Bagikan",
+        "categories": "Kategori",
+        "tags": "Tag",
+        "posted_on": "Diposting pada",
+        "by": "oleh",
+        "min_read": "menit baca"
+    },
+    "nav": {
+        "home": "Beranda",
+        "about": "Tentang",
+        "blog": "Blog",
+        "articles": "Artikel",
+        "portfolio": "Portofolio",
+        "services": "Layanan",
+        "contact": "Kontak",
+        "pages": "Halaman",
+        "products": "Produk"
+    },
+    "footer": {
+        "copyright": "Hak cipta dilindungi undang-undang.",
+        "privacy_policy": "Kebijakan Privasi",
+        "terms_of_service": "Ketentuan Layanan",
+        "sitemap": "Peta Situs",
+        "follow_us": "Ikuti Kami",
+        "newsletter": "Buletin",
+        "subscribe": "Berlangganan",
+        "email_placeholder": "Masukkan email Anda"
+    },
+    "hero": {
+        "welcome": "Selamat Datang",
+        "learn_more": "Pelajari Lebih Lanjut",
+        "get_started": "Mulai Sekarang",
+        "contact_us": "Hubungi Kami"
+    },
+    "blog": {
+        "title": "Blog",
+        "subtitle": "Berita dan pembaruan terbaru",
+        "read_more": "Baca Selengkapnya",
+        "posted_on": "Diposting pada",
+        "by_author": "oleh",
+        "in_category": "dalam",
+        "related_posts": "Artikel Terkait",
+        "no_posts": "Tidak ada artikel ditemukan."
+    },
+    "contact": {
+        "title": "Hubungi Kami",
+        "subtitle": "Silakan hubungi kami",
+        "name": "Nama",
+        "email": "Email",
+        "phone": "Telepon",
+        "message": "Pesan",
+        "send": "Kirim Pesan",
+        "sending": "Mengirim...",
+        "success": "Pesan berhasil dikirim!",
+        "error": "Gagal mengirim pesan. Silakan coba lagi.",
+        "address": "Alamat",
+        "hours": "Jam Operasional"
+    },
+    "portfolio": {
+        "title": "Portofolio",
+        "subtitle": "Karya terbaru kami",
+        "view_project": "Lihat Proyek",
+        "all": "Semua"
+    },
+    "products": {
+        "title": "Produk",
+        "add_to_cart": "Tambah ke Keranjang",
+        "buy_now": "Beli Sekarang",
+        "price": "Harga",
+        "in_stock": "Tersedia",
+        "out_of_stock": "Stok Habis"
+    },
+    "error": {
+        "404_title": "Halaman Tidak Ditemukan",
+        "404_message": "Halaman yang Anda cari tidak ada.",
+        "500_title": "Kesalahan Server",
+        "500_message": "Terjadi kesalahan. Silakan coba lagi nanti.",
+        "go_home": "Kembali ke Beranda"
+    }
+}

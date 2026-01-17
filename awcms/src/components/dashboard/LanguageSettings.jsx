@@ -26,7 +26,7 @@ function LanguageSettings() {
 
       window.googleTranslateElementInit = () => {
         new window.google.translate.TranslateElement(
-          { pageLanguage: 'id', layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE },
+          { pageLanguage: 'en', layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE },
           'google_translate_element'
         );
       };
@@ -100,7 +100,7 @@ function LanguageSettings() {
                 <span className="text-2xl">🇮🇩</span>
                 <div className="text-left">
                   <p className="font-bold text-slate-900">Bahasa Indonesia</p>
-                  <p className="text-xs text-slate-500">Default</p>
+                  <p className="text-xs text-slate-500">Secondary</p>
                 </div>
               </div>
               {currentLang === 'id' && <Check className="w-5 h-5 text-blue-600" />}
@@ -117,7 +117,7 @@ function LanguageSettings() {
                 <span className="text-2xl">🇺🇸</span>
                 <div className="text-left">
                   <p className="font-bold text-slate-900">English</p>
-                  <p className="text-xs text-slate-500">US / International</p>
+                  <p className="text-xs text-slate-500">Default (Primary)</p>
                 </div>
               </div>
               {currentLang === 'en' && <Check className="w-5 h-5 text-blue-600" />}

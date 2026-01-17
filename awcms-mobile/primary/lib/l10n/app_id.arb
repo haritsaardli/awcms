@@ -1,0 +1,79 @@
+{
+  "@@locale": "id",
+  "@@last_modified": "2026-01-18",
+  
+  "appTitle": "AWCMS Mobile",
+  "home": "Beranda",
+  "dashboard": "Dasbor",
+  "profile": "Profil",
+  "settings": "Pengaturan",
+  "notifications": "Notifikasi",
+  
+  "login": "Masuk",
+  "logout": "Keluar",
+  "register": "Daftar",
+  "email": "Email",
+  "password": "Kata Sandi",
+  "forgotPassword": "Lupa Kata Sandi?",
+  "loginButton": "Masuk",
+  "registerButton": "Buat Akun",
+  
+  "loading": "Memuat...",
+  "error": "Kesalahan",
+  "success": "Berhasil",
+  "retry": "Coba Lagi",
+  "cancel": "Batal",
+  "save": "Simpan",
+  "delete": "Hapus",
+  "edit": "Edit",
+  "confirm": "Konfirmasi",
+  "back": "Kembali",
+  "next": "Selanjutnya",
+  "done": "Selesai",
+  "close": "Tutup",
+  
+  "noData": "Tidak ada data tersedia",
+  "noConnection": "Tidak ada koneksi internet",
+  "connectionRestored": "Koneksi dipulihkan",
+  "offlineMode": "Mode Offline",
+  "syncingData": "Menyinkronkan data...",
+  "syncComplete": "Sinkronisasi selesai",
+  
+  "articles": "Artikel",
+  "readMore": "Baca Selengkapnya",
+  "postedOn": "Diposting pada",
+  "byAuthor": "oleh",
+  
+  "portfolio": "Portofolio",
+  "viewProject": "Lihat Proyek",
+  
+  "contact": "Kontak",
+  "sendMessage": "Kirim Pesan",
+  "messageSent": "Pesan berhasil dikirim",
+  
+  "language": "Bahasa",
+  "selectLanguage": "Pilih Bahasa",
+  "english": "English",
+  "indonesian": "Bahasa Indonesia",
+  
+  "darkMode": "Mode Gelap",
+  "lightMode": "Mode Terang",
+  "systemTheme": "Tema Sistem",
+  
+  "aboutApp": "Tentang Aplikasi",
+  "version": "Versi",
+  "termsOfService": "Ketentuan Layanan",
+  "privacyPolicy": "Kebijakan Privasi",
+  
+  "location": "Lokasi",
+  "gettingLocation": "Mendapatkan lokasi Anda...",
+  "locationPermissionDenied": "Izin lokasi ditolak",
+  
+  "camera": "Kamera",
+  "gallery": "Galeri",
+  "uploadImage": "Unggah Gambar",
+  
+  "pushNotifications": "Notifikasi Push",
+  "enableNotifications": "Aktifkan Notifikasi",
+  "notificationSettings": "Pengaturan Notifikasi"
+}

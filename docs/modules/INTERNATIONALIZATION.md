@@ -1,43 +1,232 @@
 # Internationalization (i18n)
 
 ## Purpose
-Describe how AWCMS handles translations and locale detection.
+
+Describe how AWCMS handles translations and locale detection for multi-language support.
 
 ## Audience
+
 - Admin panel developers
+- Frontend developers
+- Extension authors
 
 ## Prerequisites
+
 - `docs/architecture/folder-structure.md`
+
+---
+
+## Available Languages
+
+| Language   | Code | Status                |
+| :--------- | :--- | :-------------------- |
+| English    | `en` | **Primary** (Default) |
+| Indonesian | `id` | Secondary             |
+
+---
 
 ## Core Concepts
 
-- i18next provides runtime translation.
-- Translation files live in `awcms/src/locales`.
-- Template strings may be stored in `template_strings`.
+- **i18next** provides runtime translation.
+- Translation files live in `awcms/src/locales/`.
+- Language detection uses browser settings, with localStorage override.
+- User preferences are persisted to the `users.language` database column.
 
-## How It Works
+---
 
-- Configuration: `awcms/src/lib/i18n.js`.
-- Language detection uses `i18next-browser-languagedetector`.
+## Configuration
 
-## Implementation Patterns
+### File: `awcms/src/lib/i18n.js`
 
 ```javascript
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
+import LanguageDetector from 'i18next-browser-languagedetector';
 
-// See awcms/src/lib/i18n.js for the full setup.
+import en from '@/locales/en.json';
+import id from '@/locales/id.json';
+
+i18n
+  .use(LanguageDetector)
+  .use(initReactI18next)
+  .init({
+    resources: {
+      en: { translation: en },
+      id: { translation: id }
+    },
+    fallbackLng: 'en', // Default to English
+    interpolation: {
+      escapeValue: false // React already safes from XSS
+    },
+    detection: {
+      order: ['localStorage', 'navigator'],
+      caches: ['localStorage']
+    }
+  });
+
+export default i18n;
 ```
 
-## Permissions and Access
+### Detection Order
 
-- Localization data is tenant-scoped when stored in the database.
+1. **localStorage**: Checks for `i18nextLng` key.
+2. **navigator**: Falls back to browser language settings.
+3. **fallbackLng**: Uses English if no match found.
+
+---
+
+## Usage in Components
+
+### Using the `useTranslation` Hook
+
+```jsx
+import { useTranslation } from 'react-i18next';
+
+function MyComponent() {
+  const { t } = useTranslation();
+  
+  return (
+    <div>
+      <h1>{t('common.welcome_back')}</h1>
+      <p>{t('common.loading')}</p>
+    </div>
+  );
+}
+```
+
+### Changing Language Programmatically
+
+```jsx
+import { useTranslation } from 'react-i18next';
+
+function LanguageSwitcher() {
+  const { i18n } = useTranslation();
+  
+  const handleChange = (lang) => {
+    i18n.changeLanguage(lang);
+    localStorage.setItem('i18nextLng', lang);
+  };
+
+  return (
+    <button onClick={() => handleChange('id')}>Switch to Indonesian</button>
+  );
+}
+```
+
+---
+
+## Translation File Structure
+
+### File: `awcms/src/locales/en.json`
+
+```json
+{
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel"
+  },
+  "menu": {
+    "dashboard": "Dashboard",
+    "articles": "Articles"
+  }
+}
+```
+
+### Key Naming Conventions
+
+| Pattern | Example | Use Case |
+| :------ | :------ | :------- |
+| `{namespace}.{key}` | `common.loading` | Shared UI elements |
+| `{module}.{key}` | `articles.title` | Module-specific text |
+| `{module}.form.{field}` | `articles.form.excerpt` | Form labels |
+
+---
+
+## Adding New Translations
+
+### Step 1: Add to English File
+
+Edit `awcms/src/locales/en.json`:
+
+```json
+{
+  "my_module": {
+    "welcome": "Welcome to My Module"
+  }
+}
+```
+
+### Step 2: Add to Indonesian File
+
+Edit `awcms/src/locales/id.json`:
+
+```json
+{
+  "my_module": {
+    "welcome": "Selamat Datang di Modul Saya"
+  }
+}
+```
+
+### Step 3: Use in Component
+
+```jsx
+const { t } = useTranslation();
+return <h1>{t('my_module.welcome')}</h1>;
+```
+
+---
+
+## Database Persistence
+
+User language preferences are stored in the `users` table:
+
+| Column | Type | Description |
+| :----- | :--- | :---------- |
+| `language` | `text` | ISO language code (`en`, `id`) |
+
+When a user changes their language in `LanguageSettings`, it is saved to the database and will persist across sessions and devices.
+
+---
+
+## UI Components
+
+| Component | Path | Purpose |
+| :-------- | :--- | :------ |
+| `LanguageSelector` | `src/components/ui/LanguageSelector.jsx` | Dropdown in header |
+| `LanguageSettings` | `src/components/dashboard/LanguageSettings.jsx` | Full settings page |
+
+---
 
 ## Security and Compliance Notes
 
 - Do not render user-provided HTML without sanitization.
+- Translation keys should not contain sensitive data.
+- Localization data is tenant-scoped when stored in the database.
+
+---
 
 ## References
 
-- `docs/modules/TEMPLATE_SYSTEM.md`
-- `../../src/lib/i18n.js`
+- [i18next Documentation](https://www.i18next.com/)
+- [react-i18next Documentation](https://react.i18next.com/)
+- [lib/i18n.js](file:///home/data/dev_react/awcms-dev/awcms/src/lib/i18n.js)
+- [en.json](file:///home/data/dev_react/awcms-dev/awcms/src/locales/en.json)
+- [id.json](file:///home/data/dev_react/awcms-dev/awcms/src/locales/id.json)
+
+---
+
+## Cross-Channel i18n
+
+For multi-language implementation across all AWCMS channels, see:
+
+- [Multi-Language Development Guide](file:///home/data/dev_react/awcms-dev/docs/dev/multi-language.md)
+
+### Other Channels
+
+| Channel | Technology | Locale Path |
+| :------ | :--------- | :---------- |
+| awcms-public | Astro | `src/locales/` |
+| awcms-mobile | Flutter | `lib/l10n/` |
+| awcms-esp32 | C++ | `include/lang_*.h` |

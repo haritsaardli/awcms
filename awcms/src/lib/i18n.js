@@ -11,10 +11,10 @@ i18n
   .use(initReactI18next)
   .init({
     resources: {
-      id: { translation: id },
-      en: { translation: en }
+      en: { translation: en },
+      id: { translation: id }
     },
-    fallbackLng: 'id', // Default to Indonesian
+    fallbackLng: 'en', // Default to English
     interpolation: {
       escapeValue: false // react already safes from xss
     },

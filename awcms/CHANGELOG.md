@@ -5,6 +5,28 @@ All notable changes to the **AWCMS** project will be documented in this file.
 
 ## [Unreleased]
 
+## [2.17.0] "Citadel" - 2026-01-18
+
+### Added
+
+- **Cross-Channel Multi-Language Support**:
+  - Implemented English as the primary language across all AWCMS channels.
+  - Added Indonesian as a secondary language with full translations.
+  - **awcms**: Set English as `fallbackLng` in i18next config, reordered language selector.
+  - **awcms-public**: Created locale files (`en.json`, `id.json`) and `i18n.ts` utility for Astro.
+  - **awcms-mobile**: Added Flutter l10n with ARB files for English and Indonesian.
+  - **awcms-esp32**: Created language header files (`lang_en.h`, `lang_id.h`) with 40+ macros.
+- **Documentation**:
+  - Created comprehensive `docs/dev/multi-language.md` cross-channel i18n guide.
+  - Updated `docs/modules/INTERNATIONALIZATION.md` with full usage examples and channel references.
+
+### Changed
+
+- **UI Language Defaults**:
+  - `LanguageSettings.jsx`: English marked as "Default (Primary)", Indonesian as "Secondary".
+  - `LanguageSelector.jsx`: English appears first in dropdown.
+  - Google Translate widget `pageLanguage` updated to English.
+
 ## [2.16.0] "Bastion" - 2026-01-17
 
 ### Changed

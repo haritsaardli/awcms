@@ -11,6 +11,21 @@
     },
     {
       "pattern": "^#"
+    },
+    {
+      "pattern": "^https?://(www\\.)?codesandbox\\.io"
+    },
+    {
+      "pattern": "^https?://(www\\.)?githubbox\\.com"
+    },
+    {
+      "pattern": "^https?://(www\\.)?gitpod\\.io"
+    },
+    {
+      "pattern": "^https?://(www\\.)?stackblitz\\.com"
+    },
+    {
+      "pattern": "^https?://svgshare\\.com"
     }
   ],
   "replacementPatterns": [],
