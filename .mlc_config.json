@@ -71,6 +71,15 @@
     },
     {
       "pattern": "^https?://example\\.com"
+    },
+    {
+      "pattern": "^https?://.*\\.github\\.io"
+    },
+    {
+      "pattern": "^https?://.*\\.amazonaws\\.com"
+    },
+    {
+      "pattern": "^https?://assets\\.codesandbox\\.io"
     }
   ],
   "replacementPatterns": [],
