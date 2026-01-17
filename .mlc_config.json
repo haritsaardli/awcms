@@ -13,6 +13,9 @@
       "pattern": "^#"
     },
     {
+      "pattern": "^file://"
+    },
+    {
       "pattern": "^https?://(www\\.)?codesandbox\\.io"
     },
     {
