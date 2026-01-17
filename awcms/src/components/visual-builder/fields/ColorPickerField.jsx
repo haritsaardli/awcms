@@ -18,7 +18,7 @@ export const ColorPickerField = ({ field, name, value, onChange }) => {
 
     return (
         <div className="space-y-2">
-            <label className="block text-sm font-medium text-slate-700">
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
                 {field.label || name}
             </label>
             <div className="flex items-center gap-2">
@@ -27,7 +27,7 @@ export const ColorPickerField = ({ field, name, value, onChange }) => {
                     type="color"
                     value={value || '#000000'}
                     onChange={handleChange}
-                    className="h-10 w-20 rounded border border-slate-300 cursor-pointer"
+                    className="h-10 w-20 rounded border border-slate-300 dark:border-slate-600 cursor-pointer bg-transparent"
                     title="Pick a color"
                 />
                 {/* Text input for hex code */}
@@ -37,7 +37,7 @@ export const ColorPickerField = ({ field, name, value, onChange }) => {
                     onChange={handleTextChange}
                     placeholder="#000000"
                     maxLength={7}
-                    className="flex-1 px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm"
+                    className="flex-1 px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100"
                 />
                 {/* Preview swatch */}
                 <div

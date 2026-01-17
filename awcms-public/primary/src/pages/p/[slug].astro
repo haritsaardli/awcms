@@ -80,12 +80,15 @@ const htmlContent = page.content || '';
 
       <!-- Page Content -->
       {isVisual ? (
+        <>
         <!-- Visual Builder Content (JSON blocks) -->
         <div class="visual-content prose prose-lg dark:prose-invert max-w-none">
           <!-- TODO: Implement visual block renderer -->
           <p class="text-muted-foreground">Visual content rendering coming soon...</p>
         </div>
+        </>
       ) : (
+        <>
         <!-- Rich Text Content (HTML) -->
         <article 
           class="prose prose-lg dark:prose-invert max-w-none
@@ -94,6 +97,7 @@ const htmlContent = page.content || '';
                  prose-img:rounded-xl prose-img:shadow-lg"
           set:html={htmlContent}
         />
+        </>
       )}
 
       <!-- Page Footer -->

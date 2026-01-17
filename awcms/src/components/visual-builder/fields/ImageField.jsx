@@ -49,7 +49,7 @@ export const ImageField = ({ field, value, onChange, name }) => {
 
             {/* Preview */}
             {value && (
-                <div className="relative group w-full h-32 rounded-lg overflow-hidden border border-slate-200 bg-slate-100">
+                <div className="relative group w-full h-32 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800">
                     <img
                         src={value}
                         alt="Selected"

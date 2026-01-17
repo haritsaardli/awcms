@@ -11,18 +11,18 @@ const Navbar = ({ toggleSidebar }) => {
     };
 
     return (
-        <nav className="fixed z-30 w-full bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+        <nav className="fixed z-30 w-full bg-background border-b border-border">
             <div className="px-3 py-3 lg:px-5 lg:pl-3">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center justify-start">
                         <button
                             onClick={toggleSidebar}
-                            className="p-2 text-gray-600 rounded cursor-pointer lg:hidden hover:text-gray-900 hover:bg-gray-100 focus:bg-gray-100 dark:focus:bg-gray-700 focus:ring-2 focus:ring-gray-100 dark:focus:ring-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                            className="p-2 text-muted-foreground rounded cursor-pointer lg:hidden hover:text-foreground hover:bg-accent focus:bg-accent focus:ring-2 focus:ring-border"
                         >
                             <Menu className="w-6 h-6" />
                         </button>
                         <Link to="/" className="flex ml-2 md:mr-24">
-                            <span className="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap dark:text-white">
+                            <span className="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap text-foreground">
                                 AWCMS
                             </span>
                         </Link>
@@ -31,12 +31,12 @@ const Navbar = ({ toggleSidebar }) => {
                     </div>
                     <div className="flex items-center">
                         {/* Github Button */}
-                        <a href="https://github.com/ahliweb/awcms" target="_blank" rel="noreferrer" className="hidden sm:inline-block p-2 text-gray-500 rounded-lg hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-700 mr-2">
+                        <a href="https://github.com/ahliweb/awcms" target="_blank" rel="noreferrer" className="hidden sm:inline-block p-2 text-muted-foreground rounded-lg hover:text-foreground hover:bg-accent mr-2">
                             <Github className="w-6 h-6" />
                         </a>
 
                         {/* Notifications (Placeholder) */}
-                        <button type="button" className="p-2 text-gray-500 rounded-lg hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-700">
+                        <button type="button" className="p-2 text-muted-foreground rounded-lg hover:text-foreground hover:bg-accent">
                             <span className="sr-only">View notifications</span>
                             <Bell className="w-6 h-6" />
                         </button>
@@ -44,16 +44,16 @@ const Navbar = ({ toggleSidebar }) => {
                         {/* Theme Toggle */}
                         <button
                             onClick={toggleTheme}
-                            className="p-2 text-gray-500 rounded-lg hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-700"
+                            className="p-2 text-muted-foreground rounded-lg hover:text-foreground hover:bg-accent"
                         >
                             {isDark ? <Sun className="w-6 h-6" /> : <Moon className="w-6 h-6" />}
                         </button>
 
                         {/* User Profile (Simplified) */}
-                        <button type="button" className="flex mx-3 text-sm bg-gray-800 rounded-full md:mr-0 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600">
+                        <button type="button" className="flex mx-3 text-sm bg-muted rounded-full md:mr-0 focus:ring-4 focus:ring-accent">
                             <span className="sr-only">Open user menu</span>
-                            <div className="w-8 h-8 rounded-full flex items-center justify-center bg-gray-300 dark:bg-gray-600">
-                                <User className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+                            <div className="w-8 h-8 rounded-full flex items-center justify-center bg-muted">
+                                <User className="w-5 h-5 text-muted-foreground" />
                             </div>
                         </button>
                     </div>

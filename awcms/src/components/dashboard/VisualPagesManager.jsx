@@ -35,12 +35,12 @@ const VisualPagesManager = () => {
             />
 
             <Tabs defaultValue="pages" className="w-full">
-                <div className="bg-slate-100 p-1 rounded-lg inline-flex mb-6">
-                    <TabsList className="bg-transparent">
-                        <TabsTrigger value="pages" className="flex items-center gap-2 px-4">
+                <div className="bg-slate-100 dark:bg-slate-800 p-1 rounded-lg inline-flex mb-6">
+                    <TabsList className="bg-transparent dark:text-slate-200">
+                        <TabsTrigger value="pages" className="flex items-center gap-2 px-4 data-[state=active]:bg-white dark:data-[state=active]:bg-slate-950 dark:data-[state=active]:text-slate-100">
                             <Layers className="w-4 h-4" /> Content Pages
                         </TabsTrigger>
-                        <TabsTrigger value="layouts" className="flex items-center gap-2 px-4">
+                        <TabsTrigger value="layouts" className="flex items-center gap-2 px-4 data-[state=active]:bg-white dark:data-[state=active]:bg-slate-950 dark:data-[state=active]:text-slate-100">
                             <Palette className="w-4 h-4" /> Theme Layouts
                         </TabsTrigger>
                     </TabsList>

@@ -1,4 +1,8 @@
 @import "tailwindcss";
+
+/* Enable class-based dark mode for Tailwind v4 */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @plugin "tailwindcss-animate";
 @source "../node_modules/flowbite";
 @plugin "@tailwindcss/typography";
@@ -12,26 +16,30 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
 
-  /* Native CSS Variables for Colors */
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
+  /* 
+   * Color tokens - these use 'initial' to tell Tailwind these exist,
+   * then @layer base applies the actual dynamic CSS variable values.
+   * This ensures dark mode switching works properly.
+   */
+  --color-background: initial;
+  --color-foreground: initial;
+  --color-card: initial;
+  --color-card-foreground: initial;
+  --color-popover: initial;
+  --color-popover-foreground: initial;
+  --color-primary: initial;
+  --color-primary-foreground: initial;
+  --color-secondary: initial;
+  --color-secondary-foreground: initial;
+  --color-muted: initial;
+  --color-muted-foreground: initial;
+  --color-accent: initial;
+  --color-accent-foreground: initial;
+  --color-destructive: initial;
+  --color-destructive-foreground: initial;
+  --color-border: initial;
+  --color-input: initial;
+  --color-ring: initial;
 
   /* Animations from original config */
   --animate-accordion-down: accordion-down 0.2s ease-out;
@@ -98,9 +106,31 @@
   --ring: oklch(0.87 0 0);
 
   --radius: 0.5rem;
+
+  /* Tailwind color bindings - these enable bg-background, text-foreground, etc. */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
 }
 
 .dark {
+  /* Dark mode theme variables - UPDATED v2 */
   --background: oklch(0.145 0.04 264);
   --foreground: oklch(0.98 0.005 264);
 
@@ -110,8 +140,8 @@
   --popover: oklch(0.18 0.035 264);
   --popover-foreground: oklch(0.98 0.005 264);
 
-  --primary: oklch(0.98 0 0);
-  --primary-foreground: oklch(0.18 0.04 264);
+  --primary: oklch(0.55 0.2 255);
+  --primary-foreground: oklch(0.98 0 0);
 
   --secondary: oklch(0.28 0.02 264);
   --secondary-foreground: oklch(0.95 0.005 264);
@@ -132,11 +162,13 @@
 
 @layer base {
   * {
-    @apply border-border;
+    border-color: var(--border);
   }
 
   body {
-    @apply bg-background text-foreground font-sans;
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
   }
 
   h1,
@@ -145,7 +177,7 @@
   h4,
   h5,
   h6 {
-    @apply font-heading;
+    font-family: var(--font-heading);
   }
 }
 

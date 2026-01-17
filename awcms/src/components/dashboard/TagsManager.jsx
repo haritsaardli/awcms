@@ -450,7 +450,7 @@ function TagsManager() {
                             <select
                                 value={moduleFilter}
                                 onChange={(e) => { setModuleFilter(e.target.value); setCurrentPage(1); }}
-                                className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm pl-9 appearance-none focus:ring-2 focus:ring-ring"
+                                className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm pl-9 appearance-none focus:ring-2 focus:ring-ring dark:bg-slate-950 dark:text-slate-200 dark:border-slate-800"
                             >
                                 {MODULES.map(m => (
                                     <option key={m.value} value={m.value}>{m.label}</option>
@@ -462,7 +462,7 @@ function TagsManager() {
                             <select
                                 value={activeFilter}
                                 onChange={(e) => { setActiveFilter(e.target.value); setCurrentPage(1); }}
-                                className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm pl-9 appearance-none focus:ring-2 focus:ring-ring"
+                                className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm pl-9 appearance-none focus:ring-2 focus:ring-ring dark:bg-slate-950 dark:text-slate-200 dark:border-slate-800"
                             >
                                 <option value="all">All Status</option>
                                 <option value="active">Active</option>
@@ -619,12 +619,12 @@ function TagsManager() {
 
             {displayedTags.length > 0 && (
                 <div className="flex flex-col sm:flex-row justify-between items-center gap-4 px-2">
-                    <div className="text-sm text-muted-foreground">
+                    <div className="text-xs text-muted-foreground">
                         Showing <span className="font-medium text-foreground">{((currentPage - 1) * itemsPerPage) + 1}</span> to <span className="font-medium text-foreground">{Math.min(currentPage * itemsPerPage, displayedTags.length)}</span> of <span className="font-medium text-foreground">{displayedTags.length}</span> items
                     </div>
                     <div className="flex items-center gap-4">
                         <select
-                            className="h-8 rounded-md border border-input bg-background text-sm text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                            className="h-8 rounded-md border border-input bg-background text-xs text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring dark:bg-slate-950 dark:text-slate-200 dark:border-slate-800"
                             value={itemsPerPage}
                             onChange={(e) => { setItemsPerPage(Number(e.target.value)); setCurrentPage(1); }}
                         >

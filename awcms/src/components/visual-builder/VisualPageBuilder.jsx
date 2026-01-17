@@ -568,12 +568,26 @@ const VisualPageBuilder = ({ page: initialPage, onClose, onSuccess }) => {
         return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     };
 
+    // Stable handler for metadata updates
+    const handleMetadataChange = useCallback((key, value) => {
+        setPageMetadata(prev => {
+            if (prev[key] === value) return prev;
+            // Deep check for objects if necessary, but here we deal with primitives
+            return { ...prev, [key]: value };
+        });
+    }, []);
+
+    const handleSlugChange = useCallback((newSlug) => {
+        handleMetadataChange('slug', newSlug);
+    }, [handleMetadataChange]);
+
     // --- RENDER ---
     return (
         <div className="fixed inset-0 z-[100] flex flex-col bg-background">
             {/* Header / Toolbar */}
             {/* Header / Toolbar */}
-            <header className="border-b bg-white/80 backdrop-blur-md supports-[backdrop-filter]:bg-white/60 h-16 flex items-center justify-between px-6 shrink-0 gap-6 z-50 shadow-sm transition-all duration-300">
+            {/* Header / Toolbar */}
+            <header className="border-b bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/60 h-16 flex items-center justify-between px-6 shrink-0 gap-6 z-50 shadow-sm transition-all duration-300">
                 <div className="flex items-center gap-4">
                     <Button
                         variant="ghost"
@@ -593,7 +607,7 @@ const VisualPageBuilder = ({ page: initialPage, onClose, onSuccess }) => {
                     </Button>
                     <div className="flex flex-col">
                         <div className="flex items-center gap-2">
-                            <h1 className="text-lg font-bold text-slate-800 tracking-tight leading-none bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-transparent">
+                            <h1 className="text-lg font-bold text-foreground tracking-tight leading-none bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">
                                 {pageMetadata.title || 'Untitled Page'}
                             </h1>
                             <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${pageMetadata.status === 'published'
@@ -702,7 +716,7 @@ const VisualPageBuilder = ({ page: initialPage, onClose, onSuccess }) => {
             </header>
 
             {/* Main Editor Area */}
-            <div className={`flex-1 overflow-hidden relative ${previewMode ? 'bg-background' : 'bg-slate-50'}`}>
+            <div className={`flex-1 overflow-hidden relative ${previewMode ? 'bg-background' : 'bg-muted/30'}`}>
                 {previewMode ? (
                     <div className={`w-full h-full overflow-y-auto ${viewportClasses[viewport] || 'w-full'} transition-all mx-auto bg-white shadow-sm my-4 border min-h-screen`}>
                         <div className="min-h-full">
@@ -729,26 +743,26 @@ const VisualPageBuilder = ({ page: initialPage, onClose, onSuccess }) => {
             </div>
 
             <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
-                <DialogContent className="sm:max-w-[500px] bg-white/95 backdrop-blur-xl border-slate-200 shadow-2xl">
-                    <DialogHeader className="pb-4 border-b border-slate-100">
-                        <DialogTitle className="text-xl font-bold text-slate-900 tracking-tight">Page Settings</DialogTitle>
-                        <DialogDescription className="text-slate-500">
+                <DialogContent className="sm:max-w-[500px] bg-background/95 backdrop-blur-xl border-border shadow-2xl">
+                    <DialogHeader className="pb-4 border-b border-border">
+                        <DialogTitle className="text-xl font-bold text-foreground tracking-tight">Page Settings</DialogTitle>
+                        <DialogDescription className="text-muted-foreground">
                             Configure page properties, SEO metadata, and publication status.
                         </DialogDescription>
                     </DialogHeader>
                     <div className="grid gap-6 py-6">
                         <div className="space-y-4">
-                            <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                            <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider flex items-center gap-2">
                                 <span className="w-1 h-4 bg-indigo-500 rounded-full"></span>
                                 General Information
                             </h3>
                             <div className="grid gap-3">
-                                <Label htmlFor="title" className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Page Title</Label>
+                                <Label htmlFor="title" className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Page Title</Label>
                                 <Input
                                     id="title"
                                     value={pageMetadata.title}
-                                    onChange={(e) => setPageMetadata({ ...pageMetadata, title: e.target.value })}
-                                    className="bg-slate-50 border-slate-200 focus:border-indigo-500 transition-colors"
+                                    onChange={(e) => handleMetadataChange('title', e.target.value)}
+                                    className="bg-muted/50 border-input focus:border-indigo-500 transition-colors"
                                     placeholder="e.g. Landing Page"
                                 />
                             </div>
@@ -761,16 +775,16 @@ const VisualPageBuilder = ({ page: initialPage, onClose, onSuccess }) => {
                                     tableName="pages"
                                     recordId={page?.id}
                                     tenantId={currentTenant?.id}
-                                    onSlugChange={(newSlug) => setPageMetadata({ ...pageMetadata, slug: newSlug })}
+                                    onSlugChange={handleSlugChange}
                                 />
                             </div>
 
                             <div className="grid gap-3">
-                                <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Category</Label>
+                                <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Category</Label>
                                 <ResourceSelect
                                     table="categories"
                                     value={pageMetadata.category_id}
-                                    onChange={(val) => setPageMetadata({ ...pageMetadata, category_id: val })}
+                                    onChange={(val) => handleMetadataChange('category_id', val)}
                                     labelKey="name"
                                     valueKey="id"
                                     filter={{ type: mode === 'article' ? 'article' : 'page' }}
@@ -780,31 +794,31 @@ const VisualPageBuilder = ({ page: initialPage, onClose, onSuccess }) => {
                         </div>
 
                         <div className="space-y-4">
-                            <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                            <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider flex items-center gap-2">
                                 <span className="w-1 h-4 bg-purple-500 rounded-full"></span>
                                 SEO & Metadata
                             </h3>
                             <div className="grid gap-3">
-                                <Label htmlFor="meta_description" className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Description</Label>
+                                <Label htmlFor="meta_description" className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Description</Label>
                                 <Textarea
                                     id="meta_description"
                                     value={pageMetadata.meta_description}
-                                    onChange={(e) => setPageMetadata({ ...pageMetadata, meta_description: e.target.value })}
+                                    onChange={(e) => handleMetadataChange('meta_description', e.target.value)}
                                     placeholder="Brief description for search engines and social media..."
-                                    className="bg-slate-50 border-slate-200 focus:border-purple-500 transition-colors resize-none min-h-[80px]"
+                                    className="bg-muted/50 border-input focus:border-purple-500 transition-colors resize-none min-h-[80px]"
                                 />
                             </div>
                         </div>
 
                         <div className="space-y-4">
-                            <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                            <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider flex items-center gap-2">
                                 <span className="w-1 h-4 bg-emerald-500 rounded-full"></span>
                                 Publication
                             </h3>
-                            <div className="flex items-center justify-between rounded-xl border border-slate-200 p-4 bg-slate-50/50 hover:bg-slate-50 transition-colors">
+                            <div className="flex items-center justify-between rounded-xl border border-border p-4 bg-muted/30 hover:bg-muted/50 transition-colors">
                                 <div className="space-y-1">
-                                    <Label className="text-base font-semibold text-slate-800">Publish Status</Label>
-                                    <p className="text-xs text-slate-500 font-medium">
+                                    <Label className="text-base font-semibold text-foreground">Publish Status</Label>
+                                    <p className="text-xs text-muted-foreground font-medium">
                                         {pageMetadata.status === 'published'
                                             ? 'Page is live and visible to visitors.'
                                             : 'Page is hidden and only visible to editors.'}
@@ -825,24 +839,24 @@ const VisualPageBuilder = ({ page: initialPage, onClose, onSuccess }) => {
                             </div>
 
                             <div className="grid gap-3">
-                                <Label htmlFor="published_at" className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Publish Date</Label>
+                                <Label htmlFor="published_at" className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Publish Date</Label>
                                 <Input
                                     type="datetime-local"
                                     id="published_at"
                                     value={pageMetadata.published_at || ''}
                                     onChange={(e) => setPageMetadata({ ...pageMetadata, published_at: e.target.value })}
-                                    className="bg-slate-50 border-slate-200 focus:border-emerald-500 transition-colors"
+                                    className="bg-muted/50 border-input focus:border-emerald-500 transition-colors"
                                 />
                             </div>
                         </div>
                     </div>
-                    <DialogFooter className="border-t border-slate-100 pt-4">
-                        <Button variant="ghost" onClick={() => setSettingsOpen(false)} className="hover:bg-slate-100 text-slate-600">Cancel</Button>
+                    <DialogFooter className="border-t border-border pt-4">
+                        <Button variant="ghost" onClick={() => setSettingsOpen(false)} className="hover:bg-muted text-muted-foreground">Cancel</Button>
                         <Button onClick={() => {
                             setHasUnsavedChanges(true);
                             setSettingsOpen(false);
                             toast({ title: "Settings Updated", description: "Don't forget to save your changes to apply them." });
-                        }} className="bg-slate-900 text-white hover:bg-slate-800 shadow-lg shadow-slate-200">
+                        }} className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm">
                             Apply Changes
                         </Button>
                     </DialogFooter>

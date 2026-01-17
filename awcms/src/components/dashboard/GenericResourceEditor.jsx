@@ -41,23 +41,25 @@ const GenericResourceEditor = ({
     const { toast } = useToast();
     const { currentTenant } = useTenant(); // Get Current Tenant
     const [loading, setLoading] = useState(false);
-    const [formData, setFormData] = useState({});
+    const [formData, setFormData] = useState(() => {
+        if (initialData) return initialData;
+
+        // Calculate defaults
+        const defaults = {};
+        if (fields) {
+            fields.forEach(f => {
+                if (f.defaultValue !== undefined) defaults[f.key] = f.defaultValue;
+            });
+        }
+        return defaults;
+    });
 
     // Initialize form data
     useEffect(() => {
         if (initialData) {
-            console.log('[GenericResourceEditor] initialData KEYS:', Object.keys(initialData));
-            console.log('[GenericResourceEditor] initialData FULL:', initialData);
             setFormData(initialData);
-        } else {
-            // Reset for new entry
-            const defaults = {};
-            fields.forEach(f => {
-                if (f.defaultValue !== undefined) defaults[f.key] = f.defaultValue;
-            });
-            setFormData(defaults);
         }
-    }, [initialData, fields]);
+    }, [initialData]); // Removed fields from dependency to prevent reset if fields config reference changes
 
 
     const handleSubmit = async (e) => {
@@ -228,117 +230,124 @@ const GenericResourceEditor = ({
 
             <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 gap-6">
-                    {fields.map(field => (
-                        <div key={field.key} className="space-y-2">
-                            <Label>
-                                {field.label} {field.required && <span className="text-red-500">*</span>}
-                            </Label>
+                    {fields.map(field => {
+                        // Handle conditional visibility
+                        if (field.conditionalShow && typeof field.conditionalShow === 'function' && !field.conditionalShow(formData)) {
+                            return null;
+                        }
 
-                            {field.type === 'textarea' ? (
-                                <Textarea
-                                    value={formData[field.key] || ''}
-                                    onChange={e => handleChange(field.key, e.target.value)}
-                                    rows={4}
-                                    required={field.required}
-                                />
-                            ) : field.type === 'richtext' ? (
-                                <RichTextEditor
-                                    value={formData[field.key] || ''}
-                                    onChange={val => handleChange(field.key, val)}
-                                    placeholder={field.description || 'Write content...'}
-                                />
-                            ) : field.type === 'image' ? (
-                                <ImageUpload
-                                    value={formData[field.key] || ''}
-                                    onChange={url => handleChange(field.key, url)}
-                                    className="h-48"
-                                />
-                            ) : field.type === 'images' ? (
-                                <MultiImageUpload
-                                    value={formData[field.key] || []}
-                                    onChange={images => handleChange(field.key, images)}
-                                    maxImages={field.maxImages || 10}
-                                />
-                            ) : field.type === 'tags' ? (
-                                <TagInput
-                                    value={Array.isArray(formData[field.key]) ? formData[field.key] : (formData[field.key] || '').split(',').filter(Boolean).map(t => t.trim())}
-                                    onChange={tags => handleChange(field.key, tags)}
-                                    placeholder="Add tags..."
-                                />
-                            ) : field.type === 'select' ? (
-                                <Select
-                                    value={formData[field.key] || field.defaultValue || ''}
-                                    onValueChange={val => handleChange(field.key, val)}
-                                    required={field.required}
-                                >
-                                    <SelectTrigger className="w-full">
-                                        <SelectValue placeholder={field.description || "Select an option"} />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {field.options.map(opt => (
-                                            <SelectItem key={opt.value} value={opt.value}>
-                                                {opt.label}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            ) : field.type === 'resource_select' || field.type === 'relation' ? (
-                                <ResourceSelect
-                                    table={field.resourceTable || field.table}
-                                    label={field.label}
-                                    value={formData[field.key]}
-                                    onChange={val => handleChange(field.key, val)}
-                                    filter={field.filter}
-                                />
-                            ) : field.type === 'boolean' || field.type === 'checkbox' ? (
-                                <div className="flex items-center space-x-2">
-                                    <Checkbox
-                                        id={field.key}
-                                        checked={!!formData[field.key]}
-                                        onCheckedChange={(checked) => handleChange(field.key, checked)}
+                        return (
+                            <div key={field.key} className="space-y-2">
+                                <Label>
+                                    {field.label} {field.required && <span className="text-red-500">*</span>}
+                                </Label>
+
+                                {field.type === 'textarea' ? (
+                                    <Textarea
+                                        value={formData[field.key] || ''}
+                                        onChange={e => handleChange(field.key, e.target.value)}
+                                        rows={4}
+                                        required={field.required}
                                     />
-                                    <label
-                                        htmlFor={field.key}
-                                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-foreground"
+                                ) : field.type === 'richtext' ? (
+                                    <RichTextEditor
+                                        value={formData[field.key] || ''}
+                                        onChange={val => handleChange(field.key, val)}
+                                        placeholder={field.description || 'Write content...'}
+                                    />
+                                ) : field.type === 'image' ? (
+                                    <ImageUpload
+                                        value={formData[field.key] || ''}
+                                        onChange={url => handleChange(field.key, url)}
+                                        className="h-48"
+                                    />
+                                ) : field.type === 'images' ? (
+                                    <MultiImageUpload
+                                        value={formData[field.key] || []}
+                                        onChange={images => handleChange(field.key, images)}
+                                        maxImages={field.maxImages || 10}
+                                    />
+                                ) : field.type === 'tags' ? (
+                                    <TagInput
+                                        value={Array.isArray(formData[field.key]) ? formData[field.key] : (formData[field.key] || '').split(',').filter(Boolean).map(t => t.trim())}
+                                        onChange={tags => handleChange(field.key, tags)}
+                                        placeholder="Add tags..."
+                                    />
+                                ) : field.type === 'select' ? (
+                                    <Select
+                                        value={formData[field.key] || field.defaultValue || ''}
+                                        onValueChange={val => handleChange(field.key, val)}
+                                        required={field.required}
                                     >
-                                        {field.placeholder || "Enable"}
-                                    </label>
-                                </div>
-                            ) : field.type === 'date' ? (
-                                <Input
-                                    type="date"
-                                    value={formData[field.key] ? formData[field.key].substring(0, 10) : ''}
-                                    onChange={e => handleChange(field.key, e.target.value ? new Date(e.target.value).toISOString() : '')}
-                                    required={field.required}
-                                />
-                            ) : field.type === 'datetime' ? (
-                                <Input
-                                    type="datetime-local"
-                                    value={formData[field.key] ? new Date(formData[field.key]).toISOString().slice(0, 16) : ''}
-                                    onChange={e => handleChange(field.key, e.target.value ? new Date(e.target.value).toISOString() : null)}
-                                    required={field.required}
-                                    className="block"
-                                />
-                            ) : field.key === 'slug' ? (
-                                <SlugGenerator
-                                    initialSlug={formData.slug || ''}
-                                    titleValue={formData.title || formData.name || ''}
-                                    tableName={tableName}
-                                    recordId={initialData?.id}
-                                    onSlugChange={(newSlug) => handleChange('slug', newSlug)}
-                                />
-                            ) : (
-                                <Input
-                                    type={field.type || 'text'}
-                                    value={formData[field.key] || ''}
-                                    onChange={e => handleChange(field.key, e.target.value)}
-                                    required={field.required}
-                                    placeholder={field.description}
-                                />
-                            )}
-                            {field.description && <p className="text-[10px] text-muted-foreground">{field.description}</p>}
-                        </div>
-                    ))}
+                                        <SelectTrigger className="w-full">
+                                            <SelectValue placeholder={field.description || "Select an option"} />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {field.options.map(opt => (
+                                                <SelectItem key={opt.value} value={opt.value}>
+                                                    {opt.label}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                ) : field.type === 'resource_select' || field.type === 'relation' ? (
+                                    <ResourceSelect
+                                        table={field.resourceTable || field.table}
+                                        label={field.label}
+                                        value={formData[field.key]}
+                                        onChange={val => handleChange(field.key, val)}
+                                        filter={field.filter}
+                                    />
+                                ) : field.type === 'boolean' || field.type === 'checkbox' ? (
+                                    <div className="flex items-center space-x-2">
+                                        <Checkbox
+                                            id={field.key}
+                                            checked={!!formData[field.key]}
+                                            onCheckedChange={(checked) => handleChange(field.key, checked)}
+                                        />
+                                        <label
+                                            htmlFor={field.key}
+                                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-foreground"
+                                        >
+                                            {field.placeholder || "Enable"}
+                                        </label>
+                                    </div>
+                                ) : field.type === 'date' ? (
+                                    <Input
+                                        type="date"
+                                        value={formData[field.key] ? formData[field.key].substring(0, 10) : ''}
+                                        onChange={e => handleChange(field.key, e.target.value ? new Date(e.target.value).toISOString() : '')}
+                                        required={field.required}
+                                    />
+                                ) : field.type === 'datetime' ? (
+                                    <Input
+                                        type="datetime-local"
+                                        value={formData[field.key] ? new Date(formData[field.key]).toISOString().slice(0, 16) : ''}
+                                        onChange={e => handleChange(field.key, e.target.value ? new Date(e.target.value).toISOString() : null)}
+                                        required={field.required}
+                                        className="block"
+                                    />
+                                ) : field.key === 'slug' ? (
+                                    <SlugGenerator
+                                        initialSlug={formData.slug || ''}
+                                        titleValue={formData.title || formData.name || ''}
+                                        tableName={tableName}
+                                        recordId={initialData?.id}
+                                        onSlugChange={(newSlug) => handleChange('slug', newSlug)}
+                                    />
+                                ) : (
+                                    <Input
+                                        type={field.type || 'text'}
+                                        value={formData[field.key] || ''}
+                                        onChange={e => handleChange(field.key, e.target.value)}
+                                        required={field.required}
+                                        placeholder={field.description}
+                                    />
+                                )}
+                                {field.description && <p className="text-[10px] text-muted-foreground">{field.description}</p>}
+                            </div>
+                        )
+                    })}
                 </div>
 
                 <div className="flex justify-end pt-4 border-t border-border">

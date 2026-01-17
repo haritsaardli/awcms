@@ -28,7 +28,7 @@ const PageTabs = ({
 
     return (
         <Tabs value={value} onValueChange={onValueChange} className={`w-full ${className}`}>
-            <div className="bg-white rounded-xl border border-slate-200 p-1.5 shadow-sm mb-6 inline-flex">
+            <div className="bg-card rounded-xl border border-border p-1.5 shadow-sm mb-6 inline-flex">
                 <TabsList
                     className="grid gap-1 bg-transparent p-0"
                     style={{ gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))` }}

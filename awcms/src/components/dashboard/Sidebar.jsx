@@ -187,11 +187,16 @@ function Sidebar({ isOpen, setIsOpen }) {
           <div className="px-4 py-4 border-b border-slate-800/50">
             <div className="relative">
               <Search className="absolute left-3 top-2.5 w-4 h-4 text-slate-500" />
-              <Input
+              <input
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search menu..."
-                className="bg-slate-950/50 border-slate-800 pl-9 text-slate-200 placeholder:text-slate-500 focus:ring-blue-600/50 h-9 text-sm w-full"
+                className="w-full rounded-md py-2 pl-9 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all"
+                style={{
+                  backgroundColor: 'rgba(2, 6, 23, 0.5)',
+                  borderColor: '#1e293b',
+                  color: '#e2e8f0'
+                }}
               />
             </div>
           </div>

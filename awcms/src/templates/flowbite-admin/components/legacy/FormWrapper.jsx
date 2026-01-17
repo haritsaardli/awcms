@@ -70,15 +70,15 @@ const FormWrapper = ({
             {/* Validation Errors Display */}
             {errors.length > 0 && (
                 <div
-                    className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4"
+                    className="mb-6 bg-destructive/10 border border-destructive/30 rounded-lg p-4"
                     role="alert"
                     aria-live="polite"
                 >
                     <div className="flex items-start gap-3">
-                        <AlertTriangle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" aria-hidden="true" />
+                        <AlertTriangle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" aria-hidden="true" />
                         <div>
-                            <h4 className="font-medium text-red-800">Please fix the following errors:</h4>
-                            <ul className="mt-2 text-sm text-red-700 list-disc list-inside space-y-1">
+                            <h4 className="font-medium text-destructive">Please fix the following errors:</h4>
+                            <ul className="mt-2 text-sm text-destructive/80 list-disc list-inside space-y-1">
                                 {errors.map((error, index) => (
                                     <li key={index}>{error}</li>
                                 ))}
@@ -100,9 +100,9 @@ const FormWrapper = ({
 
                 {/* Sticky Submit Bar */}
                 {showStickyBar && (
-                    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 shadow-lg p-4 z-40">
+                    <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border shadow-lg p-4 z-40">
                         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
-                            <div className="flex items-center gap-2 text-sm text-slate-500">
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                 {isDirty && (
                                     <>
                                         <span className="w-2 h-2 bg-amber-500 rounded-full animate-pulse" />

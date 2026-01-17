@@ -52,35 +52,44 @@ const ToolbarButton = ({ onClick, isActive, children, title }) => (
 const Divider = () => <div className="w-px h-4 bg-slate-200 mx-1 self-center" />;
 
 const RichTextEditor = ({ value, onChange, placeholder, className, onImageAdd }) => {
+  const extensions = React.useMemo(() => [
+    StarterKit.configure({
+      heading: {
+        levels: [1, 2, 3],
+      },
+      codeBlock: false,
+    }),
+    Underline,
+    Link.configure({
+      openOnClick: false,
+      HTMLAttributes: {
+        class: 'text-blue-600 underline hover:text-blue-800 cursor-pointer',
+      },
+    }),
+    Image.configure({
+      HTMLAttributes: {
+        class: 'max-w-full h-auto rounded-lg shadow-sm border border-slate-100 my-4',
+      },
+    }),
+    Placeholder.configure({
+      placeholder: placeholder || 'Start writing...',
+    }),
+  ], [placeholder]);
+
   const editor = useEditor({
-    extensions: [
-      StarterKit.configure({
-        heading: {
-          levels: [1, 2, 3],
-        },
-        codeBlock: false, // Disable default CodeBlock to avoid conflict if I add it manually, or rely on this one.
-        // History is included in StarterKit
-      }),
-      Underline,
-      Link.configure({
-        openOnClick: false,
-        HTMLAttributes: {
-          class: 'text-blue-600 underline hover:text-blue-800 cursor-pointer',
-        },
-      }),
-      Image.configure({
-        HTMLAttributes: {
-          class: 'max-w-full h-auto rounded-lg shadow-sm border border-slate-100 my-4',
-        },
-      }),
-      Placeholder.configure({
-        placeholder: placeholder || 'Start writing...',
-      }),
-    ],
+    extensions,
     content: value || '',
     onUpdate: ({ editor }) => {
       const html = editor.getHTML();
-      if (onChange) {
+      // Only fire onChange if content actually changed (avoid loops)
+      // Tiptap returns '<p></p>' for empty content, so we normalize value to compare
+      const normalizedValue = value || '<p></p>';
+      const normalizedHtml = html === '<p></p>' ? '' : html;
+
+      // If the incoming value is empty/null and editor is empty '<p></p>', do nothing
+      if (!value && html === '<p></p>') return;
+
+      if (onChange && html !== value) {
         onChange(html);
       }
     },
@@ -89,12 +98,19 @@ const RichTextEditor = ({ value, onChange, placeholder, className, onImageAdd })
         class: 'prose prose-slate prose-lg max-w-none focus:outline-none min-h-[300px] p-6 lg:p-8',
       },
     },
-  });
+    // Ensure onUpdate doesn't trigger unnecessary re-renders via dependency on onChange
+    // We can omit onChange from dependencies if we trust it, or use a ref for the latest callback
+  }, [extensions]); // Only re-create editor if extensions change
 
   // Update content when value prop changes externally
   React.useEffect(() => {
-    if (editor && value !== editor.getHTML()) {
-      editor.commands.setContent(value || '');
+    // Check if the content is effectively different to avoid loops
+    // specifically handling the <p></p> vs "" case
+    if (editor) {
+      const currentHtml = editor.getHTML();
+      if (value !== currentHtml && !(value === null && currentHtml === '<p></p>') && !(value === '' && currentHtml === '<p></p>')) {
+        editor.commands.setContent(value || '');
+      }
     }
   }, [value, editor]);
 

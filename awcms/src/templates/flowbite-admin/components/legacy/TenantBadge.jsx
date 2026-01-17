@@ -13,12 +13,12 @@ const TenantBadge = ({ tenant, isAllTenants = false }) => {
     if (isAllTenants || !tenant) {
         return (
             <div
-                className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-50 border border-amber-200 rounded-lg"
+                className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-500/10 border border-amber-500/30 rounded-lg"
                 role="status"
                 aria-label="Viewing all tenants"
             >
-                <Globe className="w-4 h-4 text-amber-600" aria-hidden="true" />
-                <span className="text-sm font-medium text-amber-700">
+                <Globe className="w-4 h-4 text-amber-500" aria-hidden="true" />
+                <span className="text-sm font-medium text-amber-500">
                     All Tenants (Platform View)
                 </span>
             </div>
@@ -27,7 +27,7 @@ const TenantBadge = ({ tenant, isAllTenants = false }) => {
 
     return (
         <div
-            className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-50 border border-blue-200 rounded-lg"
+            className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-500/10 border border-blue-500/30 rounded-lg"
             role="status"
             aria-label={`Current tenant: ${tenant.name}`}
         >
@@ -39,9 +39,9 @@ const TenantBadge = ({ tenant, isAllTenants = false }) => {
                     aria-hidden="true"
                 />
             ) : (
-                <Building2 className="w-4 h-4 text-blue-600" aria-hidden="true" />
+                <Building2 className="w-4 h-4 text-blue-500" aria-hidden="true" />
             )}
-            <span className="text-sm font-medium text-blue-700">
+            <span className="text-sm font-medium text-blue-500">
                 {tenant.name}
             </span>
         </div>
@@ -49,3 +49,4 @@ const TenantBadge = ({ tenant, isAllTenants = false }) => {
 };
 
 export default TenantBadge;
+

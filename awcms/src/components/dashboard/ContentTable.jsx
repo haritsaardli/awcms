@@ -139,7 +139,7 @@ const ContentTable = ({
           </div>
           <div className="flex items-center gap-4">
             <select
-              className="h-8 rounded-md border border-input bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+              className="h-8 rounded-md border border-input bg-background px-2 text-xs font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700"
               value={pagination.itemsPerPage}
               onChange={(e) => pagination.onLimitChange(Number(e.target.value))}
             >

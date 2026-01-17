@@ -18,11 +18,11 @@ const SidebarItem = ({ href, icon: Icon, label, active }) => (
         <Link
             to={href}
             className={cn(
-                "flex items-center p-2 text-base text-gray-900 rounded-lg hover:bg-gray-100 group dark:text-gray-200 dark:hover:bg-gray-700",
-                active && "bg-gray-100 dark:bg-gray-700"
+                "flex items-center p-2 text-base text-foreground rounded-lg hover:bg-accent group",
+                active && "bg-accent"
             )}
         >
-            <Icon className="w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" />
+            <Icon className="w-6 h-6 text-muted-foreground transition duration-75 group-hover:text-foreground" />
             <span className="ml-3">{label}</span>
         </Link>
     </li>
@@ -35,12 +35,12 @@ const SidebarDropdown = ({ icon: Icon, label, children, id, active }) => {
         <li>
             <button
                 type="button"
-                className="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
+                className="flex items-center w-full p-2 text-base text-foreground transition duration-75 rounded-lg group hover:bg-accent"
                 onClick={() => setIsOpen(!isOpen)}
                 aria-controls={`dropdown-${id}`}
                 aria-expanded={isOpen}
             >
-                <Icon className="flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" />
+                <Icon className="flex-shrink-0 w-6 h-6 text-muted-foreground transition duration-75 group-hover:text-foreground" />
                 <span className="flex-1 ml-3 text-left whitespace-nowrap">{label}</span>
                 {isOpen ? (
                     <ChevronUp className="w-6 h-6" />
@@ -165,20 +165,20 @@ const Sidebar = ({ isOpen, isMobile }) => {
         <aside
             id="sidebar"
             className={cn(
-                "fixed top-0 left-0 z-20 flex flex-col flex-shrink-0 w-64 h-full pt-16 font-normal duration-75 lg:flex transition-width bg-white border-r border-gray-200 dark:bg-gray-800 dark:border-gray-700",
+                "fixed top-0 left-0 z-20 flex flex-col flex-shrink-0 w-64 h-full pt-16 font-normal duration-75 lg:flex transition-width bg-background border-r border-border",
                 isMobile && !isOpen ? "hidden" : "flex"
             )}
             aria-label="Sidebar"
         >
-            <div className="relative flex flex-col flex-1 min-h-0 pt-0 bg-white border-r border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+            <div className="relative flex flex-col flex-1 min-h-0 pt-0 bg-background border-r border-border">
                 <div className="flex flex-col flex-1 pt-5 pb-28 overflow-y-auto scrollbar scrollbar-w-2 scrollbar-thumb-rounded-[0.1667rem] scrollbar-thumb-slate-200 scrollbar-track-gray-400 dark:scrollbar-thumb-slate-900 dark:scrollbar-track-gray-800">
-                    <div className="flex-1 px-3 space-y-1 bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
+                    <div className="flex-1 px-3 space-y-1 bg-background divide-y divide-border">
                         {/* Search Input */}
                         <div className="pb-4">
                             <label htmlFor="sidebar-search" className="sr-only">Search</label>
                             <div className="relative">
                                 <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                    <svg className="w-5 h-5 text-gray-500 dark:text-gray-400" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                    <svg className="w-5 h-5 text-muted-foreground" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                                         <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd"></path>
                                     </svg>
                                 </div>
@@ -186,7 +186,7 @@ const Sidebar = ({ isOpen, isMobile }) => {
                                     type="text"
                                     name="search"
                                     id="sidebar-search"
-                                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                                    className="block w-full pl-10 p-2.5 text-sm rounded-lg focus:ring-primary focus:border-primary transition-colors !bg-slate-950/50 !text-slate-200 !border-slate-800 placeholder:text-slate-500"
                                     placeholder="Search"
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
@@ -206,7 +206,7 @@ const Sidebar = ({ isOpen, isMobile }) => {
                                     >
                                         {item.children.map((child, cIndex) => (
                                             <li key={cIndex}>
-                                                <Link to={child.href} className="flex items-center p-2 text-base text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700">
+                                                <Link to={child.href} className="flex items-center p-2 text-base text-foreground transition duration-75 rounded-lg pl-11 group hover:bg-accent">
                                                     {child.label}
                                                 </Link>
                                             </li>

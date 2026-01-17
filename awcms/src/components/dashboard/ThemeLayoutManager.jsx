@@ -40,7 +40,7 @@ const ThemeLayoutManager = () => {
                     '404': '404 Error',
                     archive: 'Archive'
                 };
-                return <span className="font-semibold text-xs uppercase bg-slate-100 px-2 py-1 rounded">{labels[value] || value}</span>
+                return <span className="font-semibold text-xs uppercase bg-slate-100 dark:bg-slate-800 dark:text-slate-200 px-2 py-1 rounded">{labels[value] || value}</span>
             }
         },
         { key: 'status', label: 'Status' },

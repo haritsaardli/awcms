@@ -236,7 +236,7 @@ const GenericContentManager = ({
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     <User className="w-3 h-3 text-muted-foreground" />
                     <span>{row.owner?.full_name || row.owner?.email || 'System'}</span>
-                    {user?.id === row.created_by && <span className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-200 px-1.5 rounded-full text-[10px] font-bold">You</span>}
+                    {user?.id === row.created_by && <span className="bg-primary/10 text-primary px-1.5 rounded-full text-[10px] font-bold">You</span>}
                 </div>
             )
         }
@@ -255,6 +255,11 @@ const GenericContentManager = ({
             )
         });
     }
+
+    const handleManualRefresh = async () => {
+        await fetchItems();
+        toast({ title: 'Refreshed', description: `Latest ${resourceName.toLowerCase()}s loaded.` });
+    };
 
     return (
         <div className="space-y-6">
@@ -365,8 +370,15 @@ const GenericContentManager = ({
                             />
                         </div>
                         <div className="flex-1"></div>
-                        <Button variant="ghost" size="icon" onClick={fetchItems} title="Refresh" className="text-muted-foreground hover:text-foreground">
-                            <RefreshCw className="w-4 h-4" />
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={handleManualRefresh}
+                            disabled={loading}
+                            title="Refresh"
+                            className="text-muted-foreground hover:text-foreground disabled:opacity-50"
+                        >
+                            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
                         </Button>
                     </div>
 

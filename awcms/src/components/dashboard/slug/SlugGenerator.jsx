@@ -57,15 +57,22 @@ const SlugGenerator = ({
         return newSlug;
     }, [format, titleValue, slug]);
 
+    // Use ref to keep latest onSlugChange without triggering effect
+    const onSlugChangeRef = React.useRef(onSlugChange);
+    useEffect(() => {
+        onSlugChangeRef.current = onSlugChange;
+    }, [onSlugChange]);
+
     // Auto-update slug if user hasn't manually edited and not in custom mode
     useEffect(() => {
         if (!manualEdit && format !== 'custom' && titleValue) {
             const newSlug = generateSlug(format, titleValue);
             setSlug(newSlug);
             setIsAvailable(null); // Reset availability status on change
-            onSlugChange?.(newSlug);
+            // Use ref to avoid infinite loop if parent passes unstable callback
+            onSlugChangeRef.current?.(newSlug);
         }
-    }, [titleValue, format, manualEdit, generateSlug, onSlugChange]);
+    }, [titleValue, format, manualEdit, generateSlug]);
 
     // Handle Format Change
     const handleFormatChange = (value) => {
@@ -133,11 +140,11 @@ const SlugGenerator = ({
     };
 
     return (
-        <div className="space-y-3 p-4 bg-slate-50 rounded-lg border border-slate-200">
+        <div className="space-y-3 p-4 bg-muted/50 dark:bg-slate-900/50 rounded-lg border border-border">
             <div className="flex items-center justify-between">
-                <Label className="text-sm font-medium text-slate-700">URL Slug Configuration</Label>
+                <Label className="text-sm font-medium text-foreground">URL Slug Configuration</Label>
                 <Select value={format} onValueChange={handleFormatChange}>
-                    <SelectTrigger className="w-[140px] h-8 text-xs">
+                    <SelectTrigger className="w-[140px] h-8 text-xs bg-background dark:bg-slate-950 text-foreground">
                         <SelectValue placeholder="Format" />
                     </SelectTrigger>
                     <SelectContent>
@@ -153,20 +160,21 @@ const SlugGenerator = ({
                     <Input
                         value={slug}
                         onChange={(e) => {
-                            setSlug(e.target.value);
+                            const val = e.target.value.replace(/\s+/g, '-').toLowerCase();
+                            setSlug(val);
                             setManualEdit(true);
                             setIsAvailable(null);
-                            onSlugChange?.(e.target.value);
+                            if (onSlugChangeRef.current) onSlugChangeRef.current(val);
                             if (format !== 'custom') setFormat('custom');
                         }}
-                        className={`pr-10 ${isAvailable === true ? 'border-green-500 focus-visible:ring-green-500' :
+                        className={`pr-10 bg-background dark:bg-slate-950 text-foreground ${isAvailable === true ? 'border-green-500 focus-visible:ring-green-500' :
                             isAvailable === false ? 'border-red-500 focus-visible:ring-red-500' : ''
                             }`}
                         placeholder="my-page-slug"
                     />
                     <div className="absolute right-3 top-2.5">
                         {isChecking ? (
-                            <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
+                            <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
                         ) : isAvailable === true ? (
                             <Check className="w-4 h-4 text-green-500" />
                         ) : isAvailable === false ? (
@@ -181,13 +189,14 @@ const SlugGenerator = ({
                     onClick={checkAvailability}
                     title="Check Availability"
                     disabled={!slug || isChecking}
+                    className="bg-background dark:bg-slate-950 text-foreground hover:bg-accent hover:text-accent-foreground"
                 >
                     <RefreshCw className={`w-4 h-4 ${isChecking ? 'animate-spin' : ''}`} />
                 </Button>
             </div>
 
-            <div className="flex items-center gap-1 text-xs text-slate-500">
-                Preview: <span className="font-mono bg-slate-200 px-1 rounded text-slate-700">/{slug}</span>
+            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                Preview: <span className="font-mono bg-muted dark:bg-slate-800 px-1 rounded text-foreground dark:text-slate-200">/{slug}</span>
             </div>
         </div>
     );
