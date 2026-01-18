@@ -75,7 +75,7 @@ To ensure successful code generation and integration, Agents must adhere to the 
 1. **Context First**: Before generating code, read `README.md` and related component files to understand the existing patterns.
 
 2. **Multi-Tenancy Awareness**:
-   - **RLS is Sacred**: Never bypass RLS unless explicitly creating a Platform Admin feature.
+   - **RLS is Sacred**: Never bypass RLS unless explicitly creating a Platform Admin feature (using `auth_is_admin()` or Service Role).
    - **Tenant Context**: Always use `useTenant()` or `usePermissions()` to get `tenantId`.
    - **Isolation**: Ensure all new tables have `tenant_id` and RLS policies.
    - **Permission Keys**: Use the strict format `scope.resource.action` (e.g., `tenant.post.publish`).
@@ -448,7 +448,7 @@ case 'delete': {
 Agents must use the standardized permission keys: `scope.resource.action`.
 
 - **Scopes**: `platform`, `tenant`, `content`
-- **Actions**: `create` (C), `read` (R), `update` (U), `publish` (P), `delete` (SD), `delete_permanent` (DP).
+- **Actions**: `create` (C), `read` (R), `update` (U), `publish` (P), `delete` (SD), `restore` (RS), `delete_permanent` (DP).
 - **Special Flags**: `U-own` (Update Own Only) - requires checking `user_id` against resource owner.
 
 ### Standard Permission Matrix
@@ -461,7 +461,7 @@ Agents must strictly adhere to this matrix when implementing access controls:
 | :----------------------- | :-: | :-: | :--: | :-: | :-: | :-: | :-: | :------------------------------ |
 | **Owner (Global)**       | ✅  | ✅  |  ✅  | ✅  | ✅  | ✅  | ✅  | Supreme authority (Global)      |
 | **Super Admin (Global)** | ✅  | ✅  |  ✅  | ✅  | ✅  | ✅  | ✅  | Platform management (Global)    |
-| **Admin (Tenant)**       | ✅  | ✅  |  ✅  | ✅  | ✅  | ✅  | ❌  | Tenant management (Tenant)      |
+| **Admin (Tenant)**       | ✅  | ✅  |  ✅  | ✅  | ✅  | ✅  | ✅  | Tenant management (Tenant)      |
 | **Editor (Tenant)**      | ✅  | ✅  |  ✅  | ✅  | ✅  | ❌  | ❌  | Content review & approval       |
 | **Author (Tenant)**      | ✅  | ✅  | ✅\* | ❌  | ❌  | ❌  | ❌  | Content creation & update own   |
 | **Member**               | ❌  | ✅  |  ❌  | ❌  | ❌  | ❌  | ❌  | Commenting & Profile management |

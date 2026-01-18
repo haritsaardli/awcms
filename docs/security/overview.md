@@ -76,7 +76,7 @@ All tenant-scoped tables include `tenant_id` and RLS policies.
 CREATE POLICY "table_select_unified" ON public.table_name
 USING (
   tenant_id = current_tenant_id()
-  OR is_platform_admin()
+  OR auth_is_admin()
 );
 ```
 

@@ -184,25 +184,25 @@ function UserEditor({ user, onClose, onSave }) {
       <motion.div
         initial={{ scale: 0.95, y: 20 }}
         animate={{ scale: 1, y: 0 }}
-        className="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col"
+        className="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col dark:bg-slate-900 dark:border dark:border-slate-800"
       >
-        <div className="px-6 py-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
+        <div className="px-6 py-4 border-b border-slate-200 flex justify-between items-center bg-slate-50 dark:bg-slate-900/50 dark:border-slate-800">
           <div>
-            <h3 className="text-xl font-bold text-slate-900">
+            <h3 className="text-xl font-bold text-slate-900 dark:text-white">
               {isEditing ? 'Edit User' : 'Create New User'}
             </h3>
-            <p className="text-slate-500 text-xs mt-0.5">
+            <p className="text-slate-500 text-xs mt-0.5 dark:text-slate-400">
               {isEditing ? 'Update user details and access level' : 'Add a new user to the system'}
             </p>
           </div>
-          <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full hover:bg-slate-200">
-            <X className="w-5 h-5 text-slate-500" />
+          <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full hover:bg-slate-200 dark:hover:bg-slate-800">
+            <X className="w-5 h-5 text-slate-500 dark:text-slate-400" />
           </Button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
           <div className="space-y-2">
-            <Label htmlFor="full_name" className="flex items-center gap-2 text-slate-700">
+            <Label htmlFor="full_name" className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
               <User className="w-4 h-4 text-slate-400" /> Full Name
             </Label>
             <Input
@@ -212,12 +212,12 @@ function UserEditor({ user, onClose, onSave }) {
               onChange={handleChange}
               placeholder="e.g. John Doe"
               required
-              className="bg-white focus-visible:ring-blue-500"
+              className="bg-white focus-visible:ring-blue-500 dark:bg-slate-950 dark:border-slate-800 dark:text-white dark:placeholder-slate-500"
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email" className="flex items-center gap-2 text-slate-700">
+            <Label htmlFor="email" className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
               <Mail className="w-4 h-4 text-slate-400" /> Email Address
             </Label>
             <Input
@@ -229,7 +229,7 @@ function UserEditor({ user, onClose, onSave }) {
               placeholder="john@example.com"
               required
               disabled={isEditing}
-              className={`bg-white focus-visible:ring-blue-500 ${isEditing ? 'bg-slate-100 text-slate-500 cursor-not-allowed' : ''}`}
+              className={`bg-white focus-visible:ring-blue-500 dark:bg-slate-950 dark:border-slate-800 dark:text-white dark:placeholder-slate-500 ${isEditing ? 'bg-slate-100 text-slate-500 cursor-not-allowed dark:bg-slate-900 dark:text-slate-500' : ''}`}
             />
             {isEditing && <p className="text-xs text-slate-400">Email cannot be changed after creation.</p>}
           </div>
@@ -244,14 +244,14 @@ function UserEditor({ user, onClose, onSave }) {
                   onChange={(e) => setInviteUser(e.target.checked)}
                   className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-4 h-4 cursor-pointer"
                 />
-                <Label htmlFor="inviteUser" className="text-sm font-medium text-slate-700 cursor-pointer">
+                <Label htmlFor="inviteUser" className="text-sm font-medium text-slate-700 cursor-pointer dark:text-slate-300">
                   Send email invitation (skip password)
                 </Label>
               </div>
 
               {!inviteUser && (
                 <div className="space-y-2">
-                  <Label htmlFor="password" className="flex items-center gap-2 text-slate-700">
+                  <Label htmlFor="password" className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
                     <Lock className="w-4 h-4 text-slate-400" /> Password
                   </Label>
                   <Input
@@ -263,16 +263,16 @@ function UserEditor({ user, onClose, onSave }) {
                     placeholder="••••••••"
                     required={!inviteUser}
                     minLength={6}
-                    className="bg-white focus-visible:ring-blue-500"
+                    className="bg-white focus-visible:ring-blue-500 dark:bg-slate-950 dark:border-slate-800 dark:text-white dark:placeholder-slate-500"
                   />
-                  <p className="text-xs text-slate-500">Must be at least 6 characters long.</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Must be at least 6 characters long.</p>
                 </div>
               )}
             </div>
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="role_id" className="flex items-center gap-2 text-slate-700">
+            <Label htmlFor="role_id" className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
               <Shield className="w-4 h-4 text-slate-400" /> Assign Role
             </Label>
             <select
@@ -315,7 +315,7 @@ function UserEditor({ user, onClose, onSave }) {
             // For tenant-scoped roles, always show and require tenant selection
             return (
               <div className="space-y-2">
-                <Label htmlFor="tenant_id" className="flex items-center gap-2 text-slate-700">
+                <Label htmlFor="tenant_id" className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
                   <Building className="w-4 h-4 text-slate-400" /> Assign Tenant
                   <span className="text-red-500 ml-1">*</span>
                 </Label>
@@ -337,8 +337,8 @@ function UserEditor({ user, onClose, onSave }) {
             );
           })()}
           {/* Form Actions - Inside form for proper submit behavior */}
-          <div className="pt-4 border-t border-slate-200 flex justify-end gap-3">
-            <Button type="button" variant="ghost" onClick={onClose} disabled={loading}>
+          <div className="pt-4 border-t border-slate-200 flex justify-end gap-3 dark:border-slate-800">
+            <Button type="button" variant="ghost" onClick={onClose} disabled={loading} className="dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-800">
               Cancel
             </Button>
             <Button type="submit" disabled={loading} className="bg-blue-600 hover:bg-blue-700">

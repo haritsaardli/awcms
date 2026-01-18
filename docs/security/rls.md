@@ -22,7 +22,8 @@ Document the RLS helpers and standard policy patterns used in AWCMS.
 | Function | Returns | Purpose |
 | --- | --- | --- |
 | `current_tenant_id()` | UUID | Tenant from `app.current_tenant_id` or user profile |
-| `is_platform_admin()` | boolean | Owner or Super Admin (Global Access) |
+| `auth_is_admin()` | boolean | **SECURITY DEFINER**: Checks if user is Owner/Super Admin. Bypasses RLS recursion. |
+| `is_platform_admin()` | boolean | **Standard**: Checks if user is Owner/Super Admin. Subject to RLS recursion. |
 | `has_permission(key)` | boolean | Checks if current user has specific permission key |
 | `is_admin_or_above()` | boolean | **DEPRECATED for Logic** - Returns true for Admin/Super/Owner roles. Use `has_permission` instead. |
 
@@ -48,8 +49,8 @@ FOR SELECT USING (
      -- 2. Granular Permission Check
      public.has_permission('tenant.module.read')
      OR
-     -- 3. Platform Admin Bypass
-     public.is_platform_admin()
+     -- 3. Platform Admin Bypass (Use auth_is_admin for recursion safety)
+     public.auth_is_admin()
   )
   AND deleted_at IS NULL
 );
@@ -61,7 +62,7 @@ FOR SELECT USING (
 CREATE POLICY "table_insert_abac" ON public.table_name
 FOR INSERT WITH CHECK (
   (tenant_id = public.current_tenant_id() AND public.has_permission('tenant.module.create'))
-  OR public.is_platform_admin()
+  OR public.auth_is_admin()
 );
 ```
 

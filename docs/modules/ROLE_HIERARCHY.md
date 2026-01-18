@@ -48,12 +48,12 @@ The following matrix represents the *default* configuration for new tenants.
 
 ### Content Operations
 
-| Role | Create | Read | Update | Publish | Delete |
-| ---- | :----: | :--: | :----: | :-----: | :----: |
-| Owner | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Admin | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Editor | ✅ | ✅ | ✅ | ✅ | ❌ |
-| Author | ✅ | ✅ | Own Only* | ❌ | ❌ |
+| Role | Create | Read | Update | Publish | Delete | Restore | Perm. Delete |
+| ---- | :----: | :--: | :----: | :-----: | :----: | :-----: | :----------: |
+| Owner | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Admin | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Editor | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ |
+| Author | ✅ | ✅ | Own Only* | ❌ | ❌ | ❌ | ❌ |
 
 ### System Operations
 
