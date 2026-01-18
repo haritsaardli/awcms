@@ -83,6 +83,15 @@
     },
     {
       "pattern": "^https?://assets\\.codesandbox\\.io"
+    },
+    {
+      "pattern": "^docs/"
+    },
+    {
+      "pattern": "^\\.\\./02-reference/"
+    },
+    {
+      "pattern": "^[A-Z_]+\\.md$"
     }
   ],
   "replacementPatterns": [],

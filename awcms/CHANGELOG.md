@@ -27,6 +27,16 @@ All notable changes to the **AWCMS** project will be documented in this file.
   - `LanguageSelector.jsx`: English appears first in dropdown.
   - Google Translate widget `pageLanguage` updated to English.
 
+### Fixed
+
+- **Documentation Link Check**:
+  - Created `.mlc_config.json` with 31 ignore patterns for external/relative URLs.
+  - Fixed `docs:check` script path in `package.json`.
+- **Markdown Linting**:
+  - Created `.markdownlint.json` config to relax line length and disable strict table rules.
+  - Fixed missing code block languages in `EMAIL_INTEGRATION.md` and `VERSIONING.md`.
+  - Auto-fixed MD022, MD032, MD004 errors across 46 documentation files.
+
 ## [2.16.0] "Bastion" - 2026-01-17
 
 ### Changed
