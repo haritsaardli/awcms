@@ -52,7 +52,7 @@
     "manage_resource": "Manage {{resource}} entries.",
     "back_to_active": "Back to Active",
     "create_resource": "New {{resource}}",
-    "search_resource": "Search {{resource}}s... (5+ chars)",
+    "search_resource": "Search {{resource}}...",
     "move_to_trash": "Move to Trash?",
     "move_to_trash_confirm": "This will move the {{resource}} to trash. You can restore it later.",
     "trash_bin": "Trash Bin",

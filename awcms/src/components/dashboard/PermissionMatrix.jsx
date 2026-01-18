@@ -44,25 +44,26 @@ const RESOURCE_CATEGORIES = {
 };
 
 
+
 const ACTIONS = [
-    { key: 'view', label: 'View', icon: Eye, color: 'text-blue-500', bg: 'bg-blue-50', desc: 'Can view list and details' },
-    { key: 'create', label: 'Create', icon: Edit, color: 'text-green-500', bg: 'bg-green-50', desc: 'Can create new items' },
-    { key: 'edit', label: 'Edit (All)', icon: Edit, color: 'text-amber-500', bg: 'bg-amber-50', desc: 'Can edit ANY item (Admin level)' },
-    { key: 'delete', label: 'Delete (All)', icon: Trash2, color: 'text-red-500', bg: 'bg-red-50', desc: 'Can delete ANY item (Admin level)' },
-    { key: 'publish', label: 'Publish', icon: Check, color: 'text-indigo-500', bg: 'bg-indigo-50', desc: 'Can publish content live' },
-    { key: 'restore', label: 'Restore', icon: RotateCcw, color: 'text-cyan-500', bg: 'bg-cyan-50', desc: 'Can restore from trash' },
-    { key: 'permanent_delete', label: 'Perm Delete (Disabled)', icon: X, color: 'text-rose-600', bg: 'bg-rose-50', desc: 'Reserved. Permanent delete is disabled.' }
+    { key: 'create', label: 'C', fullLabel: 'Create', icon: Edit, color: 'text-green-500', bg: 'bg-green-50', desc: 'Can create new items' },
+    { key: 'read', label: 'R', fullLabel: 'Read', icon: Eye, color: 'text-blue-500', bg: 'bg-blue-50', desc: 'Can view list and details' },
+    { key: 'update', label: 'U', fullLabel: 'Update', icon: Edit, color: 'text-amber-500', bg: 'bg-amber-50', desc: 'Can edit items (All or Own based on role)' },
+    { key: 'publish', label: 'P', fullLabel: 'Publish', icon: Check, color: 'text-indigo-500', bg: 'bg-indigo-50', desc: 'Can publish content live' },
+    { key: 'soft_delete', label: 'SD', fullLabel: 'Soft Delete', icon: Trash2, color: 'text-orange-500', bg: 'bg-orange-50', desc: 'Can move items to trash' },
+    { key: 'restore', label: 'RS', fullLabel: 'Restore', icon: RotateCcw, color: 'text-cyan-500', bg: 'bg-cyan-50', desc: 'Can restore items from trash' },
+    { key: 'delete_permanent', label: 'DP', fullLabel: 'Delete Permanent', icon: X, color: 'text-rose-600', bg: 'bg-rose-50', desc: 'Can permanently delete (irreversible)' }
 ];
 
-// Map UI keys to potential DB action names
+// Map UI keys to potential legacy DB action names for backwards compatibility
 const ACTION_ALIASES = {
-    'view': ['view', 'read'],
     'create': ['create'],
-    'edit': ['edit', 'update'],
-    'delete': ['delete', 'remove', 'soft_delete'],
+    'read': ['read', 'view'],
+    'update': ['update', 'edit'],
     'publish': ['publish'],
+    'soft_delete': ['soft_delete', 'delete'],
     'restore': ['restore'],
-    'permanent_delete': ['permanent_delete', 'delete_permanent']
+    'delete_permanent': ['delete_permanent', 'permanent_delete']
 };
 
 const getPermissionId = (map, resource, actionKey) => {
@@ -203,37 +204,37 @@ const PermissionMatrix = ({ permissions = [], selectedPermissions = new Set(), o
             </div>
 
             {/* Matrix Grid */}
-            <div className="border rounded-lg overflow-hidden bg-white shadow-sm ring-1 ring-slate-200">
+            <div className="border rounded-lg overflow-hidden bg-white dark:bg-slate-900 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700">
                 <div className="overflow-x-auto custom-scrollbar">
-                    <table className="w-full text-sm">
-                        <thead>
-                            <tr className="bg-slate-50/80 border-b border-slate-200">
-                                <th className="p-4 text-left font-bold text-slate-700 w-64 min-w-[200px] sticky left-0 bg-slate-50 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] backdrop-blur-sm">
+                    <table className="w-full text-sm min-w-[800px]">
+                        <thead className="sticky top-0 z-30">
+                            <tr className="bg-slate-50/95 dark:bg-slate-800/95 border-b border-slate-200 dark:border-slate-700 backdrop-blur-sm">
+                                <th className="p-3 text-left font-bold text-slate-700 dark:text-slate-200 w-48 min-w-[180px] sticky left-0 bg-slate-50/95 dark:bg-slate-800/95 z-30 shadow-[2px_0_8px_-2px_rgba(0,0,0,0.1)] dark:shadow-[2px_0_8px_-2px_rgba(0,0,0,0.3)]">
                                     Module / Resource
                                 </th>
                                 {ACTIONS.map(action => (
-                                    <th key={action.key} className="p-3 text-center font-semibold text-slate-600 min-w-[90px]">
+                                    <th key={action.key} className="p-2 text-center font-semibold text-slate-600 dark:text-slate-300 w-[70px]">
                                         <TooltipProvider>
                                             <Tooltip>
-                                                <TooltipTrigger className="flex flex-col items-center justify-center gap-1 cursor-help group w-full">
-                                                    <div className={`p-1.5 rounded-md ${action.bg} ${action.color} mb-1 group-hover:scale-110 transition-transform`}>
-                                                        <action.icon className="w-4 h-4" />
+                                                <TooltipTrigger className="flex flex-col items-center justify-center gap-0.5 cursor-help group w-full">
+                                                    <div className={`p-1 rounded-md ${action.bg} dark:opacity-90 ${action.color} group-hover:scale-110 transition-transform`}>
+                                                        <action.icon className="w-3.5 h-3.5" />
                                                     </div>
-                                                    <span className="text-xs">{action.label}</span>
+                                                    <span className="text-[10px] font-medium">{action.label}</span>
                                                 </TooltipTrigger>
-                                                <TooltipContent>
+                                                <TooltipContent className="dark:bg-slate-800 dark:text-slate-200">
                                                     <p>{action.desc}</p>
                                                 </TooltipContent>
                                             </Tooltip>
                                         </TooltipProvider>
                                     </th>
                                 ))}
-                                <th className="p-3 text-center font-semibold text-slate-600 w-16 sticky right-0 bg-slate-50 z-10 shadow-[-2px_0_5px_-2px_rgba(0,0,0,0.05)]">
-                                    All
+                                <th className="p-2 text-center font-semibold text-slate-600 dark:text-slate-300 w-14 sticky right-0 bg-slate-50/95 dark:bg-slate-800/95 z-30 shadow-[-2px_0_8px_-2px_rgba(0,0,0,0.1)] dark:shadow-[-2px_0_8px_-2px_rgba(0,0,0,0.3)]">
+                                    <span className="text-[10px]">All</span>
                                 </th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100">
+                        <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
                             {Object.entries(filteredResources).map(([category, resources]) => {
                                 if (resources.length === 0) return null;
                                 const isCollapsed = collapsedCategories[category];
@@ -241,11 +242,11 @@ const PermissionMatrix = ({ permissions = [], selectedPermissions = new Set(), o
                                 return (
                                     <React.Fragment key={category}>
                                         {/* Category Header */}
-                                        <tr className="bg-slate-100/50 hover:bg-slate-100 cursor-pointer" onClick={() => toggleCategory(category)}>
-                                            <td colSpan={ACTIONS.length + 2} className="px-4 py-2 font-semibold text-xs text-slate-500 uppercase tracking-wider sticky left-0 z-10">
+                                        <tr className="bg-slate-100/70 dark:bg-slate-800/70 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer" onClick={() => toggleCategory(category)}>
+                                            <td colSpan={ACTIONS.length + 2} className="px-3 py-2 font-semibold text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider sticky left-0 z-10 bg-slate-100/70 dark:bg-slate-800/70">
                                                 <div className="flex items-center gap-2">
-                                                    {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                                                    {category} <span className="bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded-full text-[10px]">{resources.length}</span>
+                                                    {isCollapsed ? <ChevronRight className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                                                    {category} <span className="bg-slate-200 dark:bg-slate-600 text-slate-600 dark:text-slate-200 px-1.5 py-0.5 rounded-full text-[10px]">{resources.length}</span>
                                                 </div>
                                             </td>
                                         </tr>
@@ -255,8 +256,8 @@ const PermissionMatrix = ({ permissions = [], selectedPermissions = new Set(), o
                                             const stats = getRowStats(resource);
 
                                             return (
-                                                <tr key={resource} className="hover:bg-slate-50 transition-colors group">
-                                                    <td className="p-4 font-medium text-slate-800 bg-white sticky left-0 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] capitalize border-r border-slate-100 group-hover:bg-slate-50 transition-colors">
+                                                <tr key={resource} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
+                                                    <td className="p-3 font-medium text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-900 sticky left-0 z-10 shadow-[2px_0_8px_-2px_rgba(0,0,0,0.08)] dark:shadow-[2px_0_8px_-2px_rgba(0,0,0,0.25)] capitalize border-r border-slate-100 dark:border-slate-700 group-hover:bg-slate-50 dark:group-hover:bg-slate-800/50 transition-colors">
                                                         <div className="flex items-center gap-2">
                                                             {resource.replace(/_/g, ' ')}
                                                         </div>
@@ -266,50 +267,50 @@ const PermissionMatrix = ({ permissions = [], selectedPermissions = new Set(), o
 
                                                         // If permission doesn't exist for this resource
                                                         if (!permId) {
-                                                            return <td key={action.key} className="p-2 text-center bg-slate-50/30">
-                                                                <div className="w-1.5 h-1.5 rounded-full bg-slate-200 mx-auto" />
+                                                            return <td key={action.key} className="p-1.5 text-center bg-slate-50/30 dark:bg-slate-800/30">
+                                                                <div className="w-1.5 h-1.5 rounded-full bg-slate-200 dark:bg-slate-600 mx-auto" />
                                                             </td>;
                                                         }
 
                                                         const isSelected = selectedPermissions.has(permId);
 
                                                         return (
-                                                            <td key={action.key} className="p-2 text-center">
+                                                            <td key={action.key} className="p-1.5 text-center">
                                                                 <button
                                                                     type="button"
                                                                     disabled={readOnly}
                                                                     onClick={() => onToggle(permId)}
                                                                     className={`
-                                                                        w-9 h-9 rounded-lg flex items-center justify-center transition-all mx-auto duration-200
+                                                                        w-8 h-8 rounded-lg flex items-center justify-center transition-all mx-auto duration-200
                                                                         ${isSelected
-                                                                            ? `${action.bg} ${action.color} shadow-sm ring-1 ring-inset ring-black/5 scale-100`
-                                                                            : 'bg-white border border-slate-200 text-slate-300 hover:border-slate-300 hover:text-slate-400 scale-95 hover:scale-100'
+                                                                            ? `${action.bg} dark:opacity-90 ${action.color} shadow-sm ring-1 ring-inset ring-black/5 dark:ring-white/10 scale-100`
+                                                                            : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 text-slate-300 dark:text-slate-500 hover:border-slate-300 dark:hover:border-slate-500 hover:text-slate-400 scale-95 hover:scale-100'
                                                                         }
                                                                         ${readOnly ? 'cursor-default opacity-80' : 'cursor-pointer'}
                                                                     `}
                                                                     title={isSelected ? 'Granted' : 'Denied'}
                                                                 >
-                                                                    {isSelected ? <Check className="w-5 h-5" strokeWidth={3} /> : <X className="w-4 h-4" />}
+                                                                    {isSelected ? <Check className="w-4 h-4" strokeWidth={3} /> : <X className="w-3.5 h-3.5" />}
                                                                 </button>
                                                             </td>
                                                         );
                                                     })}
                                                     {/* Bulk Action Column */}
-                                                    <td className="p-2 text-center sticky right-0 bg-white group-hover:bg-slate-50 z-10 shadow-[-2px_0_5px_-2px_rgba(0,0,0,0.05)] border-l border-slate-100">
+                                                    <td className="p-1.5 text-center sticky right-0 bg-white dark:bg-slate-900 group-hover:bg-slate-50 dark:group-hover:bg-slate-800/50 z-10 shadow-[-2px_0_8px_-2px_rgba(0,0,0,0.08)] dark:shadow-[-2px_0_8px_-2px_rgba(0,0,0,0.25)] border-l border-slate-100 dark:border-slate-700">
                                                         <button
                                                             type="button"
                                                             disabled={readOnly}
                                                             onClick={() => handleBulkToggle(resource, !stats.all)}
                                                             className={`
-                                                                w-8 h-8 rounded-md flex items-center justify-center transition-all mx-auto
+                                                                w-7 h-7 rounded-md flex items-center justify-center transition-all mx-auto
                                                                 ${stats.all
-                                                                    ? 'text-blue-600 bg-blue-50 hover:bg-blue-100'
-                                                                    : 'text-slate-400 hover:text-blue-500 hover:bg-slate-100'
+                                                                    ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-100 dark:hover:bg-blue-900/60'
+                                                                    : 'text-slate-400 dark:text-slate-500 hover:text-blue-500 hover:bg-slate-100 dark:hover:bg-slate-700'
                                                                 }
                                                             `}
                                                             title={stats.all ? 'Deselect All' : 'Select All'}
                                                         >
-                                                            {stats.all ? <CheckSquare className="w-4 h-4" /> : <Square className="w-4 h-4" />}
+                                                            {stats.all ? <CheckSquare className="w-3.5 h-3.5" /> : <Square className="w-3.5 h-3.5" />}
                                                         </button>
                                                     </td>
                                                 </tr>
@@ -323,28 +324,28 @@ const PermissionMatrix = ({ permissions = [], selectedPermissions = new Set(), o
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-slate-500 bg-slate-50 p-4 rounded-lg border border-slate-200">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 p-4 rounded-lg border border-slate-200 dark:border-slate-700">
                 <div>
-                    <h4 className="font-bold text-slate-700 mb-2">Legend</h4>
-                    <div className="flex flex-wrap gap-3">
-                        {ACTIONS.slice(0, 4).map(a => (
+                    <h4 className="font-bold text-slate-700 dark:text-slate-200 mb-2">Legend</h4>
+                    <div className="flex flex-wrap gap-2">
+                        {ACTIONS.map(a => (
                             <div key={a.key} className="flex items-center gap-1.5">
                                 <div className={`w-3 h-3 rounded-full ${a.bg} border ${a.color.replace('text', 'border')}`}></div>
-                                <span>{a.label}</span>
+                                <span><strong>{a.label}</strong>: {a.fullLabel}</span>
                             </div>
                         ))}
                     </div>
                 </div>
                 <div>
-                    <h4 className="font-bold text-slate-700 mb-2">Permission Logic</h4>
-                    <ul className="list-disc list-inside space-y-1">
-                        <li><strong>Edit (All)</strong> overrides ownership checks. Without this, users can only edit <strong>their own</strong> content.</li>
-                        <li><strong>Restore</strong> allows bringing items back from the Trash bin.</li>
-                        <li><strong>Permanent Delete</strong> allows completely removing items from the database (irreversible).</li>
+                    <h4 className="font-bold text-slate-700 dark:text-slate-200 mb-2">Permission Logic</h4>
+                    <ul className="list-disc list-inside space-y-1 text-slate-600 dark:text-slate-400">
+                        <li><strong>U (Update)</strong>: Authors can only edit <strong>their own</strong> content.</li>
+                        <li><strong>RS (Restore)</strong>: Allows bringing items back from Trash.</li>
+                        <li><strong>DP (Delete Permanent)</strong>: Irreversible. Reserved for Owner/Super Admin.</li>
                     </ul>
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
 

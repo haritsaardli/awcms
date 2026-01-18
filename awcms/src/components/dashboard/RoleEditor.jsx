@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Shield, Save, X, Loader2, Lock, Info } from 'lucide-react';
+import { Shield, Save, X, Loader2, Lock, Info, CheckCircle2, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -34,6 +34,7 @@ const RoleEditor = ({ role, onClose, onSave }) => {
   // Protect system roles
   const isSystemRole = ['owner', 'super_admin', 'public', 'guest'].includes(role?.name);
   const isFullAccessRole = ['owner', 'super_admin'].includes(role?.name);
+  const [syncingFullAccess, setSyncingFullAccess] = useState(false);
 
   useEffect(() => {
     const fetchPermissions = async () => {
@@ -131,6 +132,60 @@ const RoleEditor = ({ role, onClose, onSave }) => {
     toast({ title: "Template Applied", description: `Applied permissions for ${templateName}` });
   };
 
+  // Bulk action: Select All
+  const selectAllPermissions = () => {
+    if (isFullAccessRole) return;
+    const allIds = new Set(permissions.map(p => p.id));
+    setSelectedPermissions(allIds);
+    setActiveTemplate('');
+    toast({ title: "All Selected", description: `${permissions.length} permissions selected.` });
+  };
+
+  // Bulk action: Deselect All
+  const deselectAllPermissions = () => {
+    if (isFullAccessRole) return;
+    setSelectedPermissions(new Set());
+    setActiveTemplate('');
+    toast({ title: "All Cleared", description: "All permissions deselected." });
+  };
+
+  // Sync Full Access: Persist all permissions for owner/super_admin to database
+  const syncFullAccess = async () => {
+    if (!isFullAccessRole || !role?.id) return;
+
+    setSyncingFullAccess(true);
+    try {
+      // Soft-delete existing role_permissions
+      await supabase
+        .from('role_permissions')
+        .update({ deleted_at: new Date().toISOString() })
+        .eq('role_id', role.id)
+        .is('deleted_at', null);
+
+      // Insert all permissions for this role
+      const allPerms = permissions.map(p => ({
+        role_id: role.id,
+        permission_id: p.id,
+        deleted_at: null
+      }));
+
+      if (allPerms.length > 0) {
+        const { error } = await supabase
+          .from('role_permissions')
+          .upsert(allPerms, { onConflict: 'role_id, permission_id' });
+
+        if (error) throw error;
+      }
+
+      toast({ title: "Full Access Synced", description: `${permissions.length} permissions activated for ${role.name}.` });
+    } catch (err) {
+      console.error('Sync error:', err);
+      toast({ variant: 'destructive', title: 'Sync Failed', description: err.message });
+    } finally {
+      setSyncingFullAccess(false);
+    }
+  };
+
 
   const handleSave = async (e) => {
     e.preventDefault();
@@ -140,11 +195,12 @@ const RoleEditor = ({ role, onClose, onSave }) => {
     }
 
     setSaving(true);
+    console.log('Starting save for role:', role?.name || formData.name);
 
     try {
       let roleId = role?.id;
 
-      // 1. Create/Update Role
+      // 1. Create/Update Role Metadata
       if (roleId) {
         const { error } = await supabase
           .from('roles')
@@ -168,37 +224,49 @@ const RoleEditor = ({ role, onClose, onSave }) => {
         roleId = data.id;
       }
 
-      // 2. Update Permissions (Matrix)
-      // Transaction-like behavior: delete old, insert new
-      // Note: Supabase doesn't have true transactions in client lib without RPC, 
-      // but this sequential operation is standard practice.
+      console.log('Role ID secured:', roleId);
 
-      await supabase
+      // 2. Update Permissions (Matrix)
+      // Standard pattern: Soft-delete all current permissions, then re-insert active ones.
+
+      // A. Soft-delete all active permissions for this role
+      const { error: deleteError } = await supabase
         .from('role_permissions')
         .update({ deleted_at: new Date().toISOString() })
         .eq('role_id', roleId)
         .is('deleted_at', null);
 
-      const newPerms = Array.from(selectedPermissions).map(permId => ({
-        role_id: roleId,
-        permission_id: permId,
-        deleted_at: null
-      }));
+      if (deleteError) {
+        console.error('Error clearing old permissions:', deleteError);
+        throw deleteError;
+      }
 
-      if (newPerms.length > 0) {
-        // Chunk inserts if too many to avoid payload limits (unlikely here but good practice)
+      // B. Insert/Restore selected permissions
+      if (selectedPermissions.size > 0) {
+        const newPerms = Array.from(selectedPermissions).map(permId => ({
+          role_id: roleId,
+          permission_id: permId,
+          deleted_at: null
+        }));
+
+        console.log(`Saving ${newPerms.length} permissions...`);
+
+        // Use upsert to handle potential race conditions or re-activation
         const { error: permInsertError } = await supabase
           .from('role_permissions')
-          .upsert(newPerms, { onConflict: 'role_id, permission_id' });
+          .upsert(newPerms, { onConflict: 'role_id, permission_id', ignoreDuplicates: false });
 
-        if (permInsertError) throw permInsertError;
+        if (permInsertError) {
+          console.error('Error inserting permissions:', permInsertError);
+          throw permInsertError;
+        }
       }
 
       toast({ title: 'Success', description: 'Role and permissions saved successfully.' });
       onSave();
 
     } catch (err) {
-      console.error(err);
+      console.error('Save failed:', err);
       toast({ variant: 'destructive', title: 'Error', description: err.message });
     } finally {
       setSaving(false);
@@ -215,13 +283,13 @@ const RoleEditor = ({ role, onClose, onSave }) => {
       <motion.div
         initial={{ scale: 0.95, y: 20 }}
         animate={{ scale: 1, y: 0 }}
-        className="bg-white rounded-xl shadow-2xl w-full max-w-7xl h-[90vh] flex flex-col overflow-hidden border border-slate-200"
+        className="bg-white dark:bg-slate-900 rounded-xl shadow-2xl w-full max-w-[95vw] xl:max-w-[1600px] h-[92vh] flex flex-col overflow-hidden border border-slate-200 dark:border-slate-700"
       >
         {/* Header */}
-        <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50 shrink-0">
+        <div className="px-6 py-3 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-slate-800 shrink-0">
           <div>
-            <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-              <Shield className={`w-6 h-6 ${isFullAccessRole ? 'text-purple-600' : 'text-blue-600'}`} />
+            <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+              <Shield className={`w-5 h-5 ${isFullAccessRole ? 'text-purple-600' : 'text-blue-600'}`} />
               {role ? (role.name === 'owner' ? 'Owner Configuration (Global)' : 'Edit Role Configuration') : 'Create New Role'}
             </h2>
             <p className="text-sm text-slate-500 mt-1">
@@ -229,7 +297,26 @@ const RoleEditor = ({ role, onClose, onSave }) => {
             </p>
           </div>
           <div className="flex gap-2">
+            {/* Bulk Actions for non-system roles */}
             {!isSystemRole && (
+              <div className="hidden md:flex bg-white rounded-lg border border-slate-200 p-1 mr-2">
+                <button
+                  type="button"
+                  onClick={selectAllPermissions}
+                  className="px-2 py-1 text-xs font-medium rounded-md text-green-600 hover:bg-green-50 flex items-center gap-1"
+                >
+                  <CheckCircle2 className="w-3 h-3" /> All
+                </button>
+                <button
+                  type="button"
+                  onClick={deselectAllPermissions}
+                  className="px-2 py-1 text-xs font-medium rounded-md text-slate-600 hover:bg-slate-100 flex items-center gap-1"
+                >
+                  <X className="w-3 h-3" /> None
+                </button>
+              </div>
+            )}
+            {!isFullAccessRole && (
               <div className="hidden md:flex bg-white rounded-lg border border-slate-200 p-1 mr-4">
                 {['Viewer', 'Editor', 'Manager'].map(t => (
                   <button
@@ -243,6 +330,21 @@ const RoleEditor = ({ role, onClose, onSave }) => {
                 ))}
               </div>
             )}
+            {/* Sync Full Access button for owner/super_admin */}
+            {isFullAccessRole && (
+              <Button
+                type="button"
+                onClick={syncFullAccess}
+                disabled={syncingFullAccess}
+                className="bg-purple-600 hover:bg-purple-700 text-white mr-2"
+              >
+                {syncingFullAccess ? (
+                  <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Syncing...</>
+                ) : (
+                  <><Zap className="w-4 h-4 mr-2" /> Sync Full Access</>
+                )}
+              </Button>
+            )}
             <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full hover:bg-slate-200">
               <X className="w-5 h-5 text-slate-500" />
             </Button>
@@ -251,13 +353,13 @@ const RoleEditor = ({ role, onClose, onSave }) => {
 
         {/* Content */}
         <form onSubmit={handleSave} className="flex-1 flex flex-col overflow-hidden">
-          <div className="flex-1 overflow-y-auto p-6 space-y-8 custom-scrollbar bg-white">
+          <div className="flex-1 overflow-y-auto p-6 space-y-8 custom-scrollbar bg-white dark:bg-slate-900">
 
             {/* Role Details */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="space-y-4 lg:col-span-1">
-                <div className="bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-4">
-                  <h3 className="font-semibold text-slate-800 flex items-center gap-2">
+                <div className="bg-slate-50 dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700 space-y-4">
+                  <h3 className="font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-2">
                     <Info className="w-4 h-4 text-blue-500" /> Role Details
                   </h3>
 
@@ -271,7 +373,7 @@ const RoleEditor = ({ role, onClose, onSave }) => {
                         placeholder="e.g. Content Editor"
                         required
                         disabled={isSystemRole}
-                        className={isSystemRole ? "bg-slate-100 text-slate-500 font-mono" : ""}
+                        className={isSystemRole ? "bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 font-mono" : "dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600"}
                       />
                       {isSystemRole && <p className="text-[10px] text-amber-600 flex items-center gap-1 mt-1"><Lock className="w-3 h-3" /> System role name cannot be changed.</p>}
                     </div>
@@ -289,7 +391,7 @@ const RoleEditor = ({ role, onClose, onSave }) => {
                   </div>
                 </div>
 
-                <Alert className="bg-blue-50 border-blue-100 text-blue-800">
+                <Alert className="bg-blue-50 dark:bg-blue-950/30 border-blue-100 dark:border-blue-900 text-blue-800 dark:text-blue-200">
                   <Info className="w-4 h-4 text-blue-600" />
                   <AlertTitle>Permission Stats</AlertTitle>
                   <AlertDescription className="text-xs mt-1">
@@ -301,7 +403,7 @@ const RoleEditor = ({ role, onClose, onSave }) => {
                       <span>Total Available:</span>
                       <span className="font-mono">{permissions.length}</span>
                     </div>
-                    <div className="w-full bg-blue-200 h-1.5 rounded-full mt-2 overflow-hidden">
+                    <div className="w-full bg-blue-200 dark:bg-blue-900 h-1.5 rounded-full mt-2 overflow-hidden">
                       <div
                         className="bg-blue-600 h-full transition-all duration-500"
                         style={{ width: `${isFullAccessRole ? 100 : (permissions.length ? (selectedPermissions.size / permissions.length) * 100 : 0)}%` }}
@@ -313,10 +415,10 @@ const RoleEditor = ({ role, onClose, onSave }) => {
 
               <div className="lg:col-span-2 space-y-4">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-semibold text-slate-800 text-lg">Access Control Matrix</h3>
-                  <div className="text-xs text-slate-500">
+                  <h3 className="font-semibold text-slate-800 dark:text-slate-200 text-lg">Access Control Matrix</h3>
+                  <div className="text-xs text-slate-500 dark:text-slate-400">
                     {isFullAccessRole ? (
-                      <span className="flex items-center gap-1 text-purple-600 font-medium bg-purple-50 px-2 py-1 rounded"><Shield className="w-3 h-3" /> Full System Access Granted (100%)</span>
+                      <span className="flex items-center gap-1 text-purple-600 dark:text-purple-400 font-medium bg-purple-50 dark:bg-purple-900/40 px-2 py-1 rounded"><Shield className="w-3 h-3" /> Full System Access Granted (100%)</span>
                     ) : (
                       <span>Configure modular permissions below</span>
                     )}
@@ -342,7 +444,7 @@ const RoleEditor = ({ role, onClose, onSave }) => {
           </div>
 
           {/* Footer Actions */}
-          <div className="p-4 border-t border-slate-200 bg-slate-50 flex justify-between items-center shrink-0">
+          <div className="p-4 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 flex justify-between items-center shrink-0">
             <div className="text-xs text-slate-400 hidden sm:block">
               Last updated: {new Date().toLocaleDateString()}
             </div>

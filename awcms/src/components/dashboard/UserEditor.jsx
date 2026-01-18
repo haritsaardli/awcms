@@ -86,6 +86,10 @@ function UserEditor({ user, onClose, onSave }) {
     setLoading(true);
 
     try {
+      // Check if selected role is global (owner/super_admin)
+      const selectedRole = roles.find(r => r.id === formData.role_id);
+      const isGlobalRole = selectedRole && (selectedRole.name === 'owner' || selectedRole.name === 'super_admin');
+
       if (isEditing) {
         // Update existing user (Public Table Only)
         const updatePayload = {
@@ -93,10 +97,18 @@ function UserEditor({ user, onClose, onSave }) {
           role_id: formData.role_id,
           updated_at: new Date().toISOString()
         };
-        // Platform Admin can change tenant (or set to null for global)
-        if (isPlatformAdmin) {
-          updatePayload.tenant_id = formData.tenant_id || null;
+
+        // Always include tenant_id in update:
+        // - For global roles: set to null
+        // - For tenant-scoped roles: use the selected tenant
+        if (isGlobalRole) {
+          updatePayload.tenant_id = null;
+        } else if (formData.tenant_id) {
+          updatePayload.tenant_id = formData.tenant_id;
         }
+
+        console.log('Updating user with payload:', updatePayload);
+
         const { error } = await supabase
           .from('users')
           .update(updatePayload)
@@ -324,17 +336,17 @@ function UserEditor({ user, onClose, onSave }) {
               </div>
             );
           })()}
+          {/* Form Actions - Inside form for proper submit behavior */}
+          <div className="pt-4 border-t border-slate-200 flex justify-end gap-3">
+            <Button type="button" variant="ghost" onClick={onClose} disabled={loading}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={loading} className="bg-blue-600 hover:bg-blue-700">
+              <Save className="w-4 h-4 mr-2" />
+              {loading ? 'Saving...' : (isEditing ? 'Update User' : 'Create User')}
+            </Button>
+          </div>
         </form>
-
-        <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-end gap-3">
-          <Button type="button" variant="ghost" onClick={onClose} disabled={loading}>
-            Cancel
-          </Button>
-          <Button type="submit" disabled={loading} onClick={handleSubmit} className="bg-blue-600 hover:bg-blue-700">
-            <Save className="w-4 h-4 mr-2" />
-            {loading ? 'Saving...' : (isEditing ? 'Update User' : 'Create User')}
-          </Button>
-        </div>
       </motion.div>
     </motion.div>
   );

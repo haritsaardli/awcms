@@ -203,20 +203,68 @@ export const PermissionProvider = ({ children }) => {
     return permissionList.some(p => permissions.includes(p));
   }, [permissions, userRole, user]);
 
+  /**
+   * Check if the current user owns the record
+   * @param {object} record - Record with created_by field
+   * @returns {boolean}
+   */
+  const checkOwnership = useCallback((record) => {
+    if (!record || !user) return false;
+    return record.created_by === user.id || record.owner_id === user.id;
+  }, [user]);
+
   const checkAccess = useCallback((action, resource, record = null) => {
+    // Platform admins always have access
     if (['super_admin', 'owner'].includes(userRole)) return true;
 
+    // Determine the permission key based on scope
     const hasScope = resource.includes('.');
     const permissionKey = hasScope ? `${resource}.${action}` : `tenant.${resource}.${action}`;
 
-    if (permissions.includes(permissionKey)) return true;
+    // Check if user has the specific permission
+    if (permissions.includes(permissionKey)) {
+      // For 'update' action, check ownership if role is 'author'
+      if (action === 'update' && userRole === 'author' && record) {
+        return checkOwnership(record);
+      }
+      return true;
+    }
 
-    if (record && record.created_by && user) {
-      if (record.created_by === user.id) return true;
+    // Fallback: if action is 'update' and no explicit permission, allow if user owns the record
+    if (action === 'update' && record && user && record.created_by === user.id) {
+      return true;
     }
 
     return false;
-  }, [permissions, userRole, user]);
+  }, [permissions, userRole, user, checkOwnership]);
+
+  /**
+   * Shorthand: Can user publish content in this resource?
+   */
+  const canPublish = useCallback((resource) => {
+    return checkAccess('publish', resource);
+  }, [checkAccess]);
+
+  /**
+   * Shorthand: Can user restore soft-deleted items in this resource?
+   */
+  const canRestore = useCallback((resource) => {
+    return checkAccess('restore', resource);
+  }, [checkAccess]);
+
+  /**
+   * Shorthand: Can user permanently delete items in this resource?
+   */
+  const canPermanentDelete = useCallback((resource) => {
+    return checkAccess('delete_permanent', resource);
+  }, [checkAccess]);
+
+  /**
+   * Shorthand: Can user soft-delete items in this resource?
+   */
+  const canSoftDelete = useCallback((resource) => {
+    return checkAccess('soft_delete', resource);
+  }, [checkAccess]);
 
   const checkPolicy = useCallback((action, resource, context = {}) => {
     if (['super_admin', 'owner'].includes(userRole)) return true;
@@ -250,9 +298,14 @@ export const PermissionProvider = ({ children }) => {
     hasPermission,
     hasAnyPermission,
     checkAccess,
+    checkOwnership,
     checkPolicy,
+    canPublish,
+    canRestore,
+    canPermanentDelete,
+    canSoftDelete,
     refreshPermissions: fetchUserPermissions
-  }), [permissions, userRole, tenantId, isPlatformAdmin, loading, hasPermission, hasAnyPermission, checkAccess, checkPolicy, fetchUserPermissions]);
+  }), [permissions, userRole, tenantId, isPlatformAdmin, loading, hasPermission, hasAnyPermission, checkAccess, checkOwnership, checkPolicy, canPublish, canRestore, canPermanentDelete, canSoftDelete, fetchUserPermissions]);
 
   return (
     <PermissionContext.Provider value={value}>

@@ -159,7 +159,7 @@ const GenericContentManager = ({
     }, [currentPage, itemsPerPage, debouncedQuery, canView, showTrash, tableName, currentTenant?.id]);
 
     const handleEdit = (item) => {
-        if (!checkAccess('edit', permissionPrefix, item)) {
+        if (!checkAccess('update', permissionPrefix, item)) {
             toast({ variant: 'destructive', title: 'Access Denied', description: 'You can only edit your own content.' });
             return;
         }
@@ -169,8 +169,8 @@ const GenericContentManager = ({
 
     // Show delete confirmation dialog
     const handleDelete = (id, item) => {
-        if (!checkAccess('delete', permissionPrefix, item)) {
-            toast({ variant: 'destructive', title: 'Access Denied', description: 'You can only delete your own content.' });
+        if (!checkAccess('soft_delete', permissionPrefix, item)) {
+            toast({ variant: 'destructive', title: 'Access Denied', description: 'You do not have permission to delete this content.' });
             return;
         }
         setItemToDelete({ id, item });
@@ -390,7 +390,7 @@ const GenericContentManager = ({
                         loading={loading}
                         // Dynamically check permissions for each row
                         onEdit={!showTrash ? (item) => {
-                            if (checkAccess('edit', permissionPrefix, item)) handleEdit(item);
+                            if (checkAccess('update', permissionPrefix, item)) handleEdit(item);
                             else toast({ variant: 'destructive', title: 'Access Denied', description: 'You can only edit your own content.' });
                         } : null}
 

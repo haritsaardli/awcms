@@ -52,7 +52,7 @@
     "manage_resource": "Kelola entri {{resource}}.",
     "back_to_active": "Kembali ke Aktif",
     "create_resource": "{{resource}} Baru",
-    "search_resource": "Cari {{resource}}... (5+ karakter)",
+    "search_resource": "Cari {{resource}}...",
     "move_to_trash": "Pindahkan ke Sampah?",
     "move_to_trash_confirm": "Ini akan memindahkan {{resource}} ke sampah. Anda dapat memulihkannya nanti.",
     "trash_bin": "Keranjang Sampah",
