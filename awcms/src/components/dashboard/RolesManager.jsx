@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import ContentTable from '@/components/dashboard/ContentTable';
 import RoleEditor from '@/components/dashboard/RoleEditor';
 import { usePermissions } from '@/contexts/PermissionContext';
+import { sanitizeHTML } from '@/utils/sanitize';
 // Standard Permissions: tenant.role.read, tenant.role.create, tenant.role.update, tenant.role.delete
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/lib/customSupabaseClient';
@@ -220,7 +221,7 @@ function RolesManager() {
             </AlertDialogTitle>
             <AlertDialogDescription asChild>
               <div className="space-y-3">
-                <p dangerouslySetInnerHTML={{ __html: t('roles.delete.confirm', { name: roleToDelete?.name }) }} />
+                <p dangerouslySetInnerHTML={{ __html: sanitizeHTML(t('roles.delete.confirm', { name: roleToDelete?.name })) }} />
                 <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-amber-800 text-sm">
                   <p className="font-medium mb-1">⚠️ {t('common.error')}:</p>
                   <p>{t('roles.delete.warning_users')}</p>

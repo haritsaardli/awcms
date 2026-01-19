@@ -5,6 +5,7 @@ import UserEditor from '@/components/dashboard/UserEditor';
 import UserApprovalManager from '@/components/dashboard/UserApprovalManager';
 import { AdminPageLayout, PageHeader, PageTabs, TabsContent } from '@/templates/flowbite-admin';
 import { usePermissions } from '@/contexts/PermissionContext';
+import { sanitizeHTML } from '@/utils/sanitize';
 import { useToast } from '@/components/ui/use-toast';
 import { udm } from '@/lib/data/UnifiedDataManager';
 import { supabase } from '@/lib/customSupabaseClient';
@@ -237,7 +238,7 @@ function UsersManager() {
             </AlertDialogTitle>
             <AlertDialogDescription asChild>
               <div className="space-y-3">
-                <p dangerouslySetInnerHTML={{ __html: t('users.delete.confirm', { name: userToDelete?.full_name || userToDelete?.email }) }} />
+                <p dangerouslySetInnerHTML={{ __html: sanitizeHTML(t('users.delete.confirm', { name: userToDelete?.full_name || userToDelete?.email })) }} />
                 <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-amber-800 text-sm">
                   <p className="font-medium mb-1">⚠️ {t('users.delete.warning_role')}</p>
                 </div>

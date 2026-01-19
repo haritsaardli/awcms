@@ -1,6 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/lib/customSupabaseClient';
+import { sanitizeHTML } from '@/utils/sanitize';
 import { useWidgets } from '@/hooks/useWidgets';
 
 export const WidgetAreaRenderer = ({ slug, className }) => {
@@ -71,7 +72,7 @@ const WidgetDispatcher = ({ type, config }) => {
 
 const TextWidget = ({ config }) => {
     if (config.isHtml) {
-        return <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: config.content }} />;
+        return <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: sanitizeHTML(config.content) }} />;
     }
     return <div className="prose prose-sm max-w-none">{config.content}</div>;
 };
