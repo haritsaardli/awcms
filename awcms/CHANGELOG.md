@@ -3,7 +3,7 @@
 
 All notable changes to the **AWCMS** project will be documented in this file.
 
-## [Unreleased]
+## [2.20.0] "Vanguard" - 2026-01-19
 
 ### Added
 
@@ -27,7 +27,7 @@ All notable changes to the **AWCMS** project will be documented in this file.
 - **Permission Saving**: Fixed critical `42501` RLS violation when saving role permissions by using the new `auth_is_admin()` bypass.
 - **Role Permissions**: Hardened upsert logic in `RoleEditor.jsx` to prevent data loss during updates.
 
-## [2.19.0] "Evolution" - 2026-01-18
+## [2.19.0] "Evolution" - 2026-01-19
 
 ### Added
 
