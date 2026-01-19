@@ -1,5 +1,5 @@
 import { defineMiddleware } from "astro/middleware";
-import { createClientFromEnv } from "./lib/supabase";
+import { createClientFromEnv, getTenant } from "./lib/supabase";
 import { extractTenantFromPath } from "./lib/url";
 
 /**
@@ -194,9 +194,35 @@ export const onRequest = defineMiddleware(async (context, next) => {
     // Track how tenant was resolved - 'path' only if actually resolved from path lookup
     locals.tenant_source = resolvedFromPath ? "path" : "host";
 
-    // Set referral code and locale for downstream components
     locals.ref_code = refCode;
     locals.locale = locale || "en"; // Default to English
+
+    // 8. Fetch SEO Settings (if tenant resolved)
+    if (tenantId) {
+      const { data: seoData } = await SafeSupabase.from("settings")
+        .select("value")
+        .eq("tenant_id", tenantId)
+        .eq("key", "seo_global")
+        .maybeSingle();
+
+      if (seoData?.value) {
+        try {
+          locals.seo = typeof seoData.value === "string"
+            ? JSON.parse(seoData.value)
+            : seoData.value;
+        } catch (e) {
+          console.warn("[Middleware] Failed to parse SEO JSON:", e);
+        }
+      }
+    }
+
+    // 9. Fetch Full Tenant Data
+    if (tenantId) {
+      const { data: tenantProfile } = await getTenant(SafeSupabase, tenantId, "id");
+      if (tenantProfile) {
+        locals.tenant = tenantProfile;
+      }
+    }
 
     // Helper to add locale cookie to response
     const addLocaleCookie = async (response: Response): Promise<Response> => {

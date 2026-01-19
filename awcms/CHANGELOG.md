@@ -3,6 +3,22 @@
 
 All notable changes to the **AWCMS** project will be documented in this file.
 
+## [Unreleased]
+
+### Added
+
+- **Multi-Tenancy & SEO Integration**:
+  - **SEO Data Flow**: Public Portal now fetches global SEO settings (Title, Description, OG Image) from Admin Panel via `middleware.ts`.
+  - **Tenant Context**: Implemented `getTenant` helper in Public Portal to provide full tenant profile access (`locals.tenant`) to all components.
+  - **Permission Alignment**: Added permission keys for renamed resources (`projects.*`, `testimonials.*`).
+
+### Changed
+
+- **Database Alignment**:
+  - Renamed `portfolio` table to `projects` to align with Public Portal expectations.
+  - Renamed `testimonies` table to `testimonials` to align with Public Portal expectations.
+  - Updated `PortfolioManager` and `TestimonyManager` in Admin Panel to use new resource names.
+
 ## [2.20.0] "Vanguard" - 2026-01-19
 
 ### Added

@@ -31,12 +31,19 @@ export const createClientFromEnv = (
 export const getTenant = async (
   supabase: SupabaseClient,
   tenantIdOrSlug: string,
-  _type: "id" | "slug" = "id",
+  type: "id" | "slug" = "id",
 ): Promise<{ data: Record<string, unknown> | null; error: unknown }> => {
-  // This function body was not provided in the instruction, returning a placeholder.
-  // Please provide the actual implementation for getTenant if needed.
-  // For now, it's returning a dummy value to satisfy the return type.
-  return { data: null, error: "Function not implemented" };
+  if (!supabase) {
+    return { data: null, error: new Error("No Supabase client provided") };
+  }
+
+  const { data, error } = await supabase
+    .from("tenants")
+    .select("*")
+    .eq(type, tenantIdOrSlug)
+    .maybeSingle();
+
+  return { data, error };
 };
 
 export const createScopedClient = (

@@ -68,11 +68,11 @@ function TestimonyManager() {
             />
 
             <GenericContentManager
-                tableName="testimonies"
+                tableName="testimonials"
                 resourceName="Testimony"
                 columns={columns}
                 formFields={formFields}
-                permissionPrefix="testimonies"
+                permissionPrefix="testimonials"
                 showBreadcrumbs={false}
             />
         </AdminPageLayout>
