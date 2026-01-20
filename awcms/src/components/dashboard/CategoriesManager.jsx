@@ -17,6 +17,7 @@ function CategoriesManager() {
     { key: 'description', label: 'Description', type: 'textarea' },
     {
       key: 'type', label: 'Type', type: 'select', options: [
+        { value: 'content', label: 'Content (Pages & Articles)' },
         { value: 'article', label: 'Article Category' },
         { value: 'page', label: 'Page Category' },
         { value: 'product', label: 'Product Category' },

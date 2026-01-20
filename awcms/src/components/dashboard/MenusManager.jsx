@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Reorder } from 'framer-motion';
-import { GripVertical, Plus, Save, Trash2, Lock, Edit, ChevronRight, ChevronDown, RefreshCw, Menu } from 'lucide-react';
+import { GripVertical, Plus, Save, Trash2, Lock, Edit, ChevronRight, ChevronDown, RefreshCw, Menu, LayoutTemplate } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -20,6 +20,14 @@ import {
 } from "@/components/ui/dialog";
 import { AdminPageLayout, PageHeader } from '@/templates/flowbite-admin';
 
+// Available Menu Locations
+const MENU_LOCATIONS = [
+  { id: 'header', label: 'Primary Header' },
+  { id: 'footer', label: 'Footer' },
+  { id: 'public_sidebar', label: 'Public Sidebar' },
+  { id: 'mobile_menu', label: 'Mobile Menu' }
+];
+
 function MenusManager() {
   const { toast } = useToast();
   const { hasPermission, userRole } = usePermissions();
@@ -31,6 +39,7 @@ function MenusManager() {
   const [flatMenus, setFlatMenus] = useState([]); // Store flat list for parent selection
   const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentLocation, setCurrentLocation] = useState('header');
 
   // Editor State
   const [isEditing, setIsEditing] = useState(false);
@@ -58,7 +67,7 @@ function MenusManager() {
       fetchPages();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [canView]);
+  }, [canView, currentLocation]); // Re-fetch when location changes
 
   const fetchPages = async () => {
     try {
@@ -75,11 +84,18 @@ function MenusManager() {
   const fetchMenus = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('menus')
         .select('*, tenant:tenants(name)')
         .is('deleted_at', null)
+        .eq('location', currentLocation)
         .order('order', { ascending: true });
+
+      if (currentTenant?.id) {
+        query = query.eq('tenant_id', currentTenant.id);
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
 
@@ -179,7 +195,8 @@ function MenusManager() {
         ...menu,
         is_active: menu.is_active === true,
         is_public: menu.is_public === true,
-        page_id: menu.page_id || '' // Handle page_id
+        page_id: menu.page_id || '', // Handle page_id
+        location: menu.location || currentLocation
       });
     } else {
       // Default values for new menu
@@ -190,7 +207,8 @@ function MenusManager() {
         is_public: true,
         is_active: true,
         parent_id: null,
-        page_id: ''
+        page_id: '',
+        location: currentLocation
       });
     }
     setIsEditing(true);
@@ -221,6 +239,7 @@ function MenusManager() {
       url: menuFormData.url,
       parent_id: menuFormData.parent_id || null,
       page_id: menuFormData.page_id || null,
+      location: menuFormData.location || currentLocation,
       is_public: menuFormData.is_public,
       is_active: menuFormData.is_active,
       updated_at: new Date().toISOString()
@@ -334,6 +353,7 @@ function MenusManager() {
         name: mod.key,
         url: mod.url,
         icon: mod.icon,
+        location: currentLocation,
         parent_id: null,
         order: maxOrder + ((idx + 1) * 10),
         is_active: true,
@@ -377,7 +397,7 @@ function MenusManager() {
     <AdminPageLayout requiredPermission="tenant.menu.read">
       <PageHeader
         title="Menu Management"
-        description="Drag and drop to reorder navigation items"
+        description="Configure public navigation structure for headers, footers, and sidebars"
         icon={Menu}
         breadcrumbs={[{ label: 'Menus', icon: Menu }]}
         actions={(
@@ -399,13 +419,38 @@ function MenusManager() {
         )}
       />
 
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-5xl mx-auto space-y-6">
+
+        {/* Location Selector */}
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex flex-col md:flex-row md:items-center gap-4">
+          <div className="flex items-center gap-2 text-slate-500">
+            <LayoutTemplate className="w-5 h-5" />
+            <span className="font-medium text-sm">Menu Location:</span>
+          </div>
+          <div className="flex gap-2 flex-wrap">
+            {MENU_LOCATIONS.map(loc => (
+              <button
+                key={loc.id}
+                onClick={() => setCurrentLocation(loc.id)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${currentLocation === loc.id
+                    ? 'bg-blue-600 text-white shadow-sm'
+                    : 'bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200'
+                  }`}
+              >
+                {loc.label}
+              </button>
+            ))}
+          </div>
+          <div className="flex-1 md:text-right text-xs text-slate-400 hidden md:block">
+            Managing: <strong>{MENU_LOCATIONS.find(l => l.id === currentLocation)?.label}</strong>
+          </div>
+        </div>
 
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 min-h-[300px]">
           {loading ? (
             <div className="flex items-center justify-center h-40 text-slate-400">Loading menus...</div>
           ) : menus.length === 0 ? (
-            <div className="text-center py-12 text-slate-500">No menu items found. Create one to get started.</div>
+            <div className="text-center py-12 text-slate-500">No menu items found for this location. Create one to get started.</div>
           ) : (
             <Reorder.Group axis="y" values={menus} onReorder={handleReorder} className="space-y-3">
               {menus.map((menu) => (
@@ -431,7 +476,7 @@ function MenusManager() {
             <DialogHeader>
               <DialogTitle>{editingMenu ? 'Edit Menu Item' : 'Create Menu Item'}</DialogTitle>
               <DialogDescription>
-                Configure the details for this navigation link.
+                Configure the details for this navigation link in <strong>{MENU_LOCATIONS.find(l => l.id === currentLocation)?.label}</strong>.
               </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSaveMenu} className="space-y-4 py-4">
@@ -510,6 +555,21 @@ function MenusManager() {
                   ))}
                 </select>
               </div>
+
+              {/* Location Override (Optional) */}
+              <div className="space-y-2">
+                <Label>Location</Label>
+                <select
+                  className="flex h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600"
+                  value={menuFormData.location || currentLocation}
+                  onChange={e => setMenuFormData({ ...menuFormData, location: e.target.value })}
+                >
+                  {MENU_LOCATIONS.map(loc => (
+                    <option key={loc.id} value={loc.id}>{loc.label}</option>
+                  ))}
+                </select>
+              </div>
+
               <div className="flex gap-6 pt-2">
                 <label className="flex items-center gap-2 text-sm font-medium cursor-pointer">
                   <input
@@ -575,8 +635,6 @@ function MenusManager() {
     </AdminPageLayout>
   );
 }
-
-
 
 const MenuReorderItem = ({ menu, canEdit, canDelete, onEdit, onDelete, onPerms, onChildReorder, isPlatformAdmin }) => {
   const hasChildren = menu.children && menu.children.length > 0;

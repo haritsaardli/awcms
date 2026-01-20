@@ -59,6 +59,9 @@ export interface MetaData {
 
   description?: string;
 
+  /** Comma-separated keywords for meta keywords tag */
+  keywords?: string;
+
   openGraph?: MetaDataOpenGraph;
   twitter?: MetaDataTwitter;
 }
@@ -280,4 +283,4 @@ export interface Content extends Omit<Headline, "classes">, Widget {
   callToAction?: CallToAction;
 }
 
-export interface Contact extends Omit<Headline, "classes">, Form, Widget {}
+export interface Contact extends Omit<Headline, "classes">, Form, Widget { }

@@ -3,6 +3,47 @@
 
 All notable changes to the **AWCMS** project will be documented in this file.
 
+## [2.22.0] "Convergence" - 2026-01-20
+
+### Added
+
+- **Unified Content Model**:
+  - Database migration for `page_tags`, `page_files`, `content_translations` tables
+  - Extended `pages` table with `category_id`, `meta_title`, `meta_keywords`, `og_image`, `canonical_url`
+  - Added `sync_source_id` to content tables for cross-tenant synchronization
+
+- **Admin Panel**:
+  - `UnifiedContentEditor.jsx` - Multi-mode editor (Visual/RichText/Markdown)
+  - `SeoMetadataPanel.jsx` - Collapsible SEO fields panel
+  - Enhanced `PagesManager.jsx` with Tags tab and SEO fields
+  - Added "Content" unified category type in `CategoriesManager.jsx`
+
+- **Public Portal Libraries** (11 new TypeScript modules):
+  - `menu.ts` - Dynamic menu fetching from Supabase
+  - `widgets.ts` - Widget area management
+  - `plugins.ts` - Analytics plugins (GA, FB Pixel, Hotjar, Crisp)
+  - `extension_registry.ts` - Extension management with registry pattern
+  - `i18n.ts` - Multilingual translations and locale detection
+  - `tenant_sync.ts` - Cross-tenant content synchronization
+  - `theme.ts` - Dynamic theming with CSS variables
+  - `sitemap.ts` - XML sitemap generation
+  - `search.ts` - Full-text search across content
+  - `sidebar.ts` - Sidebar navigation management
+
+- **Public Portal Components** (6 new Astro components):
+  - `PuckRenderer.astro` - Render 15+ Puck visual builder components
+  - `WidgetRenderer.astro` - Render 12 dynamic widget types
+  - `PluginLoader.astro` - Script injection at head/body positions
+  - `ThemeLoader.astro` - Dynamic CSS variable injection
+  - `Sidebar.astro` - Dynamic sidebar navigation
+  - `SidebarLayout.astro` - Layout with integrated sidebar
+
+### Changed
+
+- Extended `MetaData` type with `keywords` field
+- Updated `Metadata.astro` to render meta keywords tag
+- Integrated `ThemeLoader` and `PluginLoader` into `Layout.astro`
+
 ## [2.21.1] "Synchronization" - 2026-01-20
 
 ### Added
