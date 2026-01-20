@@ -3,6 +3,29 @@
 
 All notable changes to the **AWCMS** project will be documented in this file.
 
+## [Unreleased]
+
+### Added
+
+- **Sidebar Admin**:
+  - `SidebarMenuManager` with role-based filtering, icon picker, and nested group support.
+  - Updated `Sidebar` component with permission checks, collapsible sections, and favorites.
+
+### Fixed
+
+- **Notification System**:
+  - Resolved RLS error during notification creation by ensuring `tenant_id` is explicitly passed to the insert operation.
+- **Database Synchronization**:
+  - Repaired migration history to resolve timestamps conflicts.
+  - Successfully synced local migration files with remote database (`npx supabase db push`) and resolved all schema diffs (`npx supabase db pull`).
+
+### Security
+
+- **Supabase Advisor**:
+  - Resolved `security_definer_view` warning for `published_articles_view` by setting `security_invoker = true`.
+  - Resolved `auth_rls_initplan` warnings by implementing `get_current_tenant_id()` stable function and wrapping `auth.uid()` in RLS policies.
+  - Optimized RLS policies for `page_tags`, `page_files`, `content_translations`, and `audit_logs`.
+
 ## [2.22.0] "Convergence" - 2026-01-20
 
 ### Added

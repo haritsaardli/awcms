@@ -109,7 +109,8 @@ function NotificationsManager() {
                 type: formData.type,
                 priority: formData.priority,
                 category: formData.category,
-                link: formData.link
+                link: formData.link,
+                tenantId: tenantId
             });
 
             toast({ title: 'Success', description: 'Notification sent successfully' });

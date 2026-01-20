@@ -259,7 +259,7 @@ export function useNotifications() {
     }
   }, [toast]);
 
-  const sendNotification = useCallback(async ({ userId, title, message, type = 'info', link = null, priority = 'normal', category = 'general' }) => {
+  const sendNotification = useCallback(async ({ userId, title, message, type = 'info', link = null, priority = 'normal', category = 'general', tenantId = null }) => {
     if (!user) return;
     try {
       const { error } = await supabase
@@ -272,6 +272,7 @@ export function useNotifications() {
           link,
           priority,
           category,
+          tenant_id: tenantId,
           created_by: user.id
         });
 
