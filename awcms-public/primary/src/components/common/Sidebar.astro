@@ -1,5 +1,4 @@
 ---
-import { getBinding } from "~/utils/config";
 import {
     getSidebarConfig,
     isActivePath,
@@ -24,7 +23,7 @@ const supabase = createClientFromEnv(
     Astro.locals.runtime?.env || import.meta.env,
 );
 
-let config = defaultConfig;
+let config: SidebarConfig | null | undefined = defaultConfig;
 
 // Fetch config if not provided
 if (!config && supabase) {

@@ -1,44 +1,81 @@
-// Basic Widget Registry
-// In the future, this can be extended by plugins calling registerWidget()
-
-/*
-  Widget Interface:
-  {
-    type: 'core/text',
-    name: 'Text Widget',
-    icon: IconComponent,
-    component: ReactComponent, // The component to render in the editor/frontend
-    defaultConfig: {},
-    schema: {} // Zod schema for config
-  }
-*/
-
-import { Type, Image, Link, List } from 'lucide-react';
+// Widget Registry matching WidgetRenderer.astro types
+import {
+    Type, Image, List, Share2, Megaphone, Mail, MapPin,
+    Phone, Newspaper, Tag, Hash, Code
+} from 'lucide-react';
 
 export const CORE_WIDGETS = [
     {
-        type: 'core/text',
-        name: 'Text / HTML',
+        type: 'text',
+        name: 'Text Block',
         icon: Type,
         defaultConfig: { content: '', isHtml: false }
     },
     {
-        type: 'core/image',
+        type: 'html',
+        name: 'Raw HTML',
+        icon: Code,
+        defaultConfig: { content: '' }
+    },
+    {
+        type: 'image',
         name: 'Image',
         icon: Image,
-        defaultConfig: { url: '', alt: '' }
+        defaultConfig: { src: '', alt: '', caption: '' }
     },
     {
-        type: 'core/menu',
-        name: 'Navigation Menu',
+        type: 'links',
+        name: 'Link List',
         icon: List,
-        defaultConfig: { menuId: '' }
+        defaultConfig: { items: [{ title: 'Example Link', url: '#' }] }
     },
     {
-        type: 'core/button',
-        name: 'Button',
-        icon: Link,
-        defaultConfig: { text: 'Click Me', url: '#' }
+        type: 'social',
+        name: 'Social Links',
+        icon: Share2,
+        defaultConfig: { links: [{ platform: 'twitter', url: '#' }] }
+    },
+    {
+        type: 'cta',
+        name: 'Call to Action',
+        icon: Megaphone,
+        defaultConfig: { description: 'Join us today!', button_text: 'Click Here', button_url: '#' }
+    },
+    {
+        type: 'newsletter',
+        name: 'Newsletter Signup',
+        icon: Mail,
+        defaultConfig: { description: 'Subscribe to our updates.' }
+    },
+    {
+        type: 'map',
+        name: 'Map Embed',
+        icon: MapPin,
+        defaultConfig: { embed_url: '' }
+    },
+    {
+        type: 'contact',
+        name: 'Contact Info',
+        icon: Phone,
+        defaultConfig: { address: '', phone: '', email: '' }
+    },
+    {
+        type: 'recent_posts',
+        name: 'Recent Posts',
+        icon: Newspaper,
+        defaultConfig: { count: 5 }
+    },
+    {
+        type: 'categories',
+        name: 'Categories',
+        icon: Tag,
+        defaultConfig: {}
+    },
+    {
+        type: 'tags',
+        name: 'Tags',
+        icon: Hash,
+        defaultConfig: {}
     }
 ];
 

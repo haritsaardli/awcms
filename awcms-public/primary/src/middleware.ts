@@ -207,9 +207,10 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
       if (seoData?.value) {
         try {
-          locals.seo = typeof seoData.value === "string"
-            ? JSON.parse(seoData.value)
-            : seoData.value;
+          locals.seo =
+            typeof seoData.value === "string"
+              ? JSON.parse(seoData.value)
+              : seoData.value;
         } catch (e) {
           console.warn("[Middleware] Failed to parse SEO JSON:", e);
         }
@@ -218,7 +219,11 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
     // 9. Fetch Full Tenant Data
     if (tenantId) {
-      const { data: tenantProfile } = await getTenant(SafeSupabase, tenantId, "id");
+      const { data: tenantProfile } = await getTenant(
+        SafeSupabase,
+        tenantId,
+        "id",
+      );
       if (tenantProfile) {
         locals.tenant = tenantProfile;
       }
