@@ -232,8 +232,8 @@
     "toast_failed_desc": "Failed to update password. Please try again."
   },
   "seo_manager": {
-    "title": "SEO Management",
-    "description": "Configure global metadata and search engine settings.",
+    "title": "SEO Default Configuration",
+    "description": "Configure global default SEO settings for new pages.",
     "access_denied": "Access Denied",
     "access_denied_desc": "You do not have permission to view SEO settings.",
     "card_meta_title": "Meta Tags Configuration",

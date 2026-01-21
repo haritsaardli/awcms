@@ -81,10 +81,40 @@ function PageEditor({ page, onClose, onSuccess }) {
                 if (page?.id) pageQuery = pageQuery.neq('id', page.id);
                 const { data: pageData } = await pageQuery;
                 setParentPages(pageData || []);
+
+                // Fetch SEO Defaults (Only for new pages)
+                if (!page && currentTenant?.id) {
+                    const { data: seoData } = await supabase
+                        .from('settings')
+                        .select('value')
+                        .eq('key', 'seo_global')
+                        .eq('tenant_id', currentTenant.id)
+                        .maybeSingle();
+
+                    if (seoData?.value) {
+                        try {
+                            const parsedSeo = typeof seoData.value === 'string'
+                                ? JSON.parse(seoData.value)
+                                : seoData.value;
+
+                            setFormData(prev => ({
+                                ...prev,
+                                meta_title: parsedSeo.site_title || prev.meta_title,
+                                meta_description: parsedSeo.site_description || prev.meta_description,
+                                meta_keywords: parsedSeo.default_keywords || prev.meta_keywords,
+                                og_image: parsedSeo.og_image || prev.og_image,
+                                twitter_image: parsedSeo.og_image || prev.twitter_image, // Fallback to OG image
+                            }));
+                        } catch (err) {
+                            console.error("Error parsing SEO defaults:", err);
+                        }
+                    }
+                }
+
             } catch (e) { console.error(e); }
         };
         fetchData();
-    }, [currentTenant?.id, page?.id]);
+    }, [currentTenant?.id, page?.id, page]);
 
     const generateSlug = (text) => {
         return text

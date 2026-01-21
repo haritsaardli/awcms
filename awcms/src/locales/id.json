@@ -232,8 +232,8 @@
     "toast_failed_desc": "Gagal memperbarui kata sandi. Silakan coba lagi."
   },
   "seo_manager": {
-    "title": "Manajemen SEO",
-    "description": "Konfigurasi metadata global dan pengaturan mesin pencari.",
+    "title": "Konfigurasi SEO Default",
+    "description": "Konfigurasi pengaturan SEO default global untuk halaman baru.",
     "access_denied": "Akses Ditolak",
     "access_denied_desc": "Anda tidak memiliki izin untuk melihat pengaturan SEO.",
     "card_meta_title": "Konfigurasi Meta Tags",

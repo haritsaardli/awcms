@@ -138,7 +138,7 @@ function SeoManager() {
                 title={t('seo_manager.title')}
                 description={t('seo_manager.description')}
                 icon={Globe}
-                breadcrumbs={[{ label: 'SEO', icon: Globe }]}
+                breadcrumbs={[{ label: 'SEO Default', icon: Globe }]}
             />
 
             <div className="max-w-4xl space-y-6">

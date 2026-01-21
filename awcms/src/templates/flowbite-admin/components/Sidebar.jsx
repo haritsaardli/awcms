@@ -130,7 +130,7 @@ const Sidebar = ({ isOpen, onClose }) => {
             id: 'system',
             children: [
                 { label: 'Settings', href: '/cmspanel/settings/general' },
-                { label: 'SEO', href: '/cmspanel/seo' },
+                { label: 'SEO Default', href: '/cmspanel/seo' },
                 { label: 'Audit Logs', href: '/cmspanel/logs' },
                 { label: 'Tenants', href: '/cmspanel/tenants' },
                 { label: 'IoT Devices', href: '/cmspanel/devices' },

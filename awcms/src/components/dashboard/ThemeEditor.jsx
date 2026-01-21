@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Slider } from '@/components/ui/slider';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, Save, Loader2, Monitor, Smartphone, Type, Palette as PaletteIcon, Layout } from 'lucide-react';
+import { ArrowLeft, Save, Loader2, Monitor, Smartphone, Type, Palette as PaletteIcon, Layout, RotateCcw } from 'lucide-react';
 import { usePermissions } from '@/contexts/PermissionContext';
 import { shadcnHslToHex, hexToShadcnHsl, applyTheme } from '@/lib/themeUtils';
 
@@ -27,6 +27,50 @@ const FONT_OPTIONS = [
     { label: 'System UI', value: 'system-ui, -apple-system, sans-serif' },
 ];
 
+const DEFAULT_LIGHT_COLORS = {
+    background: "0 0% 100%",
+    foreground: "222.2 84% 4.9%",
+    card: "0 0% 100%",
+    cardForeground: "222.2 84% 4.9%",
+    popover: "0 0% 100%",
+    popoverForeground: "222.2 84% 4.9%",
+    primary: "222.2 47.4% 11.2%",
+    primaryForeground: "210 40% 98%",
+    secondary: "210 40% 96.1%",
+    secondaryForeground: "222.2 47.4% 11.2%",
+    muted: "210 40% 96.1%",
+    mutedForeground: "215.4 16.3% 46.9%",
+    accent: "210 40% 96.1%",
+    accentForeground: "222.2 47.4% 11.2%",
+    destructive: "0 84.2% 60.2%",
+    destructiveForeground: "210 40% 98%",
+    border: "214.3 31.8% 91.4%",
+    input: "214.3 31.8% 91.4%",
+    ring: "222.2 84% 4.9%",
+};
+
+const DEFAULT_DARK_COLORS = {
+    background: "222.2 84% 4.9%",
+    foreground: "210 40% 98%",
+    card: "222.2 84% 4.9%",
+    cardForeground: "210 40% 98%",
+    popover: "222.2 84% 4.9%",
+    popoverForeground: "210 40% 98%",
+    primary: "210 40% 98%",
+    primaryForeground: "222.2 47.4% 11.2%",
+    secondary: "217.2 32.6% 17.5%",
+    secondaryForeground: "210 40% 98%",
+    muted: "217.2 32.6% 17.5%",
+    mutedForeground: "215 20.2% 65.1%",
+    accent: "217.2 32.6% 17.5%",
+    accentForeground: "210 40% 98%",
+    destructive: "0 62.8% 30.6%",
+    destructiveForeground: "210 40% 98%",
+    border: "217.2 32.6% 17.5%",
+    input: "217.2 32.6% 17.5%",
+    ring: "212.7 26.8% 83.9%",
+};
+
 const ThemeEditor = () => {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -41,12 +85,14 @@ const ThemeEditor = () => {
     const [saving, setSaving] = useState(false);
     const [activeTab, setActiveTab] = useState('colors');
     const [previewMode, setPreviewMode] = useState('desktop');
+    const [colorMode, setColorMode] = useState('light'); // 'light' | 'dark'
 
     // Form State
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [config, setConfig] = useState({
         colors: {},
+        darkColors: {},
         fonts: { heading: 'Inter, sans-serif', body: 'Inter, sans-serif' },
         radius: 0.5
     });
@@ -68,8 +114,16 @@ const ThemeEditor = () => {
             setDescription(data.description || '');
 
             // Merge with defaults to prevent crashes
+            // Merge with defaults to prevent crashes
+            const loadedColors = data.config?.colors || {};
+
+            // Legacy Migration: If darkColors doesn't exist, clone colors as a starting point 
+            // so the user has a base to work from instead of empty values.
+            const loadedDarkColors = data.config?.darkColors || { ...loadedColors };
+
             setConfig({
-                colors: data.config?.colors || {},
+                colors: loadedColors,
+                darkColors: loadedDarkColors,
                 fonts: data.config?.fonts || { heading: 'Inter, sans-serif', body: 'Inter, sans-serif' },
                 radius: data.config?.radius !== undefined ? data.config.radius : 0.5
             });
@@ -90,10 +144,12 @@ const ThemeEditor = () => {
 
     const handleColorChange = (key, hexValue) => {
         const hslValue = hexToShadcnHsl(hexValue);
+        const targetGroup = colorMode === 'light' ? 'colors' : 'darkColors';
+
         setConfig(prev => ({
             ...prev,
-            colors: {
-                ...prev.colors,
+            [targetGroup]: {
+                ...prev[targetGroup],
                 [key]: hslValue
             }
         }));
@@ -113,6 +169,19 @@ const ThemeEditor = () => {
         setConfig(prev => ({ ...prev, radius: val[0] }));
     };
 
+    const handleReset = () => {
+        const modeLabel = colorMode === 'light' ? 'Light' : 'Dark';
+        if (window.confirm(`Are you sure you want to reset ${modeLabel} Mode colors to their defaults?`)) {
+            setConfig(prev => ({
+                ...prev,
+                [colorMode === 'light' ? 'colors' : 'darkColors']:
+                    colorMode === 'light' ? DEFAULT_LIGHT_COLORS : DEFAULT_DARK_COLORS
+            }));
+            toast({ title: "Reset Successful", description: `${modeLabel} mode colors have been reset.` });
+        }
+    };
+
+    // ... existing handleSave ...
     const handleSave = async () => {
         if (!canEdit) {
             toast({ title: t('theme_editor.toasts.access_denied'), description: t('theme_editor.toasts.access_denied'), variant: "destructive" });
@@ -151,6 +220,8 @@ const ThemeEditor = () => {
         </div>
     );
 
+    const currentColors = colorMode === 'light' ? config.colors : config.darkColors;
+
     const ColorRow = ({ label, configKey, description }) => (
         <div className="flex items-center justify-between py-3 border-b border-border last:border-0">
             <div className="flex flex-col gap-0.5">
@@ -159,19 +230,19 @@ const ThemeEditor = () => {
             </div>
             <div className="flex items-center gap-3">
                 <span className="text-xs text-muted-foreground font-mono bg-muted px-2 py-1 rounded border border-border uppercase">
-                    {shadcnHslToHex(config.colors?.[configKey])}
+                    {shadcnHslToHex(currentColors?.[configKey])}
                 </span>
                 <div className="relative w-9 h-9 rounded-md overflow-hidden border border-border shadow-sm cursor-pointer transition-transform hover:scale-105 active:scale-95 ring-offset-2 focus-within:ring-2 focus-within:ring-primary">
                     <input
                         type="color"
                         className="absolute inset-0 w-[150%] h-[150%] -top-[25%] -left-[25%] cursor-pointer p-0 border-0 opacity-0"
-                        value={shadcnHslToHex(config.colors?.[configKey])}
+                        value={shadcnHslToHex(currentColors?.[configKey])}
                         onChange={(e) => handleColorChange(configKey, e.target.value)}
                         disabled={!canEdit}
                     />
                     <div
                         className="w-full h-full pointer-events-none"
-                        style={{ backgroundColor: shadcnHslToHex(config.colors?.[configKey]) }}
+                        style={{ backgroundColor: shadcnHslToHex(currentColors?.[configKey]) }}
                     />
                 </div>
             </div>
@@ -251,6 +322,25 @@ const ThemeEditor = () => {
                     <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
                         <Tabs value={activeTab} className="w-full">
                             <TabsContent value="colors" className="mt-0 space-y-6">
+                                <div className="flex gap-2 mb-4">
+                                    <div className="flex p-1 bg-muted rounded-lg flex-1">
+                                        <button
+                                            className={`flex-1 py-1 text-xs font-medium rounded-md transition-all ${colorMode === 'light' ? 'bg-background shadow text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+                                            onClick={() => setColorMode('light')}
+                                        >
+                                            Light Mode
+                                        </button>
+                                        <button
+                                            className={`flex-1 py-1 text-xs font-medium rounded-md transition-all ${colorMode === 'dark' ? 'bg-background shadow text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+                                            onClick={() => setColorMode('dark')}
+                                        >
+                                            Dark Mode
+                                        </button>
+                                    </div>
+                                    <Button variant="outline" size="icon" onClick={handleReset} title="Reset to Defaults" className="h-[34px] w-[34px] shrink-0">
+                                        <RotateCcw className="h-4 w-4" />
+                                    </Button>
+                                </div>
                                 <div>
                                     <h3 className="text-xs font-bold text-foreground uppercase tracking-wider mb-2">{t('theme_editor.colors.base_title')}</h3>
                                     <div className="bg-card rounded-lg border border-border shadow-sm p-1 px-3">
@@ -357,7 +447,7 @@ const ThemeEditor = () => {
                             }`}
                     >
                         {/* Mock Website Structure */}
-                        <div className="flex flex-col min-h-full font-sans">
+                        <div className={`flex flex-col min-h-full font-sans ${colorMode === 'dark' ? 'dark' : ''}`}>
                             {/* Header */}
                             <header className="border-b border-border sticky top-0 bg-background/95 backdrop-blur z-10">
                                 <div className="container mx-auto px-6 h-16 flex items-center justify-between">

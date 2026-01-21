@@ -113,38 +113,47 @@ export function shadcnHslToHex(hslString) {
 export function applyTheme(config) {
   if (!config) return;
 
-  const root = document.documentElement;
+  // We will inject a style tag instead of setting inline styles on root
+  // This allows us to define .dark overrides easily.
+  let styleTag = document.getElementById('theme-overrides');
+  if (!styleTag) {
+    styleTag = document.createElement('style');
+    styleTag.id = 'theme-overrides';
+    document.head.appendChild(styleTag);
+  }
 
-  // Apply Colors
-  if (config.colors) {
-    Object.entries(config.colors).forEach(([key, value]) => {
-      // Convert camelCase to kebab-case for CSS variables if needed, 
-      // but shadcn usually uses specific names.
-      // Assuming keys match shadcn css variables (e.g. 'primary', 'background')
-
-      // Map config keys to CSS variable names
+  const generateCssVars = (colors) => {
+    if (!colors) return '';
+    return Object.entries(colors).map(([key, value]) => {
       const varName = `--${key.replace(/[A-Z]/g, m => "-" + m.toLowerCase())}`;
-
       let finalValue = value;
-      // Check if value is legacy Shadcn HSL (e.g. "222.2 84% 4.9%")
-      // It has spaces, no commas, and starts with a number.
+      // Handle legacy space-separated format if necessary (though shadcn usually uses hsl() or raw values)
       if (typeof value === 'string' && /^\d+(\.\d+)?\s+\d+(\.\d+)?%?\s+\d+(\.\d+)?%?/.test(value) && !value.startsWith('hsl')) {
         finalValue = `hsl(${value})`;
       }
+      return `${varName}: ${finalValue};`;
+    }).join('\n');
+  };
 
-      root.style.setProperty(varName, finalValue);
-    });
+  const lightVars = generateCssVars(config.colors);
+  const darkVars = generateCssVars(config.darkColors);
+
+  let css = `
+    :root {
+      ${lightVars}
+      ${config.radius !== undefined ? `--radius: ${config.radius}rem;` : ''}
+      ${config.fonts?.heading ? `--font-heading: ${config.fonts.heading};` : ''}
+      ${config.fonts?.body ? `--font-sans: ${config.fonts.body};` : ''}
+    }
+  `;
+
+  if (darkVars) {
+    css += `
+      .dark {
+        ${darkVars}
+      }
+    `;
   }
 
-  // Apply Radius
-  if (config.radius !== undefined) {
-    root.style.setProperty('--radius', `${config.radius}rem`);
-  }
-
-  // Apply Fonts (This is trickier as it requires loading fonts, 
-  // but for now we just set the variable)
-  if (config.fonts) {
-    if (config.fonts.heading) root.style.setProperty('--font-heading', config.fonts.heading);
-    if (config.fonts.body) root.style.setProperty('--font-sans', config.fonts.body);
-  }
+  styleTag.textContent = css;
 }

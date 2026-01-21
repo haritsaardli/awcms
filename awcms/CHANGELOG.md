@@ -5,6 +5,23 @@ All notable changes to the **AWCMS** project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- **SEO Default Configuration**:
+  - Renamed "SEO" to "SEO Default" in Sidebar and SEO Manager for clarity.
+  - Implemented automatic pre-filling of global SEO settings (Title, Description, Keyword, OG Image) when creating new Pages.
+  - Updated `PageEditor` to fetch default values from `seo_global` settings.
+- **Theme Management**:
+  - **Dark Mode Support**: Added dedicated "Dark Mode" color configuration in Theme Editor.
+  - **Dual-Mode Theming**: Implemented independent light/dark CSS variable injection via `themeUtils`.
+  - **Reset Functionality**: Added "Reset to Defaults" button in `ThemeEditor` to restore factory color palettes for both modes.
+  - **Live Preview**: Added toggle to switch between Light and Dark mode previews while editing.
+
+### Changed
+
+- **Localization**:
+  - Updated Indonesian (`id.json`) translations for "SEO Default Configuration".
+
 ## [2.23.0] "Vortex" - 2026-01-21
 
 ### Added
