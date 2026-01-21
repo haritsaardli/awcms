@@ -1,0 +1,144 @@
+{
+  "articles": [
+    {
+      "id": "news-001",
+      "slug": "sman-2-pangkalan-bun-raih-juara-osn-tingkat-provinsi",
+      "category": "News",
+      "tag": "prestasi",
+      "title": {
+        "id": "SMAN 2 Pangkalan Bun Raih Juara OSN Tingkat Provinsi",
+        "en": "SMAN 2 Pangkalan Bun Wins Provincial OSN Championship"
+      },
+      "excerpt": {
+        "id": "Siswa SMAN 2 Pangkalan Bun berhasil meraih juara dalam ajang Olimpiade Sains Nasional tingkat Provinsi Kalimantan Tengah.",
+        "en": "SMAN 2 Pangkalan Bun students successfully won the Provincial Science Olympiad of Central Kalimantan."
+      },
+      "content": {
+        "id": "<p>Dengan bangga kami sampaikan bahwa siswa SMAN 2 Pangkalan Bun telah berhasil menorehkan prestasi gemilang dalam ajang Olimpiade Sains Nasional (OSN) tingkat Provinsi Kalimantan Tengah tahun 2024.</p><p>Muhammad Rizky Pratama, siswa kelas XII MIPA 1, berhasil meraih medali emas pada bidang Matematika dan akan mewakili Kalimantan Tengah di tingkat Nasional.</p><p>Selain itu, Putri Amelia Sari dari kelas XII MIPA 2 juga meraih medali perak pada bidang Biologi.</p>",
+        "en": "<p>We are proud to announce that SMAN 2 Pangkalan Bun students have achieved excellent results in the 2024 Provincial Science Olympiad of Central Kalimantan.</p><p>Muhammad Rizky Pratama, a XII MIPA 1 student, won a gold medal in Mathematics and will represent Central Kalimantan at the National level.</p><p>Additionally, Putri Amelia Sari from XII MIPA 2 also won a silver medal in Biology.</p>"
+      },
+      "image": "/images/news/osn-2024.jpg",
+      "author": "Admin",
+      "publishedAt": "2024-04-15",
+      "featured": true
+    },
+    {
+      "id": "news-002",
+      "slug": "kegiatan-masa-pengenalan-lingkungan-sekolah",
+      "category": "News",
+      "tag": "kegiatan",
+      "title": {
+        "id": "Kegiatan Masa Pengenalan Lingkungan Sekolah (MPLS) 2024",
+        "en": "School Environment Introduction Period (MPLS) 2024"
+      },
+      "excerpt": {
+        "id": "SMAN 2 Pangkalan Bun mengadakan kegiatan MPLS untuk menyambut siswa baru tahun ajaran 2024/2025.",
+        "en": "SMAN 2 Pangkalan Bun held MPLS activities to welcome new students for the 2024/2025 academic year."
+      },
+      "content": {
+        "id": "<p>Masa Pengenalan Lingkungan Sekolah (MPLS) tahun 2024 telah berlangsung dengan sukses selama tiga hari, dari tanggal 15-17 Juli 2024.</p><p>Kegiatan ini diikuti oleh 420 siswa baru yang akan menempuh pendidikan di SMAN 2 Pangkalan Bun. Para siswa diperkenalkan dengan lingkungan sekolah, tata tertib, dan berbagai program unggulan yang ada.</p>",
+        "en": "<p>The School Environment Introduction Period (MPLS) 2024 was successfully held for three days, from July 15-17, 2024.</p><p>This activity was attended by 420 new students who will pursue their education at SMAN 2 Pangkalan Bun. Students were introduced to the school environment, rules, and various featured programs.</p>"
+      },
+      "image": "/images/news/mpls-2024.jpg",
+      "author": "Admin",
+      "publishedAt": "2024-07-18",
+      "featured": true
+    },
+    {
+      "id": "news-003",
+      "slug": "peringatan-hari-pendidikan-nasional",
+      "category": "News",
+      "tag": "kegiatan",
+      "title": {
+        "id": "Peringatan Hari Pendidikan Nasional 2024",
+        "en": "National Education Day Commemoration 2024"
+      },
+      "excerpt": {
+        "id": "SMAN 2 Pangkalan Bun memperingati Hari Pendidikan Nasional dengan berbagai kegiatan.",
+        "en": "SMAN 2 Pangkalan Bun commemorated National Education Day with various activities."
+      },
+      "content": {
+        "id": "<p>Dalam rangka memperingati Hari Pendidikan Nasional yang jatuh pada tanggal 2 Mei, SMAN 2 Pangkalan Bun menggelar upacara bendera dan berbagai kegiatan lomba.</p>",
+        "en": "<p>In commemoration of National Education Day on May 2, SMAN 2 Pangkalan Bun held a flag ceremony and various competition activities.</p>"
+      },
+      "image": "/images/news/hardiknas-2024.jpg",
+      "author": "Admin",
+      "publishedAt": "2024-05-02",
+      "featured": false
+    }
+  ],
+  "schoolInfo": {
+    "id": "school-info",
+    "slug": "info-sekolah",
+    "category": "Info",
+    "tag": "general",
+    "title": {
+      "id": "Info Sekolah",
+      "en": "School Info"
+    },
+    "content": {
+      "id": "<p>Halaman ini berisi berbagai informasi terkini seputar SMAN 2 Pangkalan Bun, termasuk pengumuman, jadwal kegiatan, dan informasi penting lainnya.</p><h3>Informasi Terkini</h3><ul><li>Pendaftaran Siswa Baru 2025/2026 dibuka Februari 2025</li><li>Ujian Semester Ganjil: Desember 2024</li><li>Libur Akhir Semester: 23 Des 2024 - 5 Jan 2025</li></ul>",
+      "en": "<p>This page contains various current information about SMAN 2 Pangkalan Bun, including announcements, activity schedules, and other important information.</p><h3>Current Information</h3><ul><li>New Student Registration 2025/2026 opens February 2025</li><li>Odd Semester Exams: December 2024</li><li>End of Semester Holiday: Dec 23, 2024 - Jan 5, 2025</li></ul>"
+    }
+  },
+  "agenda": {
+    "id": "agenda",
+    "slug": "agenda",
+    "category": "Agenda",
+    "tag": "general",
+    "title": {
+      "id": "Agenda Sekolah",
+      "en": "School Agenda"
+    },
+    "events": [
+      {
+        "date": "2024-12-16",
+        "title": { "id": "Ujian Akhir Semester Ganjil", "en": "Odd Semester Final Exam" },
+        "description": { "id": "Ujian akhir semester untuk seluruh siswa", "en": "Final semester exam for all students" }
+      },
+      {
+        "date": "2024-12-23",
+        "title": { "id": "Pembagian Rapor", "en": "Report Card Distribution" },
+        "description": { "id": "Pembagian rapor semester ganjil", "en": "Odd semester report card distribution" }
+      },
+      {
+        "date": "2025-01-06",
+        "title": { "id": "Masuk Sekolah Semester Genap", "en": "Even Semester Start" },
+        "description": { "id": "Awal semester genap tahun ajaran 2024/2025", "en": "Start of even semester 2024/2025" }
+      },
+      {
+        "date": "2025-02-01",
+        "title": { "id": "Pendaftaran PPDB 2025", "en": "PPDB Registration 2025" },
+        "description": { "id": "Pembukaan pendaftaran peserta didik baru", "en": "Opening of new student registration" }
+      }
+    ]
+  },
+  "gallery": {
+    "id": "gallery",
+    "slug": "galeri",
+    "category": "Gallery",
+    "tag": "general",
+    "title": {
+      "id": "Galeri Foto",
+      "en": "Photo Gallery"
+    },
+    "albums": [
+      {
+        "title": { "id": "Kegiatan Belajar Mengajar", "en": "Teaching and Learning Activities" },
+        "images": ["/images/gallery/kbm-1.jpg", "/images/gallery/kbm-2.jpg", "/images/gallery/kbm-3.jpg"]
+      },
+      {
+        "title": { "id": "Ekstrakurikuler", "en": "Extracurricular" },
+        "images": ["/images/gallery/ekskul-1.jpg", "/images/gallery/ekskul-2.jpg", "/images/gallery/ekskul-3.jpg"]
+      },
+      {
+        "title": { "id": "Upacara dan Peringatan", "en": "Ceremonies and Commemorations" },
+        "images": ["/images/gallery/upacara-1.jpg", "/images/gallery/upacara-2.jpg"]
+      },
+      {
+        "title": { "id": "Prestasi Siswa", "en": "Student Achievements" },
+        "images": ["/images/gallery/prestasi-1.jpg", "/images/gallery/prestasi-2.jpg"]
+      }
+    ]
+  }
+}

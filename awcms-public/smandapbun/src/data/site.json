@@ -1,0 +1,36 @@
+{
+  "site": {
+    "name": "SMAN 2 Pangkalan Bun",
+    "shortName": "SMANDA",
+    "tagline": "Unggul dalam Prestasi, Berkarakter Mulia",
+    "description": "SMA Negeri 2 Pangkalan Bun adalah sekolah menengah atas negeri yang berlokasi di Kota Pangkalan Bun, Kabupaten Kotawaringin Barat, Kalimantan Tengah.",
+    "logo": "/images/logo-smanda.png",
+    "favicon": "/favicon.svg",
+    "address": "Jl. Iskandar No. 123, Pangkalan Bun, Kotawaringin Barat, Kalimantan Tengah 74113",
+    "phone": "(0532) 21234",
+    "fax": "(0532) 21235",
+    "email": "info@sman2pangkalanbun.sch.id",
+    "website": "https://sman2pangkalanbun.sch.id",
+    "socialMedia": {
+      "facebook": "https://facebook.com/sman2pangkalanbun",
+      "instagram": "https://instagram.com/sman2pangkalanbun",
+      "youtube": "https://youtube.com/@sman2pangkalanbun",
+      "twitter": "https://twitter.com/sman2pbun"
+    }
+  },
+  "accreditation": "A",
+  "npsn": "30203456",
+  "established": "1985",
+  "headmaster": {
+    "name": "Drs. H. Ahmad Sudirman, M.Pd",
+    "photo": "/images/staff/kepala-sekolah.jpg"
+  },
+  "stats": {
+    "students": 1250,
+    "teachers": 68,
+    "staff": 25,
+    "classrooms": 36,
+    "labs": 8,
+    "extracurriculars": 18
+  }
+}

@@ -22,6 +22,14 @@ All notable changes to the **AWCMS** project will be documented in this file.
 - **Localization**:
   - Updated Indonesian (`id.json`) translations for "SEO Default Configuration".
 
+### Fixed
+
+- **Public Portal (smandapbun)**:
+  - Resolved all `astro check` errors and type mismatch issues.
+  - Optimized localized list processing with explicit type casting in Astro templates.
+  - Cleaned up unused imports and variables across the entire template.
+  - Restored missing critical imports in financial, achievement, and service pages.
+
 ## [2.23.0] "Vortex" - 2026-01-21
 
 ### Added

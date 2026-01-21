@@ -1,0 +1,130 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { Icon } from "astro-icon/components";
+import {
+  getLocale,
+  t,
+  getLocalizedValue,
+  getLocalizedPath,
+  type Locale,
+} from "../../utils/i18n";
+import { getProfilePageData } from "../../lib/api";
+
+const locale = getLocale(Astro.url) as Locale;
+const profileData = await getProfilePageData();
+const { visionMission } = profileData;
+---
+
+<Layout title={getLocalizedValue(visionMission.title, locale)}>
+  <!-- Hero -->
+  <section
+    class="hero-gradient text-white py-16 md:py-20"
+    data-testid="vision-hero"
+  >
+    <div class="container-custom">
+      <nav class="text-sm text-blue-200 mb-4">
+        <a href={getLocalizedPath("/", locale)} class="hover:text-white"
+          >Beranda</a
+        >
+        <span class="mx-2">/</span>
+        <a href={getLocalizedPath("/profil", locale)} class="hover:text-white"
+          >{t("profile.title", locale)}</a
+        >
+        <span class="mx-2">/</span>
+        <span class="text-white">{t("profile.vision_mission", locale)}</span>
+      </nav>
+      <h1 class="text-3xl md:text-4xl font-bold font-heading">
+        {getLocalizedValue(visionMission.title, locale)}
+      </h1>
+    </div>
+  </section>
+
+  <!-- Content -->
+  <section class="py-16 bg-gray-50" data-testid="vision-content">
+    <div class="container-custom">
+      <div class="max-w-5xl mx-auto">
+        <!-- Vision -->
+        <div
+          class="bg-primary-600 text-white p-8 md:p-12 rounded-2xl mb-8 relative overflow-hidden"
+          data-testid="vision-card"
+        >
+          <div
+            class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2"
+          >
+          </div>
+          <div class="relative z-10">
+            <div class="flex items-center gap-4 mb-6">
+              <div
+                class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center"
+              >
+                <Icon name="tabler:eye" class="w-8 h-8" />
+              </div>
+              <h2 class="text-3xl font-bold">{t("profile.vision", locale)}</h2>
+            </div>
+            <p class="text-xl md:text-2xl text-blue-100 leading-relaxed">
+              "{getLocalizedValue(visionMission.vision, locale)}"
+            </p>
+          </div>
+        </div>
+
+        <!-- Mission -->
+        <div
+          class="bg-white rounded-2xl shadow-lg p-8 md:p-12 mb-8"
+          data-testid="mission-card"
+        >
+          <div class="flex items-center gap-4 mb-8">
+            <div
+              class="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center"
+            >
+              <Icon name="tabler:target" class="w-8 h-8 text-primary-600" />
+            </div>
+            <h2 class="text-3xl font-bold text-gray-900">
+              {t("profile.mission", locale)}
+            </h2>
+          </div>
+          <div class="grid md:grid-cols-2 gap-4">
+            {
+              (
+                getLocalizedValue(visionMission.mission, locale) as string[]
+              )?.map((item: string, index: number) => (
+                <div
+                  class="flex items-start gap-4 p-4 bg-gray-50 rounded-xl hover:bg-primary-50 transition-colors"
+                  data-testid={`mission-${index + 1}`}
+                >
+                  <span class="w-10 h-10 bg-primary-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
+                    {index + 1}
+                  </span>
+                  <p class="text-gray-700 pt-2">{item}</p>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+
+        <!-- Motto -->
+        <div
+          class="bg-gradient-to-r from-secondary-500 to-secondary-600 text-white p-8 md:p-12 rounded-2xl text-center"
+          data-testid="motto-card"
+        >
+          <Icon name="tabler:quote" class="w-12 h-12 mx-auto mb-4 opacity-50" />
+          <h3 class="text-lg font-medium mb-2">{t("profile.motto", locale)}</h3>
+          <p class="text-2xl md:text-3xl font-bold">
+            {getLocalizedValue(visionMission.motto, locale)}
+          </p>
+        </div>
+
+        <!-- Back Button -->
+        <div class="mt-8 text-center">
+          <a
+            href={getLocalizedPath("/profil", locale)}
+            class="btn-outline"
+            data-testid="back-to-profile"
+          >
+            <Icon name="tabler:arrow-left" class="w-5 h-5 mr-2" />
+            {t("common.back", locale)}
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>

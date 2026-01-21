@@ -1,0 +1,161 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { Icon } from "astro-icon/components";
+import {
+  getLocale,
+  t,
+  getLocalizedValue,
+  getLocalizedPath,
+  type Locale,
+} from "../../utils/i18n";
+import { getAgendaData } from "../../lib/api";
+
+const locale = getLocale(Astro.url) as Locale;
+const agendaData = await getAgendaData();
+const { agenda } = agendaData;
+
+// Sort events by date
+const sortedEvents = [...agenda.events].sort(
+  (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+);
+const upcomingEvents = sortedEvents.filter(
+  (e) => new Date(e.date) >= new Date(),
+);
+const pastEvents = sortedEvents.filter((e) => new Date(e.date) < new Date());
+---
+
+<Layout title={getLocalizedValue(agenda.title, locale)}>
+  <!-- Hero -->
+  <section
+    class="hero-gradient text-white py-16 md:py-20"
+    data-testid="agenda-hero"
+  >
+    <div class="container-custom">
+      <nav class="text-sm text-blue-200 mb-4">
+        <a href={getLocalizedPath("/", locale)} class="hover:text-white"
+          >Beranda</a
+        >
+        <span class="mx-2">/</span>
+        <a href={getLocalizedPath("/berita", locale)} class="hover:text-white"
+          >{t("news.title", locale)}</a
+        >
+        <span class="mx-2">/</span>
+        <span class="text-white">{t("news.agenda", locale)}</span>
+      </nav>
+      <h1 class="text-3xl md:text-4xl font-bold font-heading">
+        {getLocalizedValue(agenda.title, locale)}
+      </h1>
+    </div>
+  </section>
+
+  <!-- Agenda Content -->
+  <section class="py-16 bg-gray-50" data-testid="agenda-content">
+    <div class="container-custom">
+      <div class="max-w-4xl mx-auto">
+        <!-- Upcoming Events -->
+        {
+          upcomingEvents.length > 0 && (
+            <div class="mb-12">
+              <h2 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+                <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                  <Icon
+                    name="tabler:calendar-event"
+                    class="w-5 h-5 text-green-600"
+                  />
+                </div>
+                {locale === "id" ? "Agenda Mendatang" : "Upcoming Events"}
+              </h2>
+              <div class="space-y-4">
+                {upcomingEvents.map((event: any) => (
+                  <div
+                    class="bg-white rounded-xl p-6 shadow-sm border-l-4 border-green-500 hover:shadow-md transition-shadow"
+                    data-testid={`event-${event.date}`}
+                  >
+                    <div class="flex flex-col md:flex-row md:items-center gap-4">
+                      <div class="flex-shrink-0 text-center md:text-left">
+                        <div class="inline-block bg-green-100 px-4 py-2 rounded-lg">
+                          <div class="text-2xl font-bold text-green-600">
+                            {new Date(event.date).getDate()}
+                          </div>
+                          <div class="text-sm text-green-700">
+                            {new Date(event.date).toLocaleDateString(
+                              locale === "id" ? "id-ID" : "en-US",
+                              { month: "short", year: "numeric" },
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <div class="flex-grow">
+                        <h3 class="font-bold text-gray-900 text-lg">
+                          {getLocalizedValue(event.title, locale)}
+                        </h3>
+                        <p class="text-gray-600">
+                          {getLocalizedValue(event.description, locale)}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )
+        }
+
+        <!-- Past Events -->
+        {
+          pastEvents.length > 0 && (
+            <div>
+              <h2 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+                <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
+                  <Icon name="tabler:history" class="w-5 h-5 text-gray-600" />
+                </div>
+                {locale === "id" ? "Agenda Sebelumnya" : "Past Events"}
+              </h2>
+              <div class="space-y-4">
+                {pastEvents.map((event: any) => (
+                  <div class="bg-white rounded-xl p-6 shadow-sm border-l-4 border-gray-300 opacity-75">
+                    <div class="flex flex-col md:flex-row md:items-center gap-4">
+                      <div class="flex-shrink-0 text-center md:text-left">
+                        <div class="inline-block bg-gray-100 px-4 py-2 rounded-lg">
+                          <div class="text-2xl font-bold text-gray-500">
+                            {new Date(event.date).getDate()}
+                          </div>
+                          <div class="text-sm text-gray-500">
+                            {new Date(event.date).toLocaleDateString(
+                              locale === "id" ? "id-ID" : "en-US",
+                              { month: "short", year: "numeric" },
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <div class="flex-grow">
+                        <h3 class="font-bold text-gray-700 text-lg">
+                          {getLocalizedValue(event.title, locale)}
+                        </h3>
+                        <p class="text-gray-500">
+                          {getLocalizedValue(event.description, locale)}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )
+        }
+
+        <!-- Back Button -->
+        <div class="mt-12 text-center">
+          <a
+            href={getLocalizedPath("/berita", locale)}
+            class="btn-outline"
+            data-testid="back-to-news"
+          >
+            <Icon name="tabler:arrow-left" class="w-5 h-5 mr-2" />
+            {t("common.back", locale)}
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>

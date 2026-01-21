@@ -1,0 +1,258 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { Icon } from "astro-icon/components";
+import {
+  t,
+  getLocalizedValue,
+  getLocalizedPath,
+  type Locale,
+} from "../../utils/i18n";
+
+import { getPosts } from "../../lib/api";
+
+export async function getStaticPaths() {
+  const posts = await getPosts(100); // Fetch all posts for static generation
+
+  return posts.flatMap((post) => [
+    { params: { slug: post.slug }, props: { post, locale: "id" } },
+    { params: { slug: post.slug }, props: { post, locale: "en" } },
+  ]);
+}
+
+const { post, locale } = Astro.props as { post: any; locale: Locale };
+
+// Get related articles (same category, exclude current)
+const allPosts = await getPosts(100); // Fetch all posts again for related articles
+const relatedArticles = allPosts
+  .filter((a) => a.category === post.category && a.id !== post.id)
+  .slice(0, 3);
+---
+
+<Layout title={getLocalizedValue(post.title, locale)}>
+  <!-- Hero -->
+  <section
+    class="hero-gradient text-white py-16 md:py-20"
+    data-testid="article-hero"
+  >
+    <div class="container-custom">
+      <nav class="text-sm text-blue-200 mb-4">
+        <a href={getLocalizedPath("/", locale)} class="hover:text-white"
+          >Beranda</a
+        >
+        <span class="mx-2">/</span>
+        <a href={getLocalizedPath("/berita", locale)} class="hover:text-white"
+          >{t("news.title", locale)}</a
+        >
+        <span class="mx-2">/</span>
+        <span class="text-white">{getLocalizedValue(post.title, locale)}</span>
+      </nav>
+      <h1
+        class="text-2xl md:text-4xl font-bold font-heading leading-tight max-w-4xl"
+      >
+        {getLocalizedValue(post.title, locale)}
+      </h1>
+      <div class="flex flex-wrap items-center gap-4 mt-6 text-blue-200">
+        <div class="flex items-center gap-2">
+          <Icon name="tabler:calendar" class="w-5 h-5" />
+          {
+            new Date(post.published_at).toLocaleDateString(
+              locale === "id" ? "id-ID" : "en-US",
+              {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              },
+            )
+          }
+        </div>
+        <div class="flex items-center gap-2">
+          <Icon name="tabler:user" class="w-5 h-5" />
+          {post.author}
+        </div>
+        <span class="bg-white/20 px-3 py-1 rounded-full text-sm"
+          >{post.category}</span
+        >
+      </div>
+    </div>
+  </section>
+
+  <!-- Content -->
+  <section class="py-16 bg-gray-50" data-testid="article-content">
+    <div class="container-custom">
+      <div class="grid lg:grid-cols-3 gap-8">
+        <!-- Main Content -->
+        <div class="lg:col-span-2">
+          <article class="bg-white rounded-2xl shadow-lg overflow-hidden">
+            <!-- Featured Image -->
+            <div
+              class="aspect-video bg-gradient-to-br from-primary-100 to-primary-200"
+            >
+              <img
+                src={post.image ||
+                  `https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800&h=450&fit=crop`}
+                alt={getLocalizedValue(post.title, locale)}
+                class="w-full h-full object-cover"
+              />
+            </div>
+
+            <!-- Article Body -->
+            <div class="p-8 md:p-12">
+              <div
+                class="prose prose-lg max-w-none"
+                set:html={getLocalizedValue(post.content, locale)}
+              />
+
+              <!-- Tags -->
+              {
+                post.tag && (
+                  <div class="mt-8 pt-6 border-t border-gray-200">
+                    <div class="flex items-center gap-2">
+                      <Icon name="tabler:tag" class="w-5 h-5 text-gray-400" />
+                      <span class="text-gray-500">
+                        {t("news.tags", locale)}:
+                      </span>
+                      <span class="bg-primary-100 text-primary-600 px-3 py-1 rounded-full text-sm">
+                        {post.tag}
+                      </span>
+                    </div>
+                  </div>
+                )
+              }
+
+              <!-- Share Buttons -->
+              <div class="mt-8 pt-6 border-t border-gray-200">
+                <div class="flex items-center gap-4">
+                  <span class="text-gray-500 font-medium"
+                    >{t("common.share", locale)}:</span
+                  >
+                  <a
+                    href={`https://www.facebook.com/sharer/sharer.php?u=${Astro.url}`}
+                    target="_blank"
+                    class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center hover:bg-blue-500 hover:text-white transition-colors text-blue-600"
+                  >
+                    <Icon name="tabler:brand-facebook" class="w-5 h-5" />
+                  </a>
+                  <a
+                    href={`https://twitter.com/intent/tweet?url=${Astro.url}&text=${getLocalizedValue(post.title, locale)}`}
+                    target="_blank"
+                    class="w-10 h-10 bg-sky-100 rounded-full flex items-center justify-center hover:bg-sky-500 hover:text-white transition-colors text-sky-600"
+                  >
+                    <Icon name="tabler:brand-twitter" class="w-5 h-5" />
+                  </a>
+                  <a
+                    href={`https://wa.me/?text=${getLocalizedValue(post.title, locale)} ${Astro.url}`}
+                    target="_blank"
+                    class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center hover:bg-green-500 hover:text-white transition-colors text-green-600"
+                  >
+                    <Icon name="tabler:brand-whatsapp" class="w-5 h-5" />
+                  </a>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- Back Button -->
+          <div class="mt-8">
+            <a
+              href={getLocalizedPath("/berita", locale)}
+              class="btn-outline"
+              data-testid="back-to-news"
+            >
+              <Icon name="tabler:arrow-left" class="w-5 h-5 mr-2" />
+              {t("common.back", locale)}
+            </a>
+          </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="space-y-6">
+          <!-- Related Articles -->
+          {
+            relatedArticles.length > 0 && (
+              <div
+                class="bg-white rounded-xl shadow-lg p-6"
+                data-testid="related-articles"
+              >
+                <h3 class="font-bold text-lg text-gray-900 mb-4">
+                  {locale === "id" ? "Berita Terkait" : "Related News"}
+                </h3>
+                <div class="space-y-4">
+                  {relatedArticles.map((related: any) => (
+                    <a
+                      href={getLocalizedPath(`/berita/${related.slug}`, locale)}
+                      class="block group"
+                    >
+                      <div class="flex gap-3">
+                        <div class="w-20 h-14 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
+                          <img
+                            src={
+                              related.image ||
+                              `https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=100&h=70&fit=crop`
+                            }
+                            alt={getLocalizedValue(related.title, locale)}
+                            class="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div>
+                          <h4 class="font-medium text-gray-900 text-sm line-clamp-2 group-hover:text-primary-600 transition-colors">
+                            {getLocalizedValue(related.title, locale)}
+                          </h4>
+                          <p class="text-xs text-gray-500 mt-1">
+                            {new Date(related.published_at).toLocaleDateString(
+                              locale === "id" ? "id-ID" : "en-US",
+                            )}
+                          </p>
+                        </div>
+                      </div>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )
+          }
+
+          <!-- Quick Links -->
+          <div class="bg-white rounded-xl shadow-lg p-6">
+            <h3 class="font-bold text-lg text-gray-900 mb-4">
+              {locale === "id" ? "Kategori" : "Categories"}
+            </h3>
+            <div class="space-y-2">
+              <a
+                href={getLocalizedPath("/berita", locale)}
+                class="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                <span class="text-gray-700">{t("news.latest", locale)}</span>
+                <Icon
+                  name="tabler:chevron-right"
+                  class="w-5 h-5 text-gray-400"
+                />
+              </a>
+              <a
+                href={getLocalizedPath("/berita/info-sekolah", locale)}
+                class="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                <span class="text-gray-700"
+                  >{t("news.school_info", locale)}</span
+                >
+                <Icon
+                  name="tabler:chevron-right"
+                  class="w-5 h-5 text-gray-400"
+                />
+              </a>
+              <a
+                href={getLocalizedPath("/berita/galeri", locale)}
+                class="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                <span class="text-gray-700">{t("news.gallery", locale)}</span>
+                <Icon
+                  name="tabler:chevron-right"
+                  class="w-5 h-5 text-gray-400"
+                />
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>

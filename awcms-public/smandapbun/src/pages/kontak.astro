@@ -1,0 +1,241 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { Icon } from "astro-icon/components";
+import { getLocale, t, getLocalizedValue, type Locale } from "../utils/i18n";
+import { getContactPageData } from "../lib/api";
+
+const locale = getLocale(Astro.url) as Locale;
+
+const contactData = await getContactPageData();
+const { contactPage, contactInfo, socialMedia, mapEmbed } = contactData;
+---
+
+<Layout title={t("contact.title", locale)}>
+  <!-- Hero -->
+  <section
+    class="hero-gradient text-white py-16 md:py-24"
+    data-testid="contact-hero"
+  >
+    <div class="container-custom">
+      <p class="text-secondary-300 font-medium mb-2">
+        {t("nav.contact", locale)}
+      </p>
+      <h1 class="text-4xl md:text-5xl font-bold font-heading">
+        {getLocalizedValue(contactPage.title, locale)}
+      </h1>
+      <p class="text-xl text-blue-100 mt-4 max-w-2xl">
+        {getLocalizedValue(contactPage.description, locale)}
+      </p>
+    </div>
+  </section>
+
+  <!-- Contact Content -->
+  <section class="py-16 bg-gray-50" data-testid="contact-content">
+    <div class="container-custom">
+      <div class="grid lg:grid-cols-2 gap-12">
+        <!-- Contact Info -->
+        <div>
+          <h2 class="text-2xl font-bold text-gray-900 mb-6">
+            {t("footer.contact_info", locale)}
+          </h2>
+
+          <div class="space-y-6">
+            <div
+              class="flex items-start gap-4 bg-white p-5 rounded-xl shadow-sm"
+              data-testid="contact-address"
+            >
+              <div
+                class="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center flex-shrink-0"
+              >
+                <Icon name="tabler:map-pin" class="w-6 h-6 text-primary-600" />
+              </div>
+              <div>
+                <h3 class="font-semibold text-gray-900 mb-1">
+                  {t("contact.address", locale)}
+                </h3>
+                <p class="text-gray-600">
+                  {getLocalizedValue(contactInfo.address, locale)}
+                </p>
+              </div>
+            </div>
+
+            <div
+              class="flex items-start gap-4 bg-white p-5 rounded-xl shadow-sm"
+              data-testid="contact-phone"
+            >
+              <div
+                class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0"
+              >
+                <Icon name="tabler:phone" class="w-6 h-6 text-green-600" />
+              </div>
+              <div>
+                <h3 class="font-semibold text-gray-900 mb-1">
+                  {t("contact.phone", locale)} / {t("contact.fax", locale)}
+                </h3>
+                <p class="text-gray-600">{contactInfo.phone}</p>
+                <p class="text-gray-600">Fax: {contactInfo.fax}</p>
+              </div>
+            </div>
+
+            <div
+              class="flex items-start gap-4 bg-white p-5 rounded-xl shadow-sm"
+              data-testid="contact-email"
+            >
+              <div
+                class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center flex-shrink-0"
+              >
+                <Icon name="tabler:mail" class="w-6 h-6 text-orange-600" />
+              </div>
+              <div>
+                <h3 class="font-semibold text-gray-900 mb-1">
+                  {t("contact.email", locale)}
+                </h3>
+                <a
+                  href={`mailto:${contactInfo.email}`}
+                  class="text-primary-600 hover:text-primary-700"
+                  >{contactInfo.email}</a
+                >
+              </div>
+            </div>
+
+            <div
+              class="flex items-start gap-4 bg-white p-5 rounded-xl shadow-sm"
+              data-testid="contact-hours"
+            >
+              <div
+                class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0"
+              >
+                <Icon name="tabler:clock" class="w-6 h-6 text-purple-600" />
+              </div>
+              <div>
+                <h3 class="font-semibold text-gray-900 mb-1">
+                  {t("contact.hours", locale)}
+                </h3>
+                <p class="text-gray-600 whitespace-pre-line">
+                  {getLocalizedValue(contactInfo.operationalHours, locale)}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Social Media -->
+          <div class="mt-8">
+            <h3 class="font-semibold text-gray-900 mb-4">
+              {t("footer.follow_us", locale)}
+            </h3>
+            <div class="flex gap-3">
+              {
+                socialMedia.map((social: any) => (
+                  <a
+                    href={social.url}
+                    target="_blank"
+                    rel="noopener"
+                    class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-primary-500 hover:text-white transition-colors"
+                    data-testid={`social-${social.platform.toLowerCase()}`}
+                  >
+                    <Icon name={social.icon} class="w-5 h-5" />
+                  </a>
+                ))
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Contact Form -->
+        <div
+          class="bg-white rounded-2xl shadow-lg p-8"
+          data-testid="contact-form"
+        >
+          <h2 class="text-2xl font-bold text-gray-900 mb-6">
+            {t("contact.send_message", locale)}
+          </h2>
+          <form class="space-y-5">
+            <div>
+              <label
+                for="name"
+                class="block text-sm font-medium text-gray-700 mb-1"
+                >{t("contact.name", locale)}</label
+              >
+              <input
+                type="text"
+                id="name"
+                name="name"
+                class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 outline-none transition-all"
+                required
+                data-testid="contact-input-name"
+              />
+            </div>
+            <div>
+              <label
+                for="email"
+                class="block text-sm font-medium text-gray-700 mb-1"
+                >{t("contact.email", locale)}</label
+              >
+              <input
+                type="email"
+                id="email"
+                name="email"
+                class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 outline-none transition-all"
+                required
+                data-testid="contact-input-email"
+              />
+            </div>
+            <div>
+              <label
+                for="subject"
+                class="block text-sm font-medium text-gray-700 mb-1"
+                >{t("contact.subject", locale)}</label
+              >
+              <input
+                type="text"
+                id="subject"
+                name="subject"
+                class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 outline-none transition-all"
+                required
+                data-testid="contact-input-subject"
+              />
+            </div>
+            <div>
+              <label
+                for="message"
+                class="block text-sm font-medium text-gray-700 mb-1"
+                >{t("contact.message", locale)}</label
+              >
+              <textarea
+                id="message"
+                name="message"
+                rows="5"
+                class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 outline-none transition-all resize-none"
+                required
+                data-testid="contact-input-message"></textarea>
+            </div>
+            <button
+              type="submit"
+              class="w-full btn-primary"
+              data-testid="contact-submit-btn"
+            >
+              <Icon name="tabler:send" class="w-5 h-5 mr-2" />
+              {t("contact.submit", locale)}
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Map -->
+      <div
+        class="mt-12 rounded-2xl overflow-hidden shadow-lg"
+        data-testid="contact-map"
+      >
+        <iframe
+          src={mapEmbed}
+          width="100%"
+          height="400"
+          style="border:0;"
+          allowfullscreen=""
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          title="Lokasi SMAN 2 Pangkalan Bun"></iframe>
+      </div>
+    </div>
+  </section>
+</Layout>

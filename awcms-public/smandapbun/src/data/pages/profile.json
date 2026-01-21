@@ -1,0 +1,186 @@
+{
+  "principalMessage": {
+    "id": "principal-message",
+    "slug": "sambutan-kepala-sekolah",
+    "category": "Profile",
+    "title": {
+      "id": "Sambutan Kepala Sekolah",
+      "en": "Principal's Welcome Message"
+    },
+    "content": {
+      "id": "<p>Assalamu'alaikum Warahmatullahi Wabarakatuh</p><p>Puji syukur kehadirat Allah SWT yang telah melimpahkan rahmat dan hidayah-Nya sehingga kita dapat terus berkarya dalam dunia pendidikan.</p><p>Selamat datang di website resmi SMA Negeri 2 Pangkalan Bun. Website ini merupakan sarana komunikasi dan informasi antara sekolah dengan seluruh stakeholder pendidikan.</p><p>SMAN 2 Pangkalan Bun berkomitmen untuk terus meningkatkan kualitas pendidikan dan menghasilkan lulusan yang unggul dalam prestasi serta berkarakter mulia. Kami percaya bahwa pendidikan adalah kunci untuk membangun masa depan bangsa yang lebih baik.</p><p>Dengan dukungan seluruh civitas akademika, orang tua, dan masyarakat, kami optimis dapat mewujudkan visi sekolah menjadi lembaga pendidikan yang berkualitas dan berdaya saing tinggi.</p><p>Semoga Allah SWT senantiasa memberikan kemudahan dan keberkahan dalam setiap langkah kita.</p><p>Wassalamu'alaikum Warahmatullahi Wabarakatuh</p>",
+      "en": "<p>Assalamu'alaikum Warahmatullahi Wabarakatuh</p><p>Praise be to Allah SWT who has bestowed His grace and guidance so that we can continue to work in the world of education.</p><p>Welcome to the official website of SMA Negeri 2 Pangkalan Bun. This website serves as a means of communication and information between the school and all education stakeholders.</p><p>SMAN 2 Pangkalan Bun is committed to continuously improving the quality of education and producing graduates who excel in achievement and have noble character.</p><p>With the support of the entire academic community, parents, and society, we are optimistic that we can realize the school's vision of becoming a quality and highly competitive educational institution.</p><p>May Allah SWT always provide ease and blessings in every step we take.</p><p>Wassalamu'alaikum Warahmatullahi Wabarakatuh</p>"
+    },
+    "author": "Drs. H. Ahmad Sudirman, M.Pd",
+    "position": "Kepala Sekolah",
+    "image": "/images/staff/kepala-sekolah.jpg"
+  },
+  "history": {
+    "id": "history",
+    "slug": "sejarah",
+    "category": "Profile",
+    "title": {
+      "id": "Sejarah SMAN 2 Pangkalan Bun",
+      "en": "History of SMAN 2 Pangkalan Bun"
+    },
+    "content": {
+      "id": "<p>SMA Negeri 2 Pangkalan Bun didirikan pada tahun 1985 berdasarkan Surat Keputusan Menteri Pendidikan dan Kebudayaan Republik Indonesia. Sekolah ini merupakan SMA kedua yang berdiri di Kota Pangkalan Bun, Kabupaten Kotawaringin Barat, Kalimantan Tengah.</p><h3>Periode Awal (1985-1995)</h3><p>Pada awal berdirinya, sekolah ini hanya memiliki 6 ruang kelas dengan jumlah siswa sekitar 180 orang. Fasilitas masih sangat terbatas, namun semangat untuk memajukan pendidikan di daerah ini sangat tinggi.</p><h3>Periode Pengembangan (1995-2010)</h3><p>Seiring berjalannya waktu, SMAN 2 Pangkalan Bun terus berkembang. Penambahan fasilitas seperti laboratorium IPA, laboratorium komputer, dan perpustakaan dilakukan secara bertahap. Jumlah siswa pun meningkat signifikan.</p><h3>Era Modern (2010-Sekarang)</h3><p>Saat ini, SMAN 2 Pangkalan Bun telah menjadi salah satu SMA unggulan di Kabupaten Kotawaringin Barat. Dengan akreditasi A, sekolah ini terus berinovasi dalam pembelajaran dan menghasilkan lulusan-lulusan berkualitas yang tersebar di berbagai perguruan tinggi ternama di Indonesia.</p>",
+      "en": "<p>SMA Negeri 2 Pangkalan Bun was established in 1985 based on the Decree of the Minister of Education and Culture of the Republic of Indonesia. This school is the second high school established in Pangkalan Bun City, Kotawaringin Barat Regency, Central Kalimantan.</p><h3>Early Period (1985-1995)</h3><p>At the beginning of its establishment, this school only had 6 classrooms with approximately 180 students. Facilities were still very limited, but the spirit to advance education in this area was very high.</p><h3>Development Period (1995-2010)</h3><p>Over time, SMAN 2 Pangkalan Bun continued to develop. Additional facilities such as science laboratories, computer laboratories, and libraries were added gradually. The number of students also increased significantly.</p><h3>Modern Era (2010-Present)</h3><p>Currently, SMAN 2 Pangkalan Bun has become one of the leading high schools in Kotawaringin Barat Regency. With A accreditation, this school continues to innovate in learning and produces quality graduates spread across various leading universities in Indonesia.</p>"
+    },
+    "milestones": [
+      { "year": "1985", "event": { "id": "Pendirian SMAN 2 Pangkalan Bun", "en": "Establishment of SMAN 2 Pangkalan Bun" } },
+      { "year": "1990", "event": { "id": "Pembangunan Laboratorium IPA", "en": "Construction of Science Laboratory" } },
+      { "year": "1998", "event": { "id": "Akreditasi pertama dengan nilai B", "en": "First accreditation with B grade" } },
+      { "year": "2005", "event": { "id": "Pembangunan Laboratorium Komputer", "en": "Construction of Computer Laboratory" } },
+      { "year": "2010", "event": { "id": "Mendapat status Sekolah Standar Nasional", "en": "Obtained National Standard School status" } },
+      { "year": "2015", "event": { "id": "Akreditasi A pertama kali", "en": "First A accreditation" } },
+      { "year": "2019", "event": { "id": "Penghargaan Sekolah Adiwiyata", "en": "Adiwiyata School Award" } },
+      { "year": "2023", "event": { "id": "Re-akreditasi dengan nilai A (Unggul)", "en": "Re-accreditation with A grade (Excellent)" } }
+    ]
+  },
+  "visionMission": {
+    "id": "vision-mission",
+    "slug": "visi-misi",
+    "category": "Profile",
+    "title": {
+      "id": "Visi & Misi",
+      "en": "Vision & Mission"
+    },
+    "vision": {
+      "id": "Mewujudkan peserta didik yang beriman, bertakwa, berakhlak mulia, berprestasi, berwawasan lingkungan, dan berdaya saing global.",
+      "en": "To create students who are faithful, pious, have noble character, achieve excellence, are environmentally conscious, and globally competitive."
+    },
+    "mission": {
+      "id": [
+        "Menumbuhkan penghayatan dan pengamalan ajaran agama yang dianut",
+        "Melaksanakan pembelajaran dan bimbingan secara efektif dan efisien",
+        "Mendorong dan membantu siswa untuk mengenali potensi dirinya",
+        "Menumbuhkan semangat keunggulan kepada seluruh warga sekolah",
+        "Menerapkan manajemen partisipatif dengan melibatkan seluruh warga sekolah",
+        "Mewujudkan sekolah peduli dan berbudaya lingkungan",
+        "Membekali siswa dengan keterampilan abad 21"
+      ],
+      "en": [
+        "Cultivate appreciation and practice of religious teachings",
+        "Implement effective and efficient learning and guidance",
+        "Encourage and help students recognize their potential",
+        "Foster a spirit of excellence among all school members",
+        "Apply participatory management involving all school members",
+        "Create an environmentally conscious and cultured school",
+        "Equip students with 21st century skills"
+      ]
+    },
+    "motto": {
+      "id": "SMANDA JAYA - Unggul dalam Prestasi, Berkarakter Mulia",
+      "en": "SMANDA JAYA - Excellence in Achievement, Noble Character"
+    }
+  },
+  "schoolCondition": {
+    "id": "school-condition",
+    "slug": "kondisi-sekolah",
+    "category": "Profile",
+    "title": {
+      "id": "Kondisi Sekolah",
+      "en": "School Condition"
+    },
+    "content": {
+      "id": "<p>SMA Negeri 2 Pangkalan Bun terletak di lokasi strategis di pusat Kota Pangkalan Bun dengan luas area sekitar 2,5 hektar. Sekolah ini memiliki lingkungan yang asri dan hijau, mendukung program Adiwiyata yang telah dijalankan.</p><h3>Lokasi dan Aksesibilitas</h3><p>Sekolah mudah dijangkau dengan berbagai moda transportasi dan berada tidak jauh dari pusat kota. Lingkungan sekitar sekolah cukup kondusif untuk kegiatan belajar mengajar.</p><h3>Kondisi Bangunan</h3><p>Seluruh bangunan dalam kondisi baik dan terawat. Renovasi dan pemeliharaan dilakukan secara berkala untuk memastikan kenyamanan dan keamanan seluruh warga sekolah.</p>",
+      "en": "<p>SMA Negeri 2 Pangkalan Bun is located in a strategic location in the center of Pangkalan Bun City with an area of approximately 2.5 hectares. The school has a beautiful and green environment, supporting the Adiwiyata program that has been implemented.</p><h3>Location and Accessibility</h3><p>The school is easily accessible by various modes of transportation and is not far from the city center. The environment around the school is quite conducive for teaching and learning activities.</p><h3>Building Condition</h3><p>All buildings are in good and well-maintained condition. Renovation and maintenance are carried out regularly to ensure the comfort and safety of all school members.</p>"
+    },
+    "statistics": {
+      "landArea": "25,000 m²",
+      "buildingArea": "8,500 m²",
+      "greenArea": "10,000 m²",
+      "parkingArea": "2,000 m²"
+    }
+  },
+  "facilities": {
+    "id": "facilities",
+    "slug": "sarana-prasarana",
+    "category": "Profile",
+    "title": {
+      "id": "Sarana & Prasarana",
+      "en": "Facilities & Infrastructure"
+    },
+    "items": [
+      {
+        "name": { "id": "Ruang Kelas", "en": "Classrooms" },
+        "count": 36,
+        "condition": "Baik",
+        "description": { "id": "Dilengkapi AC dan LCD Projector", "en": "Equipped with AC and LCD Projector" }
+      },
+      {
+        "name": { "id": "Laboratorium IPA", "en": "Science Laboratory" },
+        "count": 3,
+        "condition": "Baik",
+        "description": { "id": "Lab Fisika, Kimia, dan Biologi", "en": "Physics, Chemistry, and Biology Labs" }
+      },
+      {
+        "name": { "id": "Laboratorium Komputer", "en": "Computer Laboratory" },
+        "count": 2,
+        "condition": "Baik",
+        "description": { "id": "60 unit komputer dengan internet", "en": "60 computer units with internet" }
+      },
+      {
+        "name": { "id": "Laboratorium Bahasa", "en": "Language Laboratory" },
+        "count": 1,
+        "condition": "Baik",
+        "description": { "id": "40 booth dengan headset", "en": "40 booths with headsets" }
+      },
+      {
+        "name": { "id": "Perpustakaan", "en": "Library" },
+        "count": 1,
+        "condition": "Baik",
+        "description": { "id": "12,000+ koleksi buku", "en": "12,000+ book collection" }
+      },
+      {
+        "name": { "id": "Masjid", "en": "Mosque" },
+        "count": 1,
+        "condition": "Baik",
+        "description": { "id": "Kapasitas 500 jamaah", "en": "Capacity 500 worshippers" }
+      },
+      {
+        "name": { "id": "Aula", "en": "Hall" },
+        "count": 1,
+        "condition": "Baik",
+        "description": { "id": "Kapasitas 800 orang", "en": "Capacity 800 people" }
+      },
+      {
+        "name": { "id": "Lapangan Olahraga", "en": "Sports Field" },
+        "count": 3,
+        "condition": "Baik",
+        "description": { "id": "Basket, Voli, dan Futsal", "en": "Basketball, Volleyball, and Futsal" }
+      },
+      {
+        "name": { "id": "Kantin", "en": "Canteen" },
+        "count": 1,
+        "condition": "Baik",
+        "description": { "id": "Kantin sehat dan bersih", "en": "Healthy and clean canteen" }
+      },
+      {
+        "name": { "id": "UKS", "en": "Health Room" },
+        "count": 1,
+        "condition": "Baik",
+        "description": { "id": "Dilengkapi peralatan medis dasar", "en": "Equipped with basic medical equipment" }
+      }
+    ]
+  },
+  "adiwiyata": {
+    "id": "adiwiyata",
+    "slug": "adiwiyata",
+    "category": "Profile",
+    "title": {
+      "id": "Program Adiwiyata",
+      "en": "Adiwiyata Program"
+    },
+    "content": {
+      "id": "<p>SMAN 2 Pangkalan Bun telah berhasil meraih penghargaan Sekolah Adiwiyata Nasional sebagai bentuk komitmen dalam menjaga dan melestarikan lingkungan hidup.</p><h3>Program Unggulan</h3><ul><li>Bank Sampah Sekolah</li><li>Taman Toga (Tanaman Obat Keluarga)</li><li>Greenhouse dan Kebun Sekolah</li><li>Program Hemat Energi</li><li>Kantin Bebas Plastik</li></ul>",
+      "en": "<p>SMAN 2 Pangkalan Bun has successfully received the National Adiwiyata School award as a form of commitment to protecting and preserving the environment.</p><h3>Featured Programs</h3><ul><li>School Waste Bank</li><li>Medicinal Plant Garden</li><li>Greenhouse and School Garden</li><li>Energy Saving Program</li><li>Plastic-Free Canteen</li></ul>"
+    },
+    "awards": [
+      { "year": "2019", "title": { "id": "Adiwiyata Tingkat Kabupaten", "en": "Regency Level Adiwiyata" } },
+      { "year": "2020", "title": { "id": "Adiwiyata Tingkat Provinsi", "en": "Provincial Level Adiwiyata" } },
+      { "year": "2022", "title": { "id": "Adiwiyata Nasional", "en": "National Adiwiyata" } }
+    ]
+  }
+}

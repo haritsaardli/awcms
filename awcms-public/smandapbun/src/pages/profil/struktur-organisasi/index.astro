@@ -1,0 +1,319 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import { Icon } from "astro-icon/components";
+import {
+  getLocale,
+  t,
+  getLocalizedValue,
+  getLocalizedPath,
+  type Locale,
+} from "../../../utils/i18n";
+import { getOrganizationPageData } from "../../../lib/api";
+
+const locale = getLocale(Astro.url) as Locale;
+const orgData = await getOrganizationPageData();
+const {
+  schoolOrganization,
+  committeeOrganization,
+  osisOrganization,
+  mpkOrganization,
+} = orgData;
+---
+
+<Layout
+  title={locale === "id" ? "Struktur Organisasi" : "Organizational Structure"}
+>
+  <!-- Hero -->
+  <section
+    class="hero-gradient text-white py-16 md:py-20"
+    data-testid="organization-hero"
+  >
+    <div class="container-custom">
+      <nav class="text-sm text-blue-200 mb-4">
+        <a href={getLocalizedPath("/", locale)} class="hover:text-white"
+          >Beranda</a
+        >
+        <span class="mx-2">/</span>
+        <a href={getLocalizedPath("/profil", locale)} class="hover:text-white"
+          >{t("profile.title", locale)}</a
+        >
+        <span class="mx-2">/</span>
+        <span class="text-white">{t("profile.organization", locale)}</span>
+      </nav>
+      <h1 class="text-3xl md:text-4xl font-bold font-heading">
+        {t("profile.organization", locale)}
+      </h1>
+    </div>
+  </section>
+
+  <!-- Navigation Tabs -->
+  <section class="py-4 bg-white shadow-sm sticky top-20 z-30">
+    <div class="container-custom">
+      <div class="flex flex-wrap gap-2">
+        <a
+          href="#school"
+          class="px-4 py-2 rounded-full bg-primary-100 text-primary-600 text-sm font-medium"
+          >{locale === "id" ? "Sekolah" : "School"}</a
+        >
+        <a
+          href="#committee"
+          class="px-4 py-2 rounded-full bg-gray-100 text-gray-700 text-sm font-medium hover:bg-primary-100 hover:text-primary-600"
+          >{locale === "id" ? "Komite" : "Committee"}</a
+        >
+        <a
+          href="#osis"
+          class="px-4 py-2 rounded-full bg-gray-100 text-gray-700 text-sm font-medium hover:bg-primary-100 hover:text-primary-600"
+          >OSIS</a
+        >
+        <a
+          href="#mpk"
+          class="px-4 py-2 rounded-full bg-gray-100 text-gray-700 text-sm font-medium hover:bg-primary-100 hover:text-primary-600"
+          >MPK</a
+        >
+      </div>
+    </div>
+  </section>
+
+  <!-- School Organization -->
+  <section id="school" class="py-16 bg-gray-50" data-testid="school-org">
+    <div class="container-custom">
+      <div class="max-w-4xl mx-auto">
+        <h2
+          class="text-2xl font-bold text-gray-900 mb-8 flex items-center gap-3"
+        >
+          <div
+            class="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center"
+          >
+            <Icon name="tabler:building" class="w-5 h-5 text-primary-600" />
+          </div>
+          {getLocalizedValue(schoolOrganization.title, locale)}
+        </h2>
+
+        <div class="bg-white rounded-2xl shadow-lg p-8">
+          <!-- Principal at top -->
+          <div class="text-center mb-8">
+            <div class="inline-block">
+              <div
+                class="w-24 h-24 bg-primary-600 rounded-full mx-auto mb-3 flex items-center justify-center text-white text-2xl font-bold"
+              >
+                {
+                  schoolOrganization.positions[0].name
+                    .split(" ")
+                    .map((n: string) => n[0])
+                    .slice(0, 2)
+                    .join("")
+                }
+              </div>
+              <h3 class="font-bold text-gray-900">
+                {schoolOrganization.positions[0].name}
+              </h3>
+              <p class="text-sm text-gray-500">
+                {
+                  getLocalizedValue(
+                    schoolOrganization.positions[0].position,
+                    locale,
+                  )
+                }
+              </p>
+            </div>
+          </div>
+
+          <!-- Vice Principals -->
+          <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {
+              schoolOrganization.positions.slice(1).map((person: any) => (
+                <div class="text-center p-4 bg-gray-50 rounded-xl">
+                  <div class="w-16 h-16 bg-primary-100 rounded-full mx-auto mb-2 flex items-center justify-center text-primary-600 font-bold">
+                    {person.name
+                      .split(" ")
+                      .map((n: string) => n[0])
+                      .slice(0, 2)
+                      .join("")}
+                  </div>
+                  <h4 class="font-semibold text-gray-900 text-sm">
+                    {person.name}
+                  </h4>
+                  <p class="text-xs text-gray-500">
+                    {getLocalizedValue(person.position, locale)}
+                  </p>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Committee Organization -->
+  <section id="committee" class="py-16 bg-white" data-testid="committee-org">
+    <div class="container-custom">
+      <div class="max-w-4xl mx-auto">
+        <h2
+          class="text-2xl font-bold text-gray-900 mb-2 flex items-center gap-3"
+        >
+          <div
+            class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center"
+          >
+            <Icon name="tabler:users-group" class="w-5 h-5 text-green-600" />
+          </div>
+          {getLocalizedValue(committeeOrganization.title, locale)}
+        </h2>
+        <p class="text-gray-500 mb-8 ml-13">
+          {locale === "id" ? "Periode" : "Period"}: {
+            committeeOrganization.period
+          }
+        </p>
+
+        <div class="grid md:grid-cols-2 gap-4">
+          {
+            committeeOrganization.positions.map((person: any) => (
+              <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-xl">
+                <div class="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center text-green-600 font-bold flex-shrink-0">
+                  {person.name
+                    .split(" ")
+                    .map((n: string) => n[0])
+                    .slice(0, 2)
+                    .join("")}
+                </div>
+                <div>
+                  <h4 class="font-semibold text-gray-900">{person.name}</h4>
+                  <p class="text-sm text-gray-500">
+                    {getLocalizedValue(person.position, locale)}
+                  </p>
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- OSIS Organization -->
+  <section id="osis" class="py-16 bg-gray-50" data-testid="osis-org">
+    <div class="container-custom">
+      <div class="max-w-4xl mx-auto">
+        <h2
+          class="text-2xl font-bold text-gray-900 mb-2 flex items-center gap-3"
+        >
+          <div
+            class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center"
+          >
+            <Icon name="tabler:flag" class="w-5 h-5 text-orange-600" />
+          </div>
+          {getLocalizedValue(osisOrganization.title, locale)}
+        </h2>
+        <p class="text-gray-500 mb-8 ml-13">
+          {locale === "id" ? "Periode" : "Period"}: {osisOrganization.period}
+        </p>
+
+        <div class="bg-white rounded-2xl shadow-lg p-8 mb-6">
+          <div class="grid md:grid-cols-2 gap-4">
+            {
+              osisOrganization.positions.map((person: any) => (
+                <div class="flex items-center gap-4 p-4 bg-orange-50 rounded-xl">
+                  <div class="w-14 h-14 bg-orange-100 rounded-full flex items-center justify-center text-orange-600 font-bold flex-shrink-0">
+                    {person.name
+                      .split(" ")
+                      .map((n: string) => n[0])
+                      .slice(0, 2)
+                      .join("")}
+                  </div>
+                  <div>
+                    <h4 class="font-semibold text-gray-900">{person.name}</h4>
+                    <p class="text-sm text-gray-500">
+                      {getLocalizedValue(person.position, locale)}
+                    </p>
+                    {person.class && (
+                      <p class="text-xs text-orange-600">{person.class}</p>
+                    )}
+                  </div>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+
+        <!-- OSIS Divisions -->
+        <div class="bg-white rounded-xl p-6">
+          <h3 class="font-bold text-gray-900 mb-4">
+            {locale === "id" ? "Bidang Kegiatan" : "Activity Divisions"}
+          </h3>
+          <div class="flex flex-wrap gap-2">
+            {
+              osisOrganization.divisions.map((division: any) => (
+                <span class="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-sm">
+                  {getLocalizedValue(division, locale)}
+                </span>
+              ))
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MPK Organization -->
+  <section id="mpk" class="py-16 bg-white" data-testid="mpk-org">
+    <div class="container-custom">
+      <div class="max-w-4xl mx-auto">
+        <h2
+          class="text-2xl font-bold text-gray-900 mb-2 flex items-center gap-3"
+        >
+          <div
+            class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center"
+          >
+            <Icon name="tabler:gavel" class="w-5 h-5 text-purple-600" />
+          </div>
+          {getLocalizedValue(mpkOrganization.title, locale)}
+        </h2>
+        <p class="text-gray-500 mb-8 ml-13">
+          {locale === "id" ? "Periode" : "Period"}: {mpkOrganization.period}
+        </p>
+
+        <div class="bg-purple-50 rounded-2xl p-8 mb-6">
+          <p class="text-gray-700 mb-6">
+            {getLocalizedValue(mpkOrganization.description, locale)}
+          </p>
+          <div class="grid md:grid-cols-2 gap-4">
+            {
+              mpkOrganization.positions.map((person: any) => (
+                <div class="flex items-center gap-4 p-4 bg-white rounded-xl">
+                  <div class="w-14 h-14 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 font-bold flex-shrink-0">
+                    {person.name
+                      .split(" ")
+                      .map((n: string) => n[0])
+                      .slice(0, 2)
+                      .join("")}
+                  </div>
+                  <div>
+                    <h4 class="font-semibold text-gray-900">{person.name}</h4>
+                    <p class="text-sm text-gray-500">
+                      {getLocalizedValue(person.position, locale)}
+                    </p>
+                    {person.class && (
+                      <p class="text-xs text-purple-600">{person.class}</p>
+                    )}
+                  </div>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+
+        <!-- Back Button -->
+        <div class="text-center">
+          <a
+            href={getLocalizedPath("/profil", locale)}
+            class="btn-outline"
+            data-testid="back-to-profile"
+          >
+            <Icon name="tabler:arrow-left" class="w-5 h-5 mr-2" />
+            {t("common.back", locale)}
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>

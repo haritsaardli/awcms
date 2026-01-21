@@ -1,0 +1,227 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { Icon } from "astro-icon/components";
+import {
+  getLocale,
+  t,
+  getLocalizedValue,
+  getLocalizedPath,
+  type Locale,
+} from "../../utils/i18n";
+import { getStaffPageData } from "../../lib/api";
+
+const locale = getLocale(Astro.url) as Locale;
+const staffData = await getStaffPageData();
+const { teachingStaff, administrativeStaff } = staffData;
+---
+
+<Layout
+  title={locale === "id"
+    ? "Tenaga Pendidik & Kependidikan"
+    : "Teaching & Administrative Staff"}
+>
+  <!-- Hero -->
+  <section
+    class="hero-gradient text-white py-16 md:py-20"
+    data-testid="staff-hero"
+  >
+    <div class="container-custom">
+      <nav class="text-sm text-blue-200 mb-4">
+        <a href={getLocalizedPath("/", locale)} class="hover:text-white"
+          >Beranda</a
+        >
+        <span class="mx-2">/</span>
+        <a href={getLocalizedPath("/profil", locale)} class="hover:text-white"
+          >{t("profile.title", locale)}</a
+        >
+        <span class="mx-2">/</span>
+        <span class="text-white">{t("profile.staff", locale)}</span>
+      </nav>
+      <h1 class="text-3xl md:text-4xl font-bold font-heading">
+        {t("profile.staff", locale)}
+      </h1>
+    </div>
+  </section>
+
+  <!-- Stats -->
+  <section class="py-8 bg-white shadow-sm relative -mt-6 z-10">
+    <div class="container-custom">
+      <div class="grid grid-cols-2 md:grid-cols-5 gap-6">
+        <div class="text-center">
+          <div class="text-3xl font-bold text-primary-600">
+            {teachingStaff.summary.total}
+          </div>
+          <div class="text-sm text-gray-500">
+            {locale === "id" ? "Total Guru" : "Total Teachers"}
+          </div>
+        </div>
+        <div class="text-center">
+          <div class="text-3xl font-bold text-green-600">
+            {teachingStaff.summary.pns}
+          </div>
+          <div class="text-sm text-gray-500">PNS</div>
+        </div>
+        <div class="text-center">
+          <div class="text-3xl font-bold text-orange-600">
+            {teachingStaff.summary.nonPns}
+          </div>
+          <div class="text-sm text-gray-500">Non-PNS</div>
+        </div>
+        <div class="text-center">
+          <div class="text-3xl font-bold text-purple-600">
+            {teachingStaff.summary.s2}
+          </div>
+          <div class="text-sm text-gray-500">S2/Master</div>
+        </div>
+        <div class="text-center">
+          <div class="text-3xl font-bold text-blue-600">
+            {administrativeStaff.summary.total}
+          </div>
+          <div class="text-sm text-gray-500">
+            {locale === "id" ? "Staf TU" : "Admin Staff"}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Teaching Staff -->
+  <section class="py-16 bg-gray-50" data-testid="teaching-staff">
+    <div class="container-custom">
+      <h2 class="text-2xl font-bold text-gray-900 mb-8 flex items-center gap-3">
+        <div
+          class="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center"
+        >
+          <Icon name="tabler:chalkboard" class="w-5 h-5 text-primary-600" />
+        </div>
+        {getLocalizedValue(teachingStaff.title, locale)}
+      </h2>
+      <div class="overflow-x-auto">
+        <table class="w-full bg-white rounded-xl shadow-sm overflow-hidden">
+          <thead class="bg-primary-50">
+            <tr>
+              <th
+                class="px-6 py-4 text-left text-sm font-semibold text-gray-900"
+                >No</th
+              >
+              <th
+                class="px-6 py-4 text-left text-sm font-semibold text-gray-900"
+                >{locale === "id" ? "Nama" : "Name"}</th
+              >
+              <th
+                class="px-6 py-4 text-left text-sm font-semibold text-gray-900"
+                >{locale === "id" ? "Mata Pelajaran" : "Subject"}</th
+              >
+              <th
+                class="px-6 py-4 text-left text-sm font-semibold text-gray-900"
+                >Status</th
+              >
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            {
+              teachingStaff.staff.map((staff: any, index: number) => (
+                <tr class="hover:bg-gray-50">
+                  <td class="px-6 py-4 text-sm text-gray-600">{index + 1}</td>
+                  <td class="px-6 py-4 text-sm font-medium text-gray-900">
+                    {staff.name}
+                  </td>
+                  <td class="px-6 py-4 text-sm text-gray-600">
+                    {staff.subject}
+                  </td>
+                  <td class="px-6 py-4">
+                    <span
+                      class={`px-2 py-1 rounded text-xs font-medium ${
+                        staff.status === "PNS"
+                          ? "bg-green-100 text-green-700"
+                          : "bg-orange-100 text-orange-700"
+                      }`}
+                    >
+                      {staff.status}
+                    </span>
+                  </td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Administrative Staff -->
+  <section class="py-16 bg-white" data-testid="admin-staff">
+    <div class="container-custom">
+      <h2 class="text-2xl font-bold text-gray-900 mb-8 flex items-center gap-3">
+        <div
+          class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center"
+        >
+          <Icon name="tabler:users" class="w-5 h-5 text-green-600" />
+        </div>
+        {getLocalizedValue(administrativeStaff.title, locale)}
+      </h2>
+      <div class="overflow-x-auto">
+        <table class="w-full bg-gray-50 rounded-xl overflow-hidden">
+          <thead class="bg-green-50">
+            <tr>
+              <th
+                class="px-6 py-4 text-left text-sm font-semibold text-gray-900"
+                >No</th
+              >
+              <th
+                class="px-6 py-4 text-left text-sm font-semibold text-gray-900"
+                >{locale === "id" ? "Nama" : "Name"}</th
+              >
+              <th
+                class="px-6 py-4 text-left text-sm font-semibold text-gray-900"
+                >{locale === "id" ? "Jabatan" : "Position"}</th
+              >
+              <th
+                class="px-6 py-4 text-left text-sm font-semibold text-gray-900"
+                >Status</th
+              >
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100 bg-white">
+            {
+              administrativeStaff.staff.map((staff: any, index: number) => (
+                <tr class="hover:bg-gray-50">
+                  <td class="px-6 py-4 text-sm text-gray-600">{index + 1}</td>
+                  <td class="px-6 py-4 text-sm font-medium text-gray-900">
+                    {staff.name}
+                  </td>
+                  <td class="px-6 py-4 text-sm text-gray-600">
+                    {staff.position}
+                  </td>
+                  <td class="px-6 py-4">
+                    <span
+                      class={`px-2 py-1 rounded text-xs font-medium ${
+                        staff.status === "PNS"
+                          ? "bg-green-100 text-green-700"
+                          : "bg-orange-100 text-orange-700"
+                      }`}
+                    >
+                      {staff.status}
+                    </span>
+                  </td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Back Button -->
+      <div class="mt-12 text-center">
+        <a
+          href={getLocalizedPath("/profil", locale)}
+          class="btn-outline"
+          data-testid="back-to-profile"
+        >
+          <Icon name="tabler:arrow-left" class="w-5 h-5 mr-2" />
+          {t("common.back", locale)}
+        </a>
+      </div>
+    </div>
+  </section>
+</Layout>
