@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Box, Search, RefreshCw } from 'lucide-react';
-import { useSupabaseClient } from '@supabase/auth-helpers-react';
-import PageHeader from '@/components/dashboard/PageHeader';
+import { supabase } from '@/lib/customSupabaseClient';
+import { PageHeader } from '@/templates/flowbite-admin';
 import { Card } from '@/components/ui/card';
 import { useToast } from '@/components/ui/use-toast';
 import {
@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 const ModulesManager = () => {
-  const supabase = useSupabaseClient();
+  /* const supabase = useSupabaseClient(); - Replaced by global import */
   const { toast } = useToast();
 
   const [modules, setModules] = useState([]);
@@ -56,7 +56,7 @@ const ModulesManager = () => {
     } finally {
       setLoading(false);
     }
-  }, [supabase, searchQuery, toast]);
+  }, [searchQuery, toast]);
 
   useEffect(() => {
     fetchModules();
