@@ -87,7 +87,7 @@
     "vitest": "^4.0.16"
   },
   "overrides": {
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.23"
   },
   "engines": {
     "node": ">=20.0.0"
