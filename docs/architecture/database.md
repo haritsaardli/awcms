@@ -62,6 +62,22 @@ CREATE TABLE tenants (
 );
 ```
 
+### modules (New)
+
+```sql
+CREATE TABLE modules (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  slug TEXT NOT NULL,
+  description TEXT,
+  status TEXT DEFAULT 'active' CHECK (status IN ('active', 'inactive', 'maintenance')),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(tenant_id, slug)
+);
+```
+
 ### users
 
 ```sql
@@ -196,6 +212,7 @@ CREATE TABLE articles (
   published_at TIMESTAMPTZ,
   meta_title TEXT,
   meta_description TEXT,
+  sync_source_id UUID, -- For cross-tenant synchronization
   created_by UUID REFERENCES users(id),
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
@@ -221,14 +238,66 @@ CREATE TABLE pages (
   puck_layout_jsonb JSONB DEFAULT '{}', -- Page builder data
   status TEXT DEFAULT 'draft',
   sort_order INTEGER DEFAULT 0,
+  category_id UUID REFERENCES categories(id) ON DELETE SET NULL,
   meta_title TEXT,
   meta_description TEXT,
+  meta_keywords TEXT,
+  og_image TEXT,
+  canonical_url TEXT,
+  sync_source_id UUID,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
   deleted_at TIMESTAMPTZ
 );
 
 CREATE INDEX idx_pages_tenant_slug ON pages(tenant_id, slug);
+CREATE INDEX idx_pages_category_id ON pages(category_id);
+```
+
+### page_tags (New)
+
+```sql
+CREATE TABLE page_tags (
+  page_id UUID NOT NULL REFERENCES pages(id) ON DELETE CASCADE,
+  tag_id UUID NOT NULL REFERENCES tags(id) ON DELETE CASCADE,
+  tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+  created_by UUID REFERENCES users(id) ON DELETE SET NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  PRIMARY KEY (page_id, tag_id)
+);
+```
+
+### page_files (New)
+
+```sql
+CREATE TABLE page_files (
+  page_id UUID NOT NULL REFERENCES pages(id) ON DELETE CASCADE,
+  file_id UUID NOT NULL REFERENCES files(id) ON DELETE CASCADE,
+  tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+  sort_order INT DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  PRIMARY KEY (page_id, file_id)
+);
+```
+
+### content_translations (New - i18n)
+
+```sql
+CREATE TABLE content_translations (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  content_type TEXT NOT NULL CHECK (content_type IN ('page', 'blog')),
+  content_id UUID NOT NULL,
+  locale TEXT NOT NULL,
+  title TEXT,
+  slug TEXT,
+  content TEXT,
+  excerpt TEXT,
+  meta_description TEXT,
+  tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(content_type, content_id, locale, tenant_id)
+);
 ```
 
 ### products
@@ -319,6 +388,7 @@ CREATE TABLE menus (
   label TEXT NOT NULL,
   url TEXT NOT NULL,
   icon TEXT,
+  location TEXT DEFAULT 'header', -- 'header', 'footer', 'sidebar'
   parent_id UUID REFERENCES menus(id),
   "order" INTEGER DEFAULT 0,
   is_active BOOLEAN DEFAULT TRUE,
@@ -639,4 +709,4 @@ WHERE deleted_at IS NULL;
 
 - `../02-reference/RLS_POLICIES.md`
 - `docs/architecture/database.md`
-- `../../../schema_dump.sql`
+- `../../schema_dump.sql`

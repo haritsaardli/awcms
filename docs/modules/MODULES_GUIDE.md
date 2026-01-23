@@ -66,6 +66,7 @@ Modules are categorized to match the **Permission Matrix**.
 ### 6. Platform & Plugins
 
 - **Tenants** (`TenantsManager.jsx`)
+- **Modules** (`ModulesManager.jsx`) - *New*
 - **Regions** (`RegionManager.jsx`) - *New*
 - **Mailketing** (`MailketingManager.jsx`) - *New*
 - **Analytics** (`AnalyticsManager.jsx`)

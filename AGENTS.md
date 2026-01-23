@@ -447,7 +447,7 @@ case 'delete': {
 
 Agents must use the standardized permission keys: `scope.resource.action`.
 
-- **Scopes**: `platform`, `tenant`, `content`
+- **Scopes**: `platform`, `tenant`, `content`, `modules`
 - **Actions**: `create` (C), `read` (R), `update` (U), `publish` (P), `delete` (SD), `restore` (RS), `delete_permanent` (DP).
 - **Special Flags**: `U-own` (Update Own Only) - requires checking `user_id` against resource owner.
 
@@ -481,7 +481,7 @@ _\* Author → hanya konten milik sendiri (tenant_id + owner_id)_
 - **RS**: Restore
 - **DP**: Delete Permanent
 
-Example: `tenant.user.create`, `tenant.article.publish`.
+Example: `tenant.user.create`, `tenant.article.publish`, `tenant.modules.read`.
 
 ### Implementation Pattern
 

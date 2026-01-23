@@ -3,6 +3,27 @@
 
 All notable changes to the **AWCMS** project will be documented in this file.
 
+## [2.24.0] "Nexus" - 2026-01-23
+
+### Added
+
+- **Documentation Overhaul**:
+  - Synchronized `database.md`, `standards.md`, and `AGENTS.md` with the latest database schema and codebase patterns, specifically covering the **Unified Content Model** and **Modules Management** system.
+  - Added detailed schema documentation for `page_tags`, `page_files`, and `content_translations`.
+  - Documented the `modules` table, its RLS policies, and the `tenant.modules.read` permission.
+  - Updated `MODULES_GUIDE.md` to include information about the `Modules Manager`.
+- **School Activity Images**: Added new gallery images to the public portal and updated the gallery page component.
+
+### Changed
+
+- **Database Migrations**: Added `20260121235324_remote_schema.sql` after syncing the remote schema via `supabase db pull`.
+
+### Fixed
+
+- **Performance & Reliability**: Corrected broken relative links across the documentation library to ensure link integrity.
+- **Database Migrations**: Guarded `ALTER TABLE public.blogs` with `IF EXISTS` in `20260120091500_unified_content_model.sql` to prevent `db pull` failures.
+- **Security**: Pinned `lodash` to `^4.17.23` across public templates and admin packages to address prototype pollution alerts.
+
 ## [2.23.1] "Antigravity" - 2026-01-22
 
 ### Changed
@@ -51,17 +72,6 @@ All notable changes to the **AWCMS** project will be documented in this file.
   - Cleaned up unused imports and variables across the entire template.
   - Restored missing critical imports in financial, achievement, and service pages.
   - Resolved deployment build errors by adding `VITE_` prefix fallbacks for Supabase credentials in `src/lib/supabase.ts`.
-
-## [Unreleased]
-
-### Changed
-
-- **Database Migrations**: Added `20260121235324_remote_schema.sql` after syncing the remote schema via `supabase db pull`.
-
-### Fixed
-
-- **Database Migrations**: Guarded `ALTER TABLE public.blogs` with `IF EXISTS` in `20260120091500_unified_content_model.sql` to prevent `db pull` failures when `blogs` does not exist.
-- **Security**: Pinned `lodash` to `^4.17.23` across public templates and admin packages to address prototype pollution alerts.
 
 ## [2.23.0] "Vortex" - 2026-01-21
 

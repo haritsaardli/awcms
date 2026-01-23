@@ -1,6 +1,6 @@
 # AWCMS Core Standards
 
-> Version: 2.12.1 | Last Updated: 2026-01-16 | React: 19.2.3
+> Version: 2.24.0 | Last Updated: 2026-01-23 | React: 19.2.3
 
 ## Purpose
 
@@ -13,8 +13,8 @@ Define the non-negotiable architecture and implementation standards for AWCMS ac
 
 ## Prerequisites
 
-- `../../../AGENTS.md` must be followed over all other instructions
-- `DOCS_INDEX.md` for documentation structure
+- `../../AGENTS.md` must be followed over all other instructions
+- `../../DOCS_INDEX.md` for documentation structure
 
 ## Core Concepts
 
@@ -32,7 +32,11 @@ Define the non-negotiable architecture and implementation standards for AWCMS ac
 - **Tenants**: Multi-tenancy support with `tenants` table and RLS policies.
   - Context: `awcms/src/contexts/TenantContext.jsx`
   - Hooks: `useTenant()`, `usePublicTenant()`, `useTenantTheme()`
+  - Hooks: `useTenant()`, `usePublicTenant()`, `useTenantTheme()`
   - Policy: All database queries must be scoped by `tenant_id`
+- **Modules**: Feature toggles managed via `modules` table (e.g., Blog, Shop, Portfolio).
+  - Permission: `tenant.modules.read` required to view available modules.
+  - Context: `TenantContext` generally handles active module states.
 - **Authentication**:
   - Context: `awcms/src/contexts/SupabaseAuthContext.jsx`
   - Security: `useTwoFactor()` and OTP verification
@@ -140,7 +144,8 @@ Define the non-negotiable architecture and implementation standards for AWCMS ac
 #### 3.4 Extension Documentation
 
 - `docs/modules/EXTENSIONS.md`
-- `docs/modules/MODULES_GUIDE.md`
+- `docs/modules/EXTENSIONS.md`
+- `docs/modules/MODULES_GUIDE.md` (Covers both System Modules and Extensions)
 
 ### 4. Core Documentation
 
@@ -148,8 +153,8 @@ Define the non-negotiable architecture and implementation standards for AWCMS ac
 
 #### 4.1 Documentation Architecture
 
-- AI Guidelines: `../../../AGENTS.md`
-- Docs Index: `../../../DOCS_INDEX.md`
+- AI Guidelines: `../../AGENTS.md`
+- Docs Index: `../../DOCS_INDEX.md`
 - Admin Docs Index: `../INDEX.md`
 - Tech Reference: `../02-reference/DATABASE_SCHEMA.md`
 
@@ -197,6 +202,6 @@ Define the non-negotiable architecture and implementation standards for AWCMS ac
 
 ## References
 
-- `../../../AGENTS.md`
+- `../../AGENTS.md`
 - `../../../DOCS_INDEX.md`
 - `../INDEX.md`

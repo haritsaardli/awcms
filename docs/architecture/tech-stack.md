@@ -35,15 +35,15 @@ Admin styling uses TailwindCSS 4 with CSS-based configuration.
 
 | Category | Technology | Version | Purpose |
 | --- | --- | --- | --- |
-| Meta-framework | Astro | 5.16.6 | SSR/Islands |
+| Meta-framework | Astro | 5.12.9 | SSR/Islands |
 | UI library | React | 19.2.3 | Island rendering |
 | Language | TypeScript | 5.x | Typed components |
-| Styling | TailwindCSS | 4.1.18 | Utility-first CSS |
-| Supabase JS | @supabase/supabase-js | 2.89.0 | Public API client |
+| Styling | TailwindCSS | 3.4.17 | Utility-first CSS |
+| Supabase JS | @supabase/supabase-js | 2.90.1 | Public API client |
 | Validation | Zod | 4.2.1 | Runtime prop validation |
 | Icons | Lucide React | 0.562.0 | Icon set |
 
-Public styling uses TailwindCSS 4 via the Vite plugin and `tailwind.config.mjs`.
+Public styling uses TailwindCSS 3 via `@astrojs/tailwind`.
 
 ### Mobile (awcms-mobile/primary)
 
