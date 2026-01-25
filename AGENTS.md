@@ -238,32 +238,7 @@ Agent Action 5: Update documentation if needed
 
 ---
 
-## 📚 External Documentation (Context7)
 
-To prevent API hallucinations and ensure adherence to the latest library standards, this project uses the **Context7 MCP Server**. Agents should use Context7 to fetch real-time documentation for core dependencies.
-
-### Available Tools
-
-- `resolve-library-id`: Search for a library's Context7 ID.
-- `query-docs`: Query specific documentation using a Library ID.
-
-### Core Library IDs
-
-Use these pre-resolved IDs for frequent queries:
-
-| Library           | Context7 Library ID                   | Purpose                    |
-| :---------------- | :------------------------------------ | :------------------------- |
-| **Vite 7**        | `/vitejs/vite`                        | Build tool & Dev server    |
-| **TailwindCSS 4** | `/websites/tailwindcss`               | Styling & Utility classes  |
-| **Supabase JS**   | `/supabase/supabase-js`               | Auth, DB & Storage Client  |
-| **Lucide React**  | `/websites/lucide_dev_guide_packages` | Icon documentation         |
-| **React 19**      | `/websites/react_dev`                 | Core Library documentation |
-
-### Usage Pattern
-
-1. **Identify Need**: "How do I implement a custom Tailwind 4 plugin?"
-2. **Resolve**: `resolve-library-id(libraryName: "tailwindcss")` (if ID is unknown).
-3. **Query**: `query-docs(libraryId: "/websites/tailwindcss", query: "custom plugin implementation")`.
 
 ---
 

@@ -703,7 +703,7 @@ WHERE deleted_at IS NULL;
 ## Security and Compliance Notes
 
 - All tenant-scoped tables must include `tenant_id` and `deleted_at`.
-- RLS policies and helper functions are defined in `supabase/migrations`.
+- RLS policies and helper functions are defined in `awcms/supabase/migrations`.
 
 ## References
 

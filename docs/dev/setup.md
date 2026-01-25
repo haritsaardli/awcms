@@ -4,7 +4,7 @@
 
 - **Node.js**: v20.0.0 or higher (LTS recommended)
 - **npm**: v10+
-- **Flutter**: v3.19+ (if working on mobile)
+- **Flutter**: v3.38.5+ (if working on mobile)
 - **PlatformIO**: Core 6.1+ (if working on IoT)
 - **Supabase CLI**: v1.130+
 

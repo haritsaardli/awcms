@@ -3,6 +3,20 @@
 
 All notable changes to the **AWCMS** project will be documented in this file.
 
+## [Unreleased]
+
+### Added
+
+- **Documentation**:
+  - Added "How to Choose and Use AI Models in OpenCode Zen" guide (`docs/guides/opencode-models.md`).
+
+### Changed
+
+- **Public Portal (Smandapbun)**:
+  - Upgraded TailwindCSS to v4.
+- **CI/CD**:
+  - Updated CI workflow configuration.
+
 ## [2.24.0] "Nexus" - 2026-01-23
 
 ### Added
