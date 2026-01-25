@@ -11,6 +11,11 @@ on:
 
 env:
   NODE_VERSION: '20'
+  # Global Environment Variables
+  VITE_SUPABASE_URL: "${{ secrets.VITE_SUPABASE_URL }}"
+  VITE_SUPABASE_ANON_KEY: "${{ secrets.VITE_SUPABASE_ANON_KEY }}"
+  PUBLIC_SUPABASE_URL: "${{ secrets.VITE_SUPABASE_URL }}"
+  PUBLIC_SUPABASE_ANON_KEY: "${{ secrets.VITE_SUPABASE_ANON_KEY }}"
 
 permissions:
   contents: read
