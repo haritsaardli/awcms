@@ -46,7 +46,7 @@ Public styling uses TailwindCSS 4 via `@tailwindcss/vite`.
 ### Mobile (awcms-mobile/primary)
 
 | Category | Technology | Version | Purpose |
-| --- | --- | --- |
+| --- | --- | --- | --- |
 | Framework | Flutter | 3.38.5 | Mobile app |
 | State | Riverpod | 3.1.0 | State management |
 | Supabase | supabase_flutter | 2.8.0 | Auth and data |
@@ -56,7 +56,7 @@ Public styling uses TailwindCSS 4 via `@tailwindcss/vite`.
 ### IoT (awcms-esp32/primary)
 
 | Category | Technology | Version | Purpose |
-| --- | --- | --- |
+| --- | --- | --- | --- |
 | Firmware | ESP32 | - | IoT device |
 | Build | PlatformIO | - | Build and upload |
 
