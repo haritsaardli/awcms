@@ -416,6 +416,32 @@ case 'delete': {
 
 ---
 
+## 🔌 Unified MCP Server
+
+AWCMS provides a "Swiss Army Knife" MCP server in `awcms-mcp/` that grants Agents capabilities across the entire stack.
+
+### 1. Supabase Tools
+*   `supabase_status`: Check local stack status.
+*   `supabase_db_pull`: Sync remote schema to local migrations.
+*   `supabase_db_push`: Push local migrations to remote.
+*   `supabase_migration_new`: Create new migration files.
+*   `supabase_gen_types`: Generate TypeScript types.
+
+### 2. Context7 Tools (AI Documentation)
+*   `context7_search`: Query the Context7 documentation index for up-to-date library usage (e.g., "how to use Supabase Auth with RLS").
+    *   **Requirement**: Set `CONTEXT7_API_KEY` in `.env`.
+
+### 3. Flutter Tools (Mobile)
+*   `flutter_doctor`: Check mobile environment health.
+*   `flutter_pub_get`: Install mobile dependencies.
+*   `flutter_analyze`: Run static analysis on `awcms-mobile`.
+
+### Setup
+1.  Ensure `awcms/.env` has `SUPABASE_DB_URL` and `CONTEXT7_API_KEY`.
+2.  Run `cd awcms-mcp && npm run dev`.
+
+---
+
 ## 🔐 Permission Checks
 
 ### Key Format Compliance
